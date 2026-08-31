@@ -1,132 +1,922 @@
 <!doctype html>
 <html lang="es">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+
 <title>Red Transporte Mocoa — MVP</title>
+
 <style>
-*{box-sizing:border-box}body{margin:0;background:#eef2f5;color:#18232d;font-family:Arial,sans-serif}
-.app{max-width:440px;margin:16px auto;background:#fff;min-height:800px;border-radius:24px;overflow:hidden;box-shadow:0 8px 30px #0002}
-header{background:#173b57;color:white;padding:20px}.brand{font-size:22px;font-weight:800}.sub{font-size:12px;opacity:.8;margin-top:5px}
-main{padding:20px}.screen{display:none}.screen.active{display:block}h1{font-size:25px;margin:8px 0}h2{font-size:20px;margin:8px 0}p{color:#687681;line-height:1.4}
-.card{border:1px solid #dce4e9;border-radius:14px;padding:15px;margin:12px 0}.btn{width:100%;border:0;border-radius:11px;padding:14px;margin-top:10px;background:#1670ad;color:#fff;font-weight:700;font-size:15px;cursor:pointer}.btn.alt{background:#e8edf1;color:#173b57}
-label{display:block;font-size:12px;font-weight:700;margin:11px 0 5px}input,select{width:100%;padding:11px;border:1px solid #cdd7de;border-radius:9px;font-size:14px}
-.row{display:flex;gap:9px}.row>div{flex:1}.pill{display:inline-block;padding:5px 8px;border-radius:20px;background:#edf7ef;font-size:12px;color:#28702f;font-weight:700}
-.dark{background:#f5f7f9}.price{font-size:21px;font-weight:800}.small{font-size:12px}.top{display:flex;justify-content:space-between;align-items:center}.nav{display:flex;gap:7px;margin-top:20px}.nav button{flex:1;padding:10px;border:0;border-radius:9px;background:#edf1f4;cursor:pointer}
-.alert{background:#fff5dd;border:1px solid #f1d99b;padding:12px;border-radius:10px}
-</style></head>
+*{box-sizing:border-box}
+
+body{
+  margin:0;
+  background:#eef2f5;
+  color:#18232d;
+  font-family:Arial,sans-serif
+}
+
+.app{
+  max-width:440px;
+  margin:16px auto;
+  background:#fff;
+  min-height:800px;
+  border-radius:24px;
+  overflow:hidden;
+  box-shadow:0 8px 30px #0002
+}
+
+header{
+  background:#173b57;
+  color:white;
+  padding:20px
+}
+
+.brand{
+  font-size:22px;
+  font-weight:800
+}
+
+.sub{
+  font-size:12px;
+  opacity:.8;
+  margin-top:5px
+}
+
+main{
+  padding:20px
+}
+
+.screen{
+  display:none
+}
+
+.screen.active{
+  display:block
+}
+
+h1{
+  font-size:25px;
+  margin:8px 0
+}
+
+h2{
+  font-size:20px;
+  margin:8px 0
+}
+
+p{
+  color:#687681;
+  line-height:1.4
+}
+
+.card{
+  border:1px solid #dce4e9;
+  border-radius:14px;
+  padding:15px;
+  margin:12px 0
+}
+
+.btn{
+  width:100%;
+  border:0;
+  border-radius:11px;
+  padding:14px;
+  margin-top:10px;
+  background:#1670ad;
+  color:#fff;
+  font-weight:700;
+  font-size:15px;
+  cursor:pointer
+}
+
+.btn.alt{
+  background:#e8edf1;
+  color:#173b57
+}
+
+label{
+  display:block;
+  font-size:12px;
+  font-weight:700;
+  margin:11px 0 5px
+}
+
+input,select{
+  width:100%;
+  padding:11px;
+  border:1px solid #cdd7de;
+  border-radius:9px;
+  font-size:14px
+}
+
+.row{
+  display:flex;
+  gap:9px
+}
+
+.row>div{
+  flex:1
+}
+
+.pill{
+  display:inline-block;
+  padding:5px 8px;
+  border-radius:20px;
+  background:#edf7ef;
+  font-size:12px;
+  color:#28702f;
+  font-weight:700
+}
+
+.dark{
+  background:#f5f7f9
+}
+
+.price{
+  font-size:21px;
+  font-weight:800
+}
+
+.small{
+  font-size:12px
+}
+
+.top{
+  display:flex;
+  justify-content:space-between;
+  align-items:center
+}
+
+.nav{
+  display:flex;
+  gap:7px;
+  margin-top:20px
+}
+
+.nav button{
+  flex:1;
+  padding:10px;
+  border:0;
+  border-radius:9px;
+  background:#edf1f4;
+  cursor:pointer
+}
+
+.alert{
+  background:#fff5dd;
+  border:1px solid #f1d99b;
+  padding:12px;
+  border-radius:10px
+}
+
+.success{
+  background:#edf7ef;
+  border:1px solid #b9ddbd;
+  padding:12px;
+  border-radius:10px
+}
+</style>
+</head>
+
 <body>
+
 <div class="app">
-<header><div class="brand">🚛 RED TRANSPORTE MOCOA</div><div class="sub">MVP · disponibilidad local en tiempo real</div></header>
+
+<header>
+  <div class="brand">🚛 RED TRANSPORTE MOCOA</div>
+  <div class="sub">MVP · disponibilidad local en tiempo real</div>
+</header>
+
 <main>
 
+<!-- INICIO -->
+
 <section id="home" class="screen active">
+
 <h1>¿Necesitas transporte ahora?</h1>
-<p>Encuentra un socio disponible para llevar tu mercancía dentro de Mocoa.</p>
-<div class="card"><b>📦 Tu necesidad</b><p>Indica origen, destino, carga y cantidad. La red busca automáticamente quién puede atenderte.</p></div>
-<button class="btn" onclick="show('request')">Solicitar transporte</button>
-<button class="btn alt" onclick="show('partnerHome')">Soy socio transportador</button>
+
+<p>
+Encuentra un socio disponible para llevar tu mercancía dentro de Mocoa.
+</p>
+
+<div class="card">
+<b>📦 Tu necesidad</b>
+
+<p>
+Indica origen, destino, carga y cantidad.
+La red busca automáticamente quién puede atenderte.
+</p>
+</div>
+
+<button class="btn" onclick="show('request')">
+Solicitar transporte
+</button>
+
+<button class="btn alt" onclick="show('partnerHome')">
+Soy socio transportador
+</button>
+
 </section>
+
+
+<!-- SOLICITUD -->
 
 <section id="request" class="screen">
+
 <h2>Nueva solicitud</h2>
-<label>Origen</label><input id="origin" value="Ferretería — Mocoa">
-<label>Destino</label><input id="dest" value="Vereda El Rumiyaco">
-<div class="row"><div><label>Mercancía</label><input id="cargo" value="Cemento"></div><div><label>Bultos</label><input id="bags" type="number" value="100"></div></div>
-<label>Peso aproximado por bulto (kg)</label><input id="kg" type="number" value="50">
-<label>¿Cuándo?</label><select id="when"><option>Ahora</option><option>Hoy más tarde</option><option>Programado</option></select>
-<button class="btn" onclick="sendDemand()">🚀 Buscar socio disponible ahora</button>
-<button class="btn alt" onclick="show('home')">Volver</button>
+
+<label>Origen</label>
+<input id="origin" value="Ferretería — Mocoa">
+
+<label>Destino</label>
+<input id="dest" value="Vereda El Rumiyaco">
+
+<div class="row">
+
+<div>
+<label>Mercancía</label>
+<input id="cargo" value="Cemento">
+</div>
+
+<div>
+<label>Bultos</label>
+<input id="bags" type="number" value="100">
+</div>
+
+</div>
+
+<label>Peso aproximado por bulto (kg)</label>
+<input id="kg" type="number" value="50">
+
+<label>¿Cuándo?</label>
+
+<select id="when">
+<option>Ahora</option>
+<option>Hoy más tarde</option>
+<option>Programado</option>
+</select>
+
+<button class="btn" onclick="sendDemand()">
+🚀 Buscar socio disponible ahora
+</button>
+
+<button class="btn alt" onclick="show('home')">
+Volver
+</button>
+
 </section>
+
+
+<!-- BUSCANDO -->
 
 <section id="matching" class="screen">
+
 <h2>🔎 Buscando en la red</h2>
-<div class="alert"><b>Demanda creada #MO-001</b><br><span id="demandText"></span></div>
-<p>La APP está filtrando por <b>disponibilidad + capacidad + cercanía</b>.</p>
-<div class="card"><b>Socios consultados</b><p>🟢 Carlos — disponible<br>🔴 Pedro — en servicio<br>🟢 Andrés — disponible<br>🟡 Luis — no disponible ahora</p></div>
-<button class="btn" onclick="notifyPartner()">Ver socio seleccionado</button>
+
+<div class="success">
+
+<b>Demanda creada correctamente</b>
+
+<br>
+
+<span id="demandText"></span>
+
+</div>
+
+<p>
+La APP está filtrando por
+<b>disponibilidad + capacidad + cercanía</b>.
+</p>
+
+<div class="card">
+
+<b>Socios consultados</b>
+
+<p>
+🟢 Carlos — disponible<br>
+🔴 Pedro — en servicio<br>
+🟢 Andrés — disponible<br>
+🟡 Luis — no disponible ahora
+</p>
+
+</div>
+
+<button class="btn" onclick="notifyPartner()">
+Ver socio seleccionado
+</button>
+
 </section>
+
+
+<!-- SOCIO SELECCIONADO -->
 
 <section id="assignment" class="screen">
+
 <h2>🎯 Socio seleccionado</h2>
-<div class="card"><div class="top"><b>🟢 Carlos</b><span class="pill">Disponible ahora</span></div><p>🚚 Camión 3 toneladas<br>📍 A 1,4 km del origen<br>⭐ 4,9 · 118 servicios</p><p class="price">$85.000</p><button class="btn" onclick="acceptService()">Asignar servicio</button></div>
-<p class="small">En el MVP, el sistema prioriza al socio disponible que cumple la capacidad y está más cerca.</p>
+
+<div class="card">
+
+<div class="top">
+
+<b>🟢 Carlos</b>
+
+<span class="pill">
+Disponible ahora
+</span>
+
+</div>
+
+<p>
+🚚 Camión 3 toneladas<br>
+📍 A 1,4 km del origen<br>
+⭐ 4,9 · 118 servicios
+</p>
+
+<p class="price">
+$85.000
+</p>
+
+<button class="btn" onclick="acceptService()">
+Asignar servicio
+</button>
+
+</div>
+
+<p class="small">
+En el MVP, el sistema prioriza al socio disponible que cumple la capacidad y está más cerca.
+</p>
+
 </section>
+
+
+<!-- SERVICIO ACTIVO -->
 
 <section id="active" class="screen">
+
 <h2>✅ Servicio confirmado</h2>
-<div class="card"><b>Socio: Carlos</b><p>🚚 Camión 3 toneladas<br>📍 Ferretería → El Rumiyaco</p><div class="pill">🔴 En servicio</div><p class="small">Al aceptar, el socio deja automáticamente de estar disponible para nuevas demandas.</p></div>
-<div class="card"><b>Estado del servicio</b><p>🟢 Asignado<br>🚚 En camino a recoger<br>📦 Mercancía recogida<br>🛣️ En tránsito<br>⬜ Entregado</p></div>
-<button class="btn" onclick="deliver()">Confirmar entrega</button>
+
+<div class="card">
+
+<b>Socio: Carlos</b>
+
+<p>
+🚚 Camión 3 toneladas<br>
+📍 Ferretería → El Rumiyaco
+</p>
+
+<div class="pill">
+🔴 En servicio
+</div>
+
+<p class="small">
+Al aceptar, el socio deja automáticamente de estar disponible para nuevas demandas.
+</p>
+
+</div>
+
+<div class="card">
+
+<b>Estado del servicio</b>
+
+<p>
+🟢 Asignado<br>
+🚚 En camino a recoger<br>
+📦 Mercancía recogida<br>
+🛣️ En tránsito<br>
+⬜ Entregado
+</p>
+
+</div>
+
+<button class="btn" onclick="deliver()">
+Confirmar entrega
+</button>
+
 </section>
+
+
+<!-- ENTREGA -->
 
 <section id="delivered" class="screen">
-<h2>📦 Entrega realizada</h2><div class="card"><div class="pill">Servicio finalizado</div><p>El socio Carlos vuelve automáticamente a:</p><h3>🟢 DISPONIBLE</h3><p>La red ya puede ofrecerle nuevas solicitudes.</p></div>
-<button class="btn" onclick="show('home')">Nueva solicitud</button>
+
+<h2>📦 Entrega realizada</h2>
+
+<div class="card">
+
+<div class="pill">
+Servicio finalizado
+</div>
+
+<p>
+El socio Carlos vuelve automáticamente a:
+</p>
+
+<h3>
+🟢 DISPONIBLE
+</h3>
+
+<p>
+La red ya puede ofrecerle nuevas solicitudes.
+</p>
+
+</div>
+
+<button class="btn" onclick="show('home')">
+Nueva solicitud
+</button>
+
 </section>
+
+
+<!-- SOCIO -->
 
 <section id="partnerHome" class="screen">
-<h2>🚚 Panel del socio</h2><div class="card"><div class="top"><b>Estado actual</b><span class="pill">🟢 Disponible</span></div><p>Camión 3 toneladas · Mocoa</p><button class="btn" onclick="show('partnerDemand')">Ver demanda disponible</button></div>
-<button class="btn alt" onclick="show('home')">Volver</button>
+
+<h2>🚚 Panel del socio</h2>
+
+<div class="card">
+
+<div class="top">
+
+<b>Estado actual</b>
+
+<span class="pill">
+🟢 Disponible
+</span>
+
+</div>
+
+<p>
+Camión 3 toneladas · Mocoa
+</p>
+
+<button class="btn" onclick="show('partnerDemand')">
+Ver demanda disponible
+</button>
+
+</div>
+
+<button class="btn alt" onclick="show('home')">
+Volver
+</button>
+
 </section>
+
+
+<!-- DEMANDA DEL SOCIO -->
 
 <section id="partnerDemand" class="screen">
-<h2>🔔 Nueva demanda</h2><div class="card"><b>Solicitud #MO-001</b><p>📍 Recoger: Ferretería — Mocoa<br>📍 Entregar: Vereda El Rumiyaco<br>📦 100 bultos de cemento<br>⚖️ 5.000 kg total</p><div class="alert">Esta carga requiere revisar si se realiza en uno o varios viajes según capacidad y condiciones.</div><p class="price">$85.000</p><button class="btn" onclick="acceptService()">Aceptar servicio</button><button class="btn alt" onclick="show('partnerHome')">Rechazar</button></div>
+
+<h2>🔔 Nueva demanda</h2>
+
+<div class="card">
+
+<b>Solicitud activa</b>
+
+<p>
+📍 Recoger: Ferretería — Mocoa<br>
+📍 Entregar: Vereda El Rumiyaco<br>
+📦 100 bultos de cemento<br>
+⚖️ 5.000 kg total
+</p>
+
+<div class="alert">
+
+Esta carga requiere revisar si se realiza en uno o varios viajes según capacidad y condiciones.
+
+</div>
+
+<p class="price">
+$85.000
+</p>
+
+<button class="btn" onclick="acceptService()">
+Aceptar servicio
+</button>
+
+<button class="btn alt" onclick="show('partnerHome')">
+Rechazar
+</button>
+
+</div>
+
 </section>
+
+
+<!-- CENTRAL -->
 
 <section id="admin" class="screen">
+
 <h2>🖥️ Central de operaciones — Mocoa</h2>
+
 <div class="card">
-<div class="top"><b>Estado de la red</b><span class="small">Actualizado ahora</span></div>
+
+<div class="top">
+
+<b>Estado de la red</b>
+
+<span class="small">
+Actualizado ahora
+</span>
+
+</div>
+
 <div class="row">
-<div><h3 style="margin:10px 0 2px;color:#28702f">🟢 8</h3><span class="small">Libres</span></div>
-<div><h3 style="margin:10px 0 2px;color:#b07a00">🟡 3</h3><span class="small">En camino</span></div>
-<div><h3 style="margin:10px 0 2px;color:#a52a2a">🔴 7</h3><span class="small">Ocupados</span></div>
-<div><h3 style="margin:10px 0 2px">⚪ 2</h3><span class="small">No disp.</span></div>
-</div>
-<p><b>20 socios</b> · Capacidad disponible estimada: <b>18 toneladas</b></p>
+
+<div>
+<h3 style="margin:10px 0 2px">🟢 8</h3>
+<span class="small">Libres</span>
 </div>
 
+<div>
+<h3 style="margin:10px 0 2px">🟡 3</h3>
+<span class="small">En camino</span>
+</div>
+
+<div>
+<h3 style="margin:10px 0 2px">🔴 7</h3>
+<span class="small">Ocupados</span>
+</div>
+
+<div>
+<h3 style="margin:10px 0 2px">⚪ 2</h3>
+<span class="small">No disp.</span>
+</div>
+
+</div>
+
+<p>
+<b>20 socios</b> · Capacidad disponible estimada:
+<b>18 toneladas</b>
+</p>
+
+</div>
+
+
 <div class="card">
+
 <b>📍 Mapa operativo</b>
-<div style="height:230px;background:linear-gradient(135deg,#e8f0e5,#dce9f2);border-radius:12px;margin-top:12px;position:relative;overflow:hidden">
+
+<div style="
+height:230px;
+background:linear-gradient(135deg,#e8f0e5,#dce9f2);
+border-radius:12px;
+margin-top:12px;
+position:relative;
+overflow:hidden">
+
 <div style="position:absolute;left:18%;top:30%;font-size:28px">🟢</div>
+
 <div style="position:absolute;left:55%;top:18%;font-size:28px">🟢</div>
+
 <div style="position:absolute;left:70%;top:55%;font-size:28px">🔴</div>
+
 <div style="position:absolute;left:35%;top:68%;font-size:28px">🟡</div>
+
 <div style="position:absolute;left:80%;top:28%;font-size:28px">🔴</div>
-<div style="position:absolute;left:8%;bottom:12px;background:#fff;padding:6px 9px;border-radius:8px;font-size:11px">📍 Mocoa</div>
-<div style="position:absolute;right:8px;bottom:12px;background:#fff;padding:6px 9px;border-radius:8px;font-size:11px">🟢 libre · 🟡 camino · 🔴 ocupado</div>
-</div>
+
+<div style="
+position:absolute;
+left:8%;
+bottom:12px;
+background:#fff;
+padding:6px 9px;
+border-radius:8px;
+font-size:11px">
+📍 Mocoa
 </div>
 
-<div class="card">
-<div class="top"><b>🚚 Socios en la red</b><span class="small">20 registrados</span></div>
-<div class="card dark"><div class="top"><b>Carlos</b><span class="pill">🟢 LIBRE</span></div><p>Camión 3 t · Centro · 1,4 km del último origen</p></div>
-<div class="card dark"><div class="top"><b>Andrés</b><span class="pill">🟢 LIBRE</span></div><p>Camión 2 t · San Miguel · Disponible ahora</p></div>
-<div class="card dark"><div class="top"><b>Pedro</b><span style="color:#a52a2a;font-weight:700">🔴 OCUPADO</span></div><p>Camión 3 t · Servicio: Centro → Rumiyaco</p></div>
-<div class="card dark"><div class="top"><b>Luis</b><span style="color:#b07a00;font-weight:700">🟡 EN CAMINO</span></div><p>Triciclo · Dirigiéndose al punto de recogida</p></div>
-<div class="card dark"><div class="top"><b>Jorge</b><span style="color:#a52a2a;font-weight:700">🔴 OCUPADO</span></div><p>Camión 2 t · Servicio activo</p></div>
 </div>
 
+</div>
+
+
 <div class="card">
+
+<div class="top">
+
+<b>🚚 Socios en la red</b>
+
+<span class="small">
+20 registrados
+</span>
+
+</div>
+
+<div class="card dark">
+
+<div class="top">
+
+<b>Carlos</b>
+
+<span class="pill">
+🟢 LIBRE
+</span>
+
+</div>
+
+<p>
+Camión 3 t · Centro · 1,4 km del último origen
+</p>
+
+</div>
+
+
+<div class="card dark">
+
+<div class="top">
+
+<b>Andrés</b>
+
+<span class="pill">
+🟢 LIBRE
+</span>
+
+</div>
+
+<p>
+Camión 2 t · San Miguel · Disponible ahora
+</p>
+
+</div>
+
+
+<div class="card dark">
+
+<div class="top">
+
+<b>Pedro</b>
+
+<span style="color:#a52a2a;font-weight:700">
+🔴 OCUPADO
+</span>
+
+</div>
+
+<p>
+Camión 3 t · Servicio: Centro → Rumiyaco
+</p>
+
+</div>
+
+
+<div class="card dark">
+
+<div class="top">
+
+<b>Luis</b>
+
+<span style="color:#b07a00;font-weight:700">
+🟡 EN CAMINO
+</span>
+
+</div>
+
+<p>
+Triciclo · Dirigiéndose al punto de recogida
+</p>
+
+</div>
+
+
+<div class="card dark">
+
+<div class="top">
+
+<b>Jorge</b>
+
+<span style="color:#a52a2a;font-weight:700">
+🔴 OCUPADO
+</span>
+
+</div>
+
+<p>
+Camión 2 t · Servicio activo
+</p>
+
+</div>
+
+</div>
+
+
+<div class="card">
+
 <b>📦 Demanda activa</b>
-<p><b>#MO-001</b><br>100 bultos de cemento · Ferretería → El Rumiyaco</p>
-<span class="pill">Asignada a Carlos</span>
+
+<p id="adminDemand">
+No hay demanda registrada todavía.
+</p>
+
 </div>
+
 </section>
 
-<div class="nav"><button onclick="show('home')">Inicio</button><button onclick="show('request')">Solicitar</button><button onclick="show('partnerHome')">Socio</button><button onclick="show('admin')">Central</button></div>
-</main></div>
+
+<!-- NAVEGACIÓN -->
+
+<div class="nav">
+
+<button onclick="show('home')">
+Inicio
+</button>
+
+<button onclick="show('request')">
+Solicitar
+</button>
+
+<button onclick="show('partnerHome')">
+Socio
+</button>
+
+<button onclick="show('admin')">
+Central
+</button>
+
+</div>
+
+</main>
+</div>
+
+
+<!-- SUPABASE -->
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
-function show(id){document.querySelectorAll('.screen').forEach(x=>x.classList.remove('active'));document.getElementById(id).classList.add('active')}
-function sendDemand(){
- let o=document.getElementById('origin').value,d=document.getElementById('dest').value,c=document.getElementById('cargo').value,b=document.getElementById('bags').value,k=document.getElementById('kg').value;
- document.getElementById('demandText').textContent=`${b} bultos de ${c} · ${b*k} kg · ${o} → ${d}`;
- show('matching');
+
+/* ================================
+   CONFIGURACIÓN SUPABASE
+   ================================ */
+
+const SUPABASE_URL =
+'https://lmmbbivyhhjepjfengtt.supabase.co';
+
+const SUPABASE_KEY =
+'TU_CLAVE_PUBLISHABLE';
+
+
+const supabaseClient =
+window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_KEY
+);
+
+
+/* ================================
+   CAMBIAR PANTALLA
+   ================================ */
+
+function show(id){
+
+  document
+    .querySelectorAll('.screen')
+    .forEach(x =>
+      x.classList.remove('active')
+    );
+
+  const screen =
+    document.getElementById(id);
+
+  if(screen){
+    screen.classList.add('active');
+  }
+
 }
-function notifyPartner(){show('assignment')}
-function acceptService(){show('active')}
-function deliver(){show('delivered')}
+
+
+/* ================================
+   CREAR SOLICITUD
+   ================================ */
+
+async function sendDemand(){
+
+  const o =
+    document.getElementById('origin').value;
+
+  const d =
+    document.getElementById('dest').value;
+
+  const c =
+    document.getElementById('cargo').value;
+
+  const b =
+    Number(
+      document.getElementById('bags').value
+    );
+
+  const k =
+    Number(
+      document.getElementById('kg').value
+    );
+
+  const totalKg = b * k;
+
+
+  if(!o || !d || !c || !b || !k){
+
+    alert(
+      'Por favor completa todos los datos.'
+    );
+
+    return;
+  }
+
+
+  /* Guardar en Supabase */
+
+  const { data, error } =
+    await supabaseClient
+      .from('solicitudes')
+      .insert([{
+
+        origen: o,
+
+        destino: d,
+
+        mercancia: c,
+
+        bultos: b,
+
+        peso_kg: totalKg,
+
+        estado: 'pendiente'
+
+      }])
+      .select()
+      .single();
+
+
+  if(error){
+
+    console.error(error);
+
+    alert(
+      'No se pudo crear la solicitud:\n\n' +
+      error.message
+    );
+
+    return;
+  }
+
+
+  /* Mostrar información */
+
+  document
+    .getElementById('demandText')
+    .textContent =
+      `${b} bultos de ${c} · ${totalKg} kg · ${o} → ${d}`;
+
+
+  document
+    .getElementById('adminDemand')
+    .innerHTML =
+      `<b>Solicitud creada</b><br>
+       ${b} bultos de ${c}<br>
+       ${totalKg} kg<br>
+       ${o} → ${d}<br>
+       <span class="pill">Pendiente</span>`;
+
+
+  show('matching');
+
+}
+
+
+/* ================================
+   MOSTRAR SOCIO
+   ================================ */
+
+function notifyPartner(){
+
+  show('assignment');
+
+}
+
+
+/* ================================
+   ACEPTAR SERVICIO
+   ================================ */
+
+function acceptService(){
+
+  show('active');
+
+}
+
+
+/* ================================
+   FINALIZAR SERVICIO
+   ================================ */
+
+function deliver(){
+
+  show('delivered');
+
+}
+
 </script>
-</body></html>
+
+</body>
+</html>
