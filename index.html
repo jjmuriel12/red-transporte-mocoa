@@ -3,19 +3,16 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-
-<title>Red Transporte Mocoa — MVP</title>
+<title>Red Transporte Mocoa</title>
 
 <style>
 *{box-sizing:border-box}
-
 body{
   margin:0;
   background:#eef2f5;
   color:#18232d;
   font-family:Arial,sans-serif
 }
-
 .app{
   max-width:440px;
   margin:16px auto;
@@ -25,58 +22,25 @@ body{
   overflow:hidden;
   box-shadow:0 8px 30px #0002
 }
-
 header{
   background:#173b57;
   color:white;
   padding:20px
 }
-
-.brand{
-  font-size:22px;
-  font-weight:800
-}
-
-.sub{
-  font-size:12px;
-  opacity:.8;
-  margin-top:5px
-}
-
-main{
-  padding:20px
-}
-
-.screen{
-  display:none
-}
-
-.screen.active{
-  display:block
-}
-
-h1{
-  font-size:25px;
-  margin:8px 0
-}
-
-h2{
-  font-size:20px;
-  margin:8px 0
-}
-
-p{
-  color:#687681;
-  line-height:1.4
-}
-
+.brand{font-size:22px;font-weight:800}
+.sub{font-size:12px;opacity:.8;margin-top:5px}
+main{padding:20px}
+.screen{display:none}
+.screen.active{display:block}
+h1{font-size:25px;margin:8px 0}
+h2{font-size:20px;margin:8px 0}
+p{color:#687681;line-height:1.4}
 .card{
   border:1px solid #dce4e9;
   border-radius:14px;
   padding:15px;
   margin:12px 0
 }
-
 .btn{
   width:100%;
   border:0;
@@ -89,19 +53,13 @@ p{
   font-size:15px;
   cursor:pointer
 }
-
-.btn.alt{
-  background:#e8edf1;
-  color:#173b57
-}
-
+.btn.alt{background:#e8edf1;color:#173b57}
 label{
   display:block;
   font-size:12px;
   font-weight:700;
   margin:11px 0 5px
 }
-
 input,select{
   width:100%;
   padding:11px;
@@ -109,16 +67,8 @@ input,select{
   border-radius:9px;
   font-size:14px
 }
-
-.row{
-  display:flex;
-  gap:9px
-}
-
-.row>div{
-  flex:1
-}
-
+.row{display:flex;gap:9px}
+.row>div{flex:1}
 .pill{
   display:inline-block;
   padding:5px 8px;
@@ -128,32 +78,19 @@ input,select{
   color:#28702f;
   font-weight:700
 }
-
-.dark{
-  background:#f5f7f9
-}
-
-.price{
-  font-size:21px;
-  font-weight:800
-}
-
-.small{
-  font-size:12px
-}
-
+.dark{background:#f5f7f9}
+.price{font-size:21px;font-weight:800}
+.small{font-size:12px}
 .top{
   display:flex;
   justify-content:space-between;
   align-items:center
 }
-
 .nav{
   display:flex;
   gap:7px;
   margin-top:20px
 }
-
 .nav button{
   flex:1;
   padding:10px;
@@ -162,19 +99,35 @@ input,select{
   background:#edf1f4;
   cursor:pointer
 }
-
 .alert{
   background:#fff5dd;
   border:1px solid #f1d99b;
   padding:12px;
   border-radius:10px
 }
-
-.success{
-  background:#edf7ef;
-  border:1px solid #b9ddbd;
+.socio{
+  border:1px solid #dce4e9;
+  border-radius:12px;
+  padding:13px;
+  margin:10px 0;
+  cursor:pointer
+}
+.socio:hover{background:#f5f8fa}
+.error{
+  background:#ffe8e8;
+  border:1px solid #e5aaaa;
+  color:#8b2222;
   padding:12px;
-  border-radius:10px
+  border-radius:10px;
+  margin:10px 0
+}
+.success{
+  background:#e8f7eb;
+  border:1px solid #a9d8b1;
+  color:#246b2d;
+  padding:12px;
+  border-radius:10px;
+  margin:10px 0
 }
 </style>
 </head>
@@ -191,7 +144,6 @@ input,select{
 <main>
 
 <!-- INICIO -->
-
 <section id="home" class="screen active">
 
 <h1>¿Necesitas transporte ahora?</h1>
@@ -202,10 +154,9 @@ Encuentra un socio disponible para llevar tu mercancía dentro de Mocoa.
 
 <div class="card">
 <b>📦 Tu necesidad</b>
-
 <p>
 Indica origen, destino, carga y cantidad.
-La red busca automáticamente quién puede atenderte.
+La red buscará automáticamente un socio disponible.
 </p>
 </div>
 
@@ -221,7 +172,6 @@ Soy socio transportador
 
 
 <!-- SOLICITUD -->
-
 <section id="request" class="screen">
 
 <h2>Nueva solicitud</h2>
@@ -268,136 +218,51 @@ Volver
 </section>
 
 
-<!-- BUSCANDO -->
-
+<!-- RESULTADO -->
 <section id="matching" class="screen">
 
-<h2>🔎 Buscando en la red</h2>
+<h2>🔎 Socios disponibles</h2>
 
-<div class="success">
-
-<b>Demanda creada correctamente</b>
-
-<br>
-
-<span id="demandText"></span>
-
-</div>
+<div id="demandBox" class="alert"></div>
 
 <p>
-La APP está filtrando por
-<b>disponibilidad + capacidad + cercanía</b>.
+Mostramos socios registrados en Supabase que están disponibles y tienen capacidad suficiente.
 </p>
 
-<div class="card">
+<div id="sociosLista"></div>
 
-<b>Socios consultados</b>
-
-<p>
-🟢 Carlos — disponible<br>
-🔴 Pedro — en servicio<br>
-🟢 Andrés — disponible<br>
-🟡 Luis — no disponible ahora
-</p>
-
-</div>
-
-<button class="btn" onclick="notifyPartner()">
-Ver socio seleccionado
+<button class="btn alt" onclick="show('request')">
+Nueva búsqueda
 </button>
 
 </section>
 
 
 <!-- SOCIO SELECCIONADO -->
-
 <section id="assignment" class="screen">
 
 <h2>🎯 Socio seleccionado</h2>
 
-<div class="card">
-
-<div class="top">
-
-<b>🟢 Carlos</b>
-
-<span class="pill">
-Disponible ahora
-</span>
-
-</div>
-
-<p>
-🚚 Camión 3 toneladas<br>
-📍 A 1,4 km del origen<br>
-⭐ 4,9 · 118 servicios
-</p>
-
-<p class="price">
-$85.000
-</p>
-
-<button class="btn" onclick="acceptService()">
-Asignar servicio
-</button>
-
-</div>
-
-<p class="small">
-En el MVP, el sistema prioriza al socio disponible que cumple la capacidad y está más cerca.
-</p>
+<div id="assignmentBox"></div>
 
 </section>
 
 
 <!-- SERVICIO ACTIVO -->
-
 <section id="active" class="screen">
 
 <h2>✅ Servicio confirmado</h2>
 
-<div class="card">
-
-<b>Socio: Carlos</b>
-
-<p>
-🚚 Camión 3 toneladas<br>
-📍 Ferretería → El Rumiyaco
-</p>
-
-<div class="pill">
-🔴 En servicio
-</div>
-
-<p class="small">
-Al aceptar, el socio deja automáticamente de estar disponible para nuevas demandas.
-</p>
-
-</div>
-
-<div class="card">
-
-<b>Estado del servicio</b>
-
-<p>
-🟢 Asignado<br>
-🚚 En camino a recoger<br>
-📦 Mercancía recogida<br>
-🛣️ En tránsito<br>
-⬜ Entregado
-</p>
-
-</div>
+<div id="activeBox"></div>
 
 <button class="btn" onclick="deliver()">
-Confirmar entrega
+📦 Confirmar entrega
 </button>
 
 </section>
 
 
-<!-- ENTREGA -->
-
+<!-- ENTREGADO -->
 <section id="delivered" class="screen">
 
 <h2>📦 Entrega realizada</h2>
@@ -409,16 +274,10 @@ Servicio finalizado
 </div>
 
 <p>
-El socio Carlos vuelve automáticamente a:
+El socio ha terminado el servicio y vuelve a estar disponible.
 </p>
 
-<h3>
-🟢 DISPONIBLE
-</h3>
-
-<p>
-La red ya puede ofrecerle nuevas solicitudes.
-</p>
+<h3>🟢 DISPONIBLE</h3>
 
 </div>
 
@@ -429,33 +288,16 @@ Nueva solicitud
 </section>
 
 
-<!-- SOCIO -->
-
+<!-- PANEL SOCIO -->
 <section id="partnerHome" class="screen">
 
 <h2>🚚 Panel del socio</h2>
 
-<div class="card">
+<div id="partnerStatus"></div>
 
-<div class="top">
-
-<b>Estado actual</b>
-
-<span class="pill">
-🟢 Disponible
-</span>
-
-</div>
-
-<p>
-Camión 3 toneladas · Mocoa
-</p>
-
-<button class="btn" onclick="show('partnerDemand')">
-Ver demanda disponible
+<button class="btn" onclick="loadPartnerDemands()">
+Ver demandas disponibles
 </button>
-
-</div>
 
 <button class="btn alt" onclick="show('home')">
 Volver
@@ -464,48 +306,17 @@ Volver
 </section>
 
 
-<!-- DEMANDA DEL SOCIO -->
-
+<!-- DEMANDA PARA SOCIO -->
 <section id="partnerDemand" class="screen">
 
-<h2>🔔 Nueva demanda</h2>
+<h2>🔔 Demanda disponible</h2>
 
-<div class="card">
-
-<b>Solicitud activa</b>
-
-<p>
-📍 Recoger: Ferretería — Mocoa<br>
-📍 Entregar: Vereda El Rumiyaco<br>
-📦 100 bultos de cemento<br>
-⚖️ 5.000 kg total
-</p>
-
-<div class="alert">
-
-Esta carga requiere revisar si se realiza en uno o varios viajes según capacidad y condiciones.
-
-</div>
-
-<p class="price">
-$85.000
-</p>
-
-<button class="btn" onclick="acceptService()">
-Aceptar servicio
-</button>
-
-<button class="btn alt" onclick="show('partnerHome')">
-Rechazar
-</button>
-
-</div>
+<div id="partnerDemandBox"></div>
 
 </section>
 
 
 <!-- CENTRAL -->
-
 <section id="admin" class="screen">
 
 <h2>🖥️ Central de operaciones — Mocoa</h2>
@@ -513,214 +324,43 @@ Rechazar
 <div class="card">
 
 <div class="top">
-
 <b>Estado de la red</b>
-
-<span class="small">
-Actualizado ahora
-</span>
-
+<span class="small">En vivo</span>
 </div>
 
-<div class="row">
-
-<div>
-<h3 style="margin:10px 0 2px">🟢 8</h3>
-<span class="small">Libres</span>
-</div>
-
-<div>
-<h3 style="margin:10px 0 2px">🟡 3</h3>
-<span class="small">En camino</span>
-</div>
-
-<div>
-<h3 style="margin:10px 0 2px">🔴 7</h3>
-<span class="small">Ocupados</span>
-</div>
-
-<div>
-<h3 style="margin:10px 0 2px">⚪ 2</h3>
-<span class="small">No disp.</span>
+<div id="adminStats">
+Cargando socios...
 </div>
 
 </div>
-
-<p>
-<b>20 socios</b> · Capacidad disponible estimada:
-<b>18 toneladas</b>
-</p>
-
-</div>
-
 
 <div class="card">
-
-<b>📍 Mapa operativo</b>
-
-<div style="
-height:230px;
-background:linear-gradient(135deg,#e8f0e5,#dce9f2);
-border-radius:12px;
-margin-top:12px;
-position:relative;
-overflow:hidden">
-
-<div style="position:absolute;left:18%;top:30%;font-size:28px">🟢</div>
-
-<div style="position:absolute;left:55%;top:18%;font-size:28px">🟢</div>
-
-<div style="position:absolute;left:70%;top:55%;font-size:28px">🔴</div>
-
-<div style="position:absolute;left:35%;top:68%;font-size:28px">🟡</div>
-
-<div style="position:absolute;left:80%;top:28%;font-size:28px">🔴</div>
-
-<div style="
-position:absolute;
-left:8%;
-bottom:12px;
-background:#fff;
-padding:6px 9px;
-border-radius:8px;
-font-size:11px">
-📍 Mocoa
-</div>
-
-</div>
-
-</div>
-
-
-<div class="card">
-
-<div class="top">
 
 <b>🚚 Socios en la red</b>
 
-<span class="small">
-20 registrados
-</span>
-
-</div>
-
-<div class="card dark">
-
-<div class="top">
-
-<b>Carlos</b>
-
-<span class="pill">
-🟢 LIBRE
-</span>
-
-</div>
-
-<p>
-Camión 3 t · Centro · 1,4 km del último origen
-</p>
-
-</div>
-
-
-<div class="card dark">
-
-<div class="top">
-
-<b>Andrés</b>
-
-<span class="pill">
-🟢 LIBRE
-</span>
-
-</div>
-
-<p>
-Camión 2 t · San Miguel · Disponible ahora
-</p>
-
-</div>
-
-
-<div class="card dark">
-
-<div class="top">
-
-<b>Pedro</b>
-
-<span style="color:#a52a2a;font-weight:700">
-🔴 OCUPADO
-</span>
-
-</div>
-
-<p>
-Camión 3 t · Servicio: Centro → Rumiyaco
-</p>
-
-</div>
-
-
-<div class="card dark">
-
-<div class="top">
-
-<b>Luis</b>
-
-<span style="color:#b07a00;font-weight:700">
-🟡 EN CAMINO
-</span>
-
-</div>
-
-<p>
-Triciclo · Dirigiéndose al punto de recogida
-</p>
-
-</div>
-
-
-<div class="card dark">
-
-<div class="top">
-
-<b>Jorge</b>
-
-<span style="color:#a52a2a;font-weight:700">
-🔴 OCUPADO
-</span>
-
-</div>
-
-<p>
-Camión 2 t · Servicio activo
-</p>
-
+<div id="adminSocios">
+Cargando...
 </div>
 
 </div>
-
 
 <div class="card">
 
-<b>📦 Demanda activa</b>
+<b>📦 Solicitudes</b>
 
-<p id="adminDemand">
-No hay demanda registrada todavía.
-</p>
+<div id="adminSolicitudes">
+Cargando...
+</div>
 
 </div>
 
 </section>
 
 
-<!-- NAVEGACIÓN -->
-
+<!-- NAVEGACION -->
 <div class="nav">
 
-<button onclick="show('home')">
-Inicio
-</button>
+<button onclick="show('home')">Inicio</button>
 
 <button onclick="show('request')">
 Solicitar
@@ -730,7 +370,7 @@ Solicitar
 Socio
 </button>
 
-<button onclick="show('admin')">
+<button onclick="loadAdmin()">
 Central
 </button>
 
@@ -741,180 +381,719 @@ Central
 
 
 <!-- SUPABASE -->
-
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
-
-/* ================================
-   CONFIGURACIÓN SUPABASE
-   ================================ */
 
 const SUPABASE_URL =
 'https://lmmbbivyhhjepjfengtt.supabase.co';
 
 const SUPABASE_KEY =
-'TU_CLAVE_PUBLISHABLE';
+'sb_publishable_3rK7v9Jhd0ZRv02vU4JTeg_5Q8iXArI';
 
-
-const supabaseClient =
+const supabase =
 window.supabase.createClient(
-  SUPABASE_URL,
-  SUPABASE_KEY
+SUPABASE_URL,
+SUPABASE_KEY
 );
 
 
-/* ================================
-   CAMBIAR PANTALLA
-   ================================ */
+/* NAVEGACION */
 
 function show(id){
 
-  document
-    .querySelectorAll('.screen')
-    .forEach(x =>
-      x.classList.remove('active')
-    );
+document
+.querySelectorAll('.screen')
+.forEach(x =>
+x.classList.remove('active')
+);
 
-  const screen =
-    document.getElementById(id);
+const screen =
+document.getElementById(id);
 
-  if(screen){
-    screen.classList.add('active');
-  }
+if(screen){
+screen.classList.add('active');
+}
 
 }
 
 
-/* ================================
-   CREAR SOLICITUD
-   ================================ */
+/* CREAR SOLICITUD */
 
 async function sendDemand(){
 
-  const o =
-    document.getElementById('origin').value;
+const o =
+document.getElementById('origin').value;
 
-  const d =
-    document.getElementById('dest').value;
+const d =
+document.getElementById('dest').value;
 
-  const c =
-    document.getElementById('cargo').value;
+const c =
+document.getElementById('cargo').value;
 
-  const b =
-    Number(
-      document.getElementById('bags').value
-    );
+const b =
+Number(document.getElementById('bags').value);
 
-  const k =
-    Number(
-      document.getElementById('kg').value
-    );
+const k =
+Number(document.getElementById('kg').value);
 
-  const totalKg = b * k;
+const totalKg =
+b * k;
 
 
-  if(!o || !d || !c || !b || !k){
+/* GUARDAR SOLICITUD */
 
-    alert(
-      'Por favor completa todos los datos.'
-    );
+const {data,error} =
+await supabase
+.from('solicitudes')
+.insert([{
 
-    return;
-  }
+origen:o,
+destino:d,
+mercancia:c,
+bultos:b,
+peso_kg:totalKg,
+estado:'pendiente'
 
-
-  /* Guardar en Supabase */
-
-  const { data, error } =
-    await supabaseClient
-      .from('solicitudes')
-      .insert([{
-
-        origen: o,
-
-        destino: d,
-
-        mercancia: c,
-
-        bultos: b,
-
-        peso_kg: totalKg,
-
-        estado: 'pendiente'
-
-      }])
-      .select()
-      .single();
+}])
+.select()
+.single();
 
 
-  if(error){
+if(error){
 
-    console.error(error);
+alert(
+'No se pudo crear la solicitud: ' +
+error.message
+);
 
-    alert(
-      'No se pudo crear la solicitud:\n\n' +
-      error.message
-    );
+console.error(error);
 
-    return;
-  }
-
-
-  /* Mostrar información */
-
-  document
-    .getElementById('demandText')
-    .textContent =
-      `${b} bultos de ${c} · ${totalKg} kg · ${o} → ${d}`;
-
-
-  document
-    .getElementById('adminDemand')
-    .innerHTML =
-      `<b>Solicitud creada</b><br>
-       ${b} bultos de ${c}<br>
-       ${totalKg} kg<br>
-       ${o} → ${d}<br>
-       <span class="pill">Pendiente</span>`;
-
-
-  show('matching');
+return;
 
 }
 
 
-/* ================================
-   MOSTRAR SOCIO
-   ================================ */
+/* MOSTRAR INFORMACION */
 
-function notifyPartner(){
+document
+.getElementById('demandBox')
+.innerHTML =
 
-  show('assignment');
+'<b>Solicitud creada</b><br>' +
+
+'📦 ' + b + ' bultos de ' + c +
+'<br>⚖️ ' + totalKg + ' kg' +
+'<br>📍 ' + o + ' → ' + d +
+'<br>🆔 Solicitud #' + data.id;
+
+
+/* BUSCAR SOCIOS */
+
+await buscarSocios(totalKg,data);
+
+show('matching');
+
+}
+
+
+/* BUSCAR SOCIOS */
+
+async function buscarSocios(totalKg,solicitud){
+
+const {data,error} =
+await supabase
+.from('socios')
+.select('*')
+.eq('estado','disponible')
+.gte('capacidad',totalKg);
+
+
+if(error){
+
+document
+.getElementById('sociosLista')
+.innerHTML =
+'<div class="error">' +
+'Error consultando socios: ' +
+error.message +
+'</div>';
+
+console.error(error);
+
+return;
 
 }
 
 
-/* ================================
-   ACEPTAR SERVICIO
-   ================================ */
+const lista =
+document.getElementById('sociosLista');
 
-function acceptService(){
 
-  show('active');
+if(!data || data.length === 0){
+
+lista.innerHTML =
+'<div class="alert">' +
+'⚠️ No hay socios disponibles con capacidad suficiente para esta carga.' +
+'</div>';
+
+return;
+
+}
+
+
+/* MOSTRAR SOCIOS */
+
+lista.innerHTML =
+'<h3>Socios encontrados</h3>';
+
+
+data.forEach(socio => {
+
+const div =
+document.createElement('div');
+
+div.className='socio';
+
+div.innerHTML =
+
+'<div class="top">' +
+
+'<b>🟢 ' +
+(socio.nombre || 'Socio') +
+'</b>' +
+
+'<span class="pill">' +
+'Disponible' +
+'</span>' +
+
+'</div>' +
+
+'<p>' +
+
+'🚚 Vehículo: ' +
+(socio.vehiculo || 'No registrado') +
+
+'<br>' +
+
+'⚖️ Capacidad: ' +
+(socio.capacidad || 0) +
+' kg' +
+
+'<br>' +
+
+'📞 Teléfono: ' +
+(socio.telefono || 'No registrado') +
+
+'</p>' +
+
+'<button class="btn">' +
+'Seleccionar socio' +
+'</button>';
+
+
+div
+.querySelector('button')
+.onclick =
+() =>
+seleccionarSocio(socio,solicitud);
+
+
+lista.appendChild(div);
+
+});
 
 }
 
 
-/* ================================
-   FINALIZAR SERVICIO
-   ================================ */
+/* SELECCIONAR SOCIO */
 
-function deliver(){
+async function seleccionarSocio(socio,solicitud){
 
-  show('delivered');
+const {error} =
+await supabase
+.from('socios')
+.update({
+estado:'ocupado'
+})
+.eq('id',socio.id);
+
+
+if(error){
+
+alert(
+'No se pudo asignar el socio: ' +
+error.message
+);
+
+return;
 
 }
+
+
+/* ACTUALIZAR SOLICITUD */
+
+await supabase
+.from('solicitudes')
+.update({
+estado:'asignada'
+})
+.eq('id',solicitud.id);
+
+
+/* MOSTRAR */
+
+document
+.getElementById('assignmentBox')
+.innerHTML =
+
+'<div class="success">' +
+'🟢 Socio asignado correctamente' +
+'</div>' +
+
+'<div class="card">' +
+
+'<h3>🚚 ' +
+socio.nombre +
+'</h3>' +
+
+'<p>' +
+
+'Vehículo: ' +
+socio.vehiculo +
+
+'<br>' +
+
+'Capacidad: ' +
+socio.capacidad +
+' kg' +
+
+'<br>' +
+
+'Teléfono: ' +
+socio.telefono +
+
+'</p>' +
+
+'<p class="price">' +
+'Servicio asignado' +
+'</p>' +
+
+'<button class="btn" onclick="activarServicio(' +
+solicitud.id +
+',' +
+socio.id +
+')">' +
+
+'Confirmar servicio' +
+
+'</button>' +
+
+'</div>';
+
+
+show('assignment');
+
+}
+
+
+/* ACTIVAR SERVICIO */
+
+async function activarServicio(solicitudId,socioId){
+
+await supabase
+.from('solicitudes')
+.update({
+estado:'en_servicio'
+})
+.eq('id',solicitudId);
+
+
+const {data:socio} =
+await supabase
+.from('socios')
+.select('*')
+.eq('id',socioId)
+.single();
+
+
+document
+.getElementById('activeBox')
+.innerHTML =
+
+'<div class="card">' +
+
+'<div class="pill">🔴 EN SERVICIO</div>' +
+
+'<h3>🚚 ' +
+socio.nombre +
+'</h3>' +
+
+'<p>' +
+
+'Vehículo: ' +
+socio.vehiculo +
+
+'<br>' +
+
+'Capacidad: ' +
+socio.capacidad +
+' kg' +
+
+'</p>' +
+
+'<p>' +
+
+'El socio está ocupado y no aparecerá para nuevas solicitudes.' +
+
+'</p>' +
+
+'</div>';
+
+
+show('active');
+
+}
+
+
+/* ENTREGA */
+
+async function deliver(){
+
+alert('Servicio finalizado.');
+
+show('delivered');
+
+}
+
+
+/* CARGAR DEMANDAS PARA SOCIO */
+
+async function loadPartnerDemands(){
+
+const {data,error} =
+await supabase
+.from('solicitudes')
+.select('*')
+.eq('estado','pendiente')
+.order('id',{ascending:false});
+
+
+if(error){
+
+alert(
+'Error cargando solicitudes: ' +
+error.message
+);
+
+return;
+
+}
+
+
+const box =
+document.getElementById('partnerDemandBox');
+
+
+if(!data || data.length===0){
+
+box.innerHTML =
+'<div class="alert">' +
+'No hay solicitudes pendientes en este momento.' +
+'</div>';
+
+show('partnerDemand');
+
+return;
+
+}
+
+
+box.innerHTML='';
+
+
+data.forEach(sol => {
+
+const div =
+document.createElement('div');
+
+div.className='card';
+
+div.innerHTML =
+
+'<b>📦 Solicitud #' +
+sol.id +
+'</b>' +
+
+'<p>' +
+
+'📍 ' + sol.origen +
+'<br>📍 ' + sol.destino +
+'<br>📦 ' + sol.bultos +
+' bultos de ' + sol.mercancia +
+'<br>⚖️ ' + sol.peso_kg +
+' kg' +
+
+'</p>' +
+
+'<button class="btn" onclick="aceptarDemanda(' +
+sol.id +
+')">' +
+
+'Aceptar servicio' +
+
+'</button>';
+
+box.appendChild(div);
+
+});
+
+show('partnerDemand');
+
+}
+
+
+/* ACEPTAR DEMANDA */
+
+async function aceptarDemanda(solicitudId){
+
+const {data:disponibles} =
+await supabase
+.from('socios')
+.select('*')
+.eq('estado','disponible');
+
+
+if(!disponibles || disponibles.length===0){
+
+alert('No hay socios disponibles.');
+
+return;
+
+}
+
+
+const socio =
+disponibles[0];
+
+
+/* OCUPAR SOCIO */
+
+await supabase
+.from('socios')
+.update({
+estado:'ocupado'
+})
+.eq('id',socio.id);
+
+
+/* CAMBIAR SOLICITUD */
+
+await supabase
+.from('solicitudes')
+.update({
+estado:'asignada'
+})
+.eq('id',solicitudId);
+
+
+alert(
+'Servicio aceptado por ' +
+socio.nombre
+);
+
+show('partnerHome');
+
+}
+
+
+/* ESTADO DEL PANEL */
+
+async function loadPartner(){
+
+const {data,error} =
+await supabase
+.from('socios')
+.select('*')
+.eq('estado','disponible');
+
+
+if(error)return;
+
+
+document
+.getElementById('partnerStatus')
+.innerHTML =
+
+'<div class="card">' +
+
+'<b>🟢 Socios disponibles</b>' +
+
+'<h2>' +
+(data ? data.length : 0) +
+'</h2>' +
+
+'<p>' +
+'La red muestra los socios disponibles.' +
+'</p>' +
+
+'</div>';
+
+}
+
+
+/* CENTRAL */
+
+async function loadAdmin(){
+
+const {data:socios} =
+await supabase
+.from('socios')
+.select('*');
+
+
+const {data:solicitudes} =
+await supabase
+.from('solicitudes')
+.select('*')
+.order('id',{ascending:false});
+
+
+const libres =
+(socios || [])
+.filter(x => x.estado === 'disponible')
+.length;
+
+const ocupados =
+(socios || [])
+.filter(x => x.estado === 'ocupado')
+.length;
+
+
+document
+.getElementById('adminStats')
+.innerHTML =
+
+'<div class="row">' +
+
+'<div><h3>🟢 ' +
+libres +
+'</h3><span class="small">Disponibles</span></div>' +
+
+'<div><h3>🔴 ' +
+ocupados +
+'</h3><span class="small">Ocupados</span></div>' +
+
+'</div>';
+
+
+const sociosBox =
+document.getElementById('adminSocios');
+
+sociosBox.innerHTML='';
+
+
+(socios || []).forEach(socio => {
+
+const div =
+document.createElement('div');
+
+div.className='card dark';
+
+div.innerHTML =
+
+'<div class="top">' +
+
+'<b>' +
+socio.nombre +
+'</b>' +
+
+'<span class="pill">' +
+
+(socio.estado || 'sin estado') +
+
+'</span>' +
+
+'</div>' +
+
+'<p>' +
+
+'🚚 ' +
+socio.vehiculo +
+
+'<br>' +
+
+'⚖️ ' +
+socio.capacidad +
+' kg' +
+
+'</p>';
+
+sociosBox.appendChild(div);
+
+});
+
+
+const solicitudesBox =
+document.getElementById('adminSolicitudes');
+
+solicitudesBox.innerHTML='';
+
+
+(solicitudes || []).forEach(sol => {
+
+const div =
+document.createElement('div');
+
+div.className='card dark';
+
+div.innerHTML =
+
+'<b>Solicitud #' +
+sol.id +
+'</b>' +
+
+'<p>' +
+
+'📦 ' +
+sol.bultos +
+' bultos de ' +
+sol.mercancia +
+
+'<br>' +
+
+'📍 ' +
+sol.origen +
+' → ' +
+sol.destino +
+
+'<br>' +
+
+'⚖️ ' +
+sol.peso_kg +
+' kg' +
+
+'</p>' +
+
+'<span class="pill">' +
+(sol.estado || 'sin estado') +
+'</span>';
+
+solicitudesBox.appendChild(div);
+
+});
+
+show('admin');
+
+}
+
+
+/* AL ABRIR PANEL SOCIO */
+
+document
+.querySelector('[onclick="show(\'partnerHome\')"]')
+.addEventListener('click',loadPartner);
+
 
 </script>
 
