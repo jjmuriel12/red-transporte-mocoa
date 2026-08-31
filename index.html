@@ -7,36 +7,195 @@
 
 <style>
 *{box-sizing:border-box}
-body{margin:0;background:#eef2f5;color:#18232d;font-family:Arial,sans-serif}
-.app{max-width:440px;margin:16px auto;background:#fff;min-height:800px;border-radius:24px;overflow:hidden;box-shadow:0 8px 30px #0002}
-header{background:#173b57;color:white;padding:20px}
-.brand{font-size:22px;font-weight:800}
-.sub{font-size:12px;opacity:.8;margin-top:5px}
-main{padding:20px}
-.screen{display:none}
-.screen.active{display:block}
-h1{font-size:25px;margin:8px 0}
-h2{font-size:20px;margin:8px 0}
-p{color:#687681;line-height:1.4}
-.card{border:1px solid #dce4e9;border-radius:14px;padding:15px;margin:12px 0}
-.dark{background:#f5f7f9}
-.btn{width:100%;border:0;border-radius:11px;padding:14px;margin-top:10px;background:#1670ad;color:#fff;font-weight:700;font-size:15px;cursor:pointer}
-.btn.alt{background:#e8edf1;color:#173b57}
-label{display:block;font-size:12px;font-weight:700;margin:11px 0 5px}
-input,select{width:100%;padding:11px;border:1px solid #cdd7de;border-radius:9px;font-size:14px}
-.row{display:flex;gap:9px}
-.row>div{flex:1}
-.pill{display:inline-block;padding:5px 8px;border-radius:20px;background:#edf7ef;font-size:12px;color:#28702f;font-weight:700}
-.price{font-size:21px;font-weight:800}
-.small{font-size:12px}
-.top{display:flex;justify-content:space-between;align-items:center}
-.alert{background:#fff5dd;border:1px solid #f1d99b;padding:12px;border-radius:10px}
-.error{background:#ffe9e9;border:1px solid #e0a0a0;padding:12px;border-radius:10px;color:#8a2222}
-.loading{text-align:center;padding:20px;color:#687681}
-.nav{display:flex;gap:7px;margin-top:20px}
-.nav button{flex:1;padding:10px;border:0;border-radius:9px;background:#edf1f4;cursor:pointer}
-.map{height:230px;background:linear-gradient(135deg,#e8f0e5,#dce9f2);border-radius:12px;margin-top:12px;position:relative;overflow:hidden}
-.marker{position:absolute;font-size:28px}
+
+body{
+  margin:0;
+  background:#eef2f5;
+  color:#18232d;
+  font-family:Arial,sans-serif;
+}
+
+.app{
+  max-width:440px;
+  margin:16px auto;
+  background:white;
+  min-height:800px;
+  border-radius:24px;
+  overflow:hidden;
+  box-shadow:0 8px 30px #0002;
+}
+
+header{
+  background:#173b57;
+  color:white;
+  padding:20px;
+}
+
+.brand{
+  font-size:22px;
+  font-weight:800;
+}
+
+.sub{
+  font-size:12px;
+  opacity:.8;
+  margin-top:5px;
+}
+
+main{
+  padding:20px;
+}
+
+.screen{
+  display:none;
+}
+
+.screen.active{
+  display:block;
+}
+
+h1{
+  font-size:25px;
+  margin:8px 0;
+}
+
+h2{
+  font-size:20px;
+  margin:8px 0;
+}
+
+p{
+  color:#687681;
+  line-height:1.4;
+}
+
+.card{
+  border:1px solid #dce4e9;
+  border-radius:14px;
+  padding:15px;
+  margin:12px 0;
+}
+
+.dark{
+  background:#f5f7f9;
+}
+
+.btn{
+  width:100%;
+  border:0;
+  border-radius:11px;
+  padding:14px;
+  margin-top:10px;
+  background:#1670ad;
+  color:white;
+  font-weight:700;
+  font-size:15px;
+  cursor:pointer;
+}
+
+.btn.alt{
+  background:#e8edf1;
+  color:#173b57;
+}
+
+label{
+  display:block;
+  font-size:12px;
+  font-weight:700;
+  margin:11px 0 5px;
+}
+
+input,select{
+  width:100%;
+  padding:11px;
+  border:1px solid #cdd7de;
+  border-radius:9px;
+  font-size:14px;
+}
+
+.row{
+  display:flex;
+  gap:9px;
+}
+
+.row>div{
+  flex:1;
+}
+
+.pill{
+  display:inline-block;
+  padding:5px 8px;
+  border-radius:20px;
+  background:#edf7ef;
+  font-size:12px;
+  color:#28702f;
+  font-weight:700;
+}
+
+.price{
+  font-size:21px;
+  font-weight:800;
+}
+
+.small{
+  font-size:12px;
+}
+
+.top{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.alert{
+  background:#fff5dd;
+  border:1px solid #f1d99b;
+  padding:12px;
+  border-radius:10px;
+}
+
+.error{
+  background:#ffe9e9;
+  border:1px solid #e0a0a0;
+  padding:12px;
+  border-radius:10px;
+  color:#8a2222;
+}
+
+.loading{
+  text-align:center;
+  padding:20px;
+  color:#687681;
+}
+
+.nav{
+  display:flex;
+  gap:7px;
+  margin-top:20px;
+}
+
+.nav button{
+  flex:1;
+  padding:10px;
+  border:0;
+  border-radius:9px;
+  background:#edf1f4;
+  cursor:pointer;
+}
+
+.map{
+  height:230px;
+  background:linear-gradient(135deg,#e8f0e5,#dce9f2);
+  border-radius:12px;
+  margin-top:12px;
+  position:relative;
+  overflow:hidden;
+}
+
+.marker{
+  position:absolute;
+  font-size:28px;
+}
 </style>
 </head>
 
@@ -51,21 +210,40 @@ input,select{width:100%;padding:11px;border:1px solid #cdd7de;border-radius:9px;
 
 <main>
 
+<!-- INICIO -->
+
 <section id="home" class="screen active">
+
 <h1>¿Necesitas transporte ahora?</h1>
-<p>Encuentra un socio disponible para llevar tu mercancía dentro de Mocoa.</p>
+
+<p>
+Encuentra un socio disponible para llevar tu mercancía dentro de Mocoa.
+</p>
 
 <div class="card">
 <b>📦 Tu necesidad</b>
-<p>Indica origen, destino, mercancía y cantidad. La red buscará socios disponibles.</p>
+
+<p>
+Indica origen, destino, mercancía y cantidad.
+La red buscará socios disponibles.
+</p>
 </div>
 
-<button class="btn" onclick="show('request')">Solicitar transporte</button>
-<button class="btn alt" onclick="show('partnerHome')">Soy socio transportador</button>
+<button class="btn" onclick="show('request')">
+Solicitar transporte
+</button>
+
+<button class="btn alt" onclick="show('partnerHome')">
+Soy socio transportador
+</button>
+
 </section>
 
 
+<!-- SOLICITUD -->
+
 <section id="request" class="screen">
+
 <h2>📦 Nueva solicitud</h2>
 
 <label>Origen</label>
@@ -74,71 +252,108 @@ input,select{width:100%;padding:11px;border:1px solid #cdd7de;border-radius:9px;
 <label>Destino</label>
 <input id="dest" value="Vereda El Rumiyaco">
 
-<div class="row">
-<div>
 <label>Mercancía</label>
 <input id="cargo" value="Cemento">
-</div>
 
-<div>
-<label>Bultos</label>
+<label>Cantidad de bultos</label>
 <input id="bags" type="number" value="100">
-</div>
-</div>
 
 <label>Peso aproximado por bulto (kg)</label>
 <input id="kg" type="number" value="50">
 
 <label>¿Cuándo?</label>
+
 <select id="when">
 <option>Ahora</option>
 <option>Hoy más tarde</option>
 <option>Programado</option>
 </select>
 
-<button class="btn" onclick="sendDemand()">🚀 Buscar socio disponible</button>
-<button class="btn alt" onclick="show('home')">Volver</button>
+<button class="btn" onclick="sendDemand()">
+🚀 Buscar socio disponible
+</button>
+
+<button class="btn alt" onclick="show('home')">
+Volver
+</button>
+
 </section>
 
 
+<!-- SOCIOS DISPONIBLES -->
+
 <section id="matching" class="screen">
+
 <h2>🔎 Socios disponibles</h2>
 
 <div class="alert">
+
 <b>Solicitud creada</b>
-<p id="demandText">Buscando...</p>
+
+<p id="demandText">
+Buscando...
+</p>
+
 </div>
 
 <div id="matchingList">
-<div class="loading">Buscando socios disponibles...</div>
+<div class="loading">
+Buscando socios disponibles...
+</div>
 </div>
 
-<button class="btn alt" onclick="show('request')">Nueva solicitud</button>
+<button class="btn alt" onclick="show('request')">
+Nueva solicitud
+</button>
+
 </section>
 
 
+<!-- ASIGNACION -->
+
 <section id="assignment" class="screen">
+
 <h2>🎯 Socio seleccionado</h2>
 
 <div id="selectedPartnerCard"></div>
 
-<button class="btn" onclick="acceptService()">✅ Asignar servicio</button>
-<button class="btn alt" onclick="show('matching')">Volver</button>
+<button class="btn" onclick="acceptService()">
+✅ Asignar servicio
+</button>
+
+<button class="btn alt" onclick="show('matching')">
+Volver
+</button>
+
 </section>
 
 
+<!-- SERVICIO -->
+
 <section id="active" class="screen">
+
 <h2>✅ Servicio confirmado</h2>
 
 <div class="card">
+
 <b>Socio:</b>
+
 <h3 id="activePartner">-</h3>
-<p id="activeServiceText">Servicio activo.</p>
-<div class="pill">🔴 EN SERVICIO</div>
+
+<p id="activeServiceText">
+Servicio activo.
+</p>
+
+<div class="pill">
+🔴 EN SERVICIO
+</div>
+
 </div>
 
 <div class="card">
+
 <b>Estado del servicio</b>
+
 <p>
 🟢 Solicitud asignada<br>
 🚚 En camino a recoger<br>
@@ -146,53 +361,97 @@ input,select{width:100%;padding:11px;border:1px solid #cdd7de;border-radius:9px;
 🛣️ En tránsito<br>
 ⬜ Entregado
 </p>
+
 </div>
 
-<button class="btn" onclick="deliver()">📦 Confirmar entrega</button>
+<button class="btn" onclick="deliver()">
+📦 Confirmar entrega
+</button>
+
 </section>
 
 
+<!-- ENTREGADO -->
+
 <section id="delivered" class="screen">
+
 <h2>📦 Entrega realizada</h2>
 
 <div class="card">
-<div class="pill">Servicio finalizado</div>
 
-<p>
-El socio <b id="deliveredPartner">-</b> ha terminado el servicio.
-</p>
-
-<h3>🟢 DISPONIBLE</h3>
-
-<p>El socio puede recibir nuevas solicitudes.</p>
+<div class="pill">
+Servicio finalizado
 </div>
 
-<button class="btn" onclick="show('home')">Nueva solicitud</button>
+<p>
+El socio
+<b id="deliveredPartner">-</b>
+ha terminado el servicio.
+</p>
+
+<h3>
+🟢 DISPONIBLE
+</h3>
+
+<p>
+El socio puede recibir nuevas solicitudes.
+</p>
+
+</div>
+
+<button class="btn" onclick="show('home')">
+Nueva solicitud
+</button>
+
 </section>
 
 
+<!-- PANEL SOCIO -->
+
 <section id="partnerHome" class="screen">
+
 <h2>🚚 Panel del socio</h2>
 
 <div class="card">
+
 <b>Socios registrados</b>
-<p>Estos son los socios guardados en Supabase.</p>
+
+<p>
+Socios conectados a la red de transporte.
+</p>
+
 </div>
 
 <div id="partnerList">
-<div class="loading">Cargando socios...</div>
+
+<div class="loading">
+Cargando socios...
 </div>
 
-<button class="btn" onclick="show('partnerDemand')">🔔 Ver demanda disponible</button>
-<button class="btn alt" onclick="show('home')">Volver</button>
+</div>
+
+<button class="btn" onclick="show('partnerDemand')">
+🔔 Ver demanda disponible
+</button>
+
+<button class="btn alt" onclick="show('home')">
+Volver
+</button>
+
 </section>
 
 
+<!-- DEMANDA SOCIO -->
+
 <section id="partnerDemand" class="screen">
+
 <h2>🔔 Nueva demanda</h2>
 
 <div class="card">
-<b id="partnerDemandNumber">Solicitud</b>
+
+<b id="partnerDemandNumber">
+Solicitud
+</b>
 
 <p id="partnerDemandText">
 No hay solicitud seleccionada.
@@ -202,60 +461,132 @@ No hay solicitud seleccionada.
 Revisa la capacidad del vehículo antes de aceptar.
 </div>
 
-<p class="price">$85.000</p>
+<p class="price">
+$85.000
+</p>
 
-<button class="btn" onclick="acceptPartnerDemand()">✅ Aceptar servicio</button>
-<button class="btn alt" onclick="show('partnerHome')">Rechazar</button>
+<button class="btn" onclick="acceptPartnerDemand()">
+✅ Aceptar servicio
+</button>
+
+<button class="btn alt" onclick="show('partnerHome')">
+Rechazar
+</button>
+
 </div>
+
 </section>
 
 
+<!-- CENTRAL -->
+
 <section id="admin" class="screen">
+
 <h2>🖥️ Central de operaciones</h2>
 
 <div class="card">
+
 <div class="top">
+
 <b>Estado de la red</b>
-<button onclick="loadPartners()" style="border:0;background:#edf1f4;border-radius:8px;padding:7px;cursor:pointer">🔄</button>
+
+<button
+onclick="loadPartners()"
+style="border:0;background:#edf1f4;border-radius:8px;padding:7px;cursor:pointer">
+🔄
+</button>
+
 </div>
 
-<div id="networkStats">Cargando...</div>
+<div id="networkStats">
+Cargando...
 </div>
+
+</div>
+
 
 <div class="card">
+
 <b>📍 Mapa operativo</b>
 
 <div class="map">
 
-<div class="marker" style="left:18%;top:30%">🟢</div>
-<div class="marker" style="left:55%;top:18%">🟢</div>
-<div class="marker" style="left:70%;top:55%">🔴</div>
-<div class="marker" style="left:35%;top:68%">🟡</div>
+<div class="marker" style="left:18%;top:30%">
+🟢
+</div>
 
-<div style="position:absolute;left:8px;bottom:12px;background:white;padding:6px 9px;border-radius:8px;font-size:11px">
+<div class="marker" style="left:55%;top:18%">
+🟢
+</div>
+
+<div class="marker" style="left:70%;top:55%">
+🔴
+</div>
+
+<div class="marker" style="left:35%;top:68%">
+🟡
+</div>
+
+<div style="
+position:absolute;
+left:8px;
+bottom:12px;
+background:white;
+padding:6px 9px;
+border-radius:8px;
+font-size:11px">
 📍 Mocoa
 </div>
 
 </div>
+
 </div>
 
+
 <div class="card">
+
 <b>🚚 Socios en la red</b>
-<div id="adminPartners">Cargando socios...</div>
+
+<div id="adminPartners">
+Cargando socios...
 </div>
 
-<div class="card">
-<b>📦 Última solicitud</b>
-<p id="adminDemand">No hay solicitudes cargadas.</p>
 </div>
+
+
+<div class="card">
+
+<b>📦 Última solicitud</b>
+
+<p id="adminDemand">
+No hay solicitudes cargadas.
+</p>
+
+</div>
+
 </section>
 
 
+<!-- NAVEGACION -->
+
 <div class="nav">
-<button onclick="show('home')">Inicio</button>
-<button onclick="show('request')">Solicitar</button>
-<button onclick="show('partnerHome')">Socio</button>
-<button onclick="show('admin')">Central</button>
+
+<button onclick="show('home')">
+Inicio
+</button>
+
+<button onclick="show('request')">
+Solicitar
+</button>
+
+<button onclick="show('partnerHome')">
+Socio
+</button>
+
+<button onclick="show('admin')">
+Central
+</button>
+
 </div>
 
 </main>
@@ -269,20 +600,14 @@ Revisa la capacidad del vehículo antes de aceptar.
 <script>
 
 /* ==========================================
-   CONFIGURACIÓN SUPABASE
+   CONFIGURACIÓN
    ========================================== */
 
 const SUPABASE_URL =
 'https://lmmbbivyhhjepjfengtt.supabase.co';
 
-/*
-   PEGA AQUÍ TU NUEVA PUBLISHABLE KEY
-   NO BORRES LAS COMILLAS
-*/
-
 const SUPABASE_KEY =
-'sb_publishable_3rK7v9Jhd0ZRv02vU4JTeg_5Q8iXArI';
-
+'PEGA_AQUI_TU_CLAVE_PUBLISHABLE';
 
 const supabaseClient =
 window.supabase.createClient(
@@ -296,12 +621,14 @@ SUPABASE_KEY
    ========================================== */
 
 let socios = [];
+
 let currentDemand = null;
+
 let selectedPartner = null;
 
 
 /* ==========================================
-   CAMBIAR PANTALLA
+   PANTALLAS
    ========================================== */
 
 function show(id){
@@ -312,7 +639,8 @@ document
 screen.classList.remove('active');
 });
 
-const target=document.getElementById(id);
+const target =
+document.getElementById(id);
 
 if(target){
 target.classList.add('active');
@@ -322,7 +650,7 @@ target.classList.add('active');
 
 
 /* ==========================================
-   ESCAPAR TEXTO
+   SEGURIDAD
    ========================================== */
 
 function escapeHtml(value){
@@ -351,32 +679,50 @@ return String(value)
 
 async function loadPartners(){
 
-const partnerList=document.getElementById('partnerList');
-const adminPartners=document.getElementById('adminPartners');
-const networkStats=document.getElementById('networkStats');
+const partnerList =
+document.getElementById('partnerList');
+
+const adminPartners =
+document.getElementById('adminPartners');
+
+const networkStats =
+document.getElementById('networkStats');
 
 if(partnerList){
-partnerList.innerHTML='<div class="loading">⏳ Cargando socios...</div>';
+
+partnerList.innerHTML =
+'<div class="loading">⏳ Cargando socios...</div>';
+
 }
 
-const result=await supabaseClient
+
+const result =
+await supabaseClient
 .from('socios')
 .select('*')
 .order('id');
 
+
 const data=result.data;
 const error=result.error;
+
 
 if(error){
 
 console.error(error);
 
 const message=`
+
 <div class="error">
+
 ❌ No se pudieron cargar los socios.
+
 <br><br>
+
 ${escapeHtml(error.message)}
+
 </div>
+
 `;
 
 if(partnerList){
@@ -388,26 +734,32 @@ adminPartners.innerHTML=message;
 }
 
 return;
+
 }
+
 
 socios=data || [];
 
 
-/* PANEL SOCIO */
+/* SOCIOS */
 
 if(partnerList){
 
 if(socios.length===0){
 
 partnerList.innerHTML=`
+
 <div class="card">
+
 ⚠️ No hay socios registrados.
+
 </div>
+
 `;
 
 }else{
 
-partnerList.innerHTML=
+partnerList.innerHTML =
 socios.map(renderPartnerCard).join('');
 
 }
@@ -421,12 +773,12 @@ if(adminPartners){
 
 if(socios.length===0){
 
-adminPartners.innerHTML=
+adminPartners.innerHTML =
 '<p>No hay socios registrados.</p>';
 
 }else{
 
-adminPartners.innerHTML=
+adminPartners.innerHTML =
 socios.map(renderAdminPartner).join('');
 
 }
@@ -434,13 +786,18 @@ socios.map(renderAdminPartner).join('');
 }
 
 
-/* ESTADÍSTICAS */
+/* ESTADISTICAS */
 
-const disponibles=socios.filter(s=>
-String(s.estado || '').toLowerCase()==='disponible'
+const disponibles =
+socios.filter(s=>
+String(s.estado || '')
+.toLowerCase()
+==='disponible'
 ).length;
 
-const ocupados=socios.length-disponibles;
+const ocupados =
+socios.length-disponibles;
+
 
 if(networkStats){
 
@@ -449,20 +806,36 @@ networkStats.innerHTML=`
 <div class="row">
 
 <div>
-<h3>🟢 ${disponibles}</h3>
-<span class="small">Disponibles</span>
+
+<h3>
+🟢 ${disponibles}
+</h3>
+
+<span class="small">
+Disponibles
+</span>
+
 </div>
 
 <div>
-<h3>🔴 ${ocupados}</h3>
-<span class="small">No disponibles</span>
+
+<h3>
+🔴 ${ocupados}
+</h3>
+
+<span class="small">
+No disponibles
+</span>
+
 </div>
 
 </div>
 
 <p>
-<b>${socios.length}</b> socios registrados.
+<b>${socios.length}</b>
+socios registrados.
 </p>
+
 `;
 
 }
@@ -476,14 +849,27 @@ networkStats.innerHTML=`
 
 function renderPartnerCard(socio){
 
-const nombre=socio.nombre || 'Sin nombre';
-const telefono=socio.telefono || 'No registrado';
-const vehiculo=socio.vehiculo || 'Vehículo no registrado';
-const capacidad=socio.capacidad_ton ?? '-';
-const estado=socio.estado || 'Sin estado';
+const nombre =
+socio.nombre || 'Sin nombre';
 
-const disponible=
-String(estado).toLowerCase()==='disponible';
+const telefono =
+socio.telefono || 'No registrado';
+
+const vehiculo =
+socio.vehiculo || 'Vehículo no registrado';
+
+const capacidad =
+socio.capacidad_ton ?? '-';
+
+const estado =
+socio.estado || 'Sin estado';
+
+
+const disponible =
+String(estado)
+.toLowerCase()
+==='disponible';
+
 
 return `
 
@@ -492,38 +878,57 @@ return `
 <div class="top">
 
 <b>
+
 ${disponible?'🟢':'🔴'}
+
 ${escapeHtml(nombre)}
+
 </b>
 
 <span class="pill">
+
 ${escapeHtml(estado)}
+
 </span>
 
 </div>
 
 <p>
+
 🚚 ${escapeHtml(vehiculo)}
+
 <br>
-⚖️ Capacidad: ${escapeHtml(String(capacidad))} toneladas
+
+⚖️ Capacidad:
+${escapeHtml(String(capacidad))}
+toneladas
+
 <br>
+
 📞 ${escapeHtml(String(telefono))}
+
 </p>
+
 
 ${
 disponible
 ?
 `
+
 <button
 class="btn"
 onclick="selectPartner('${escapeAttr(socio.id)}')">
+
 🎯 Seleccionar socio
+
 </button>
+
 `
 :''
 }
 
 </div>
+
 `;
 
 }
@@ -535,13 +940,24 @@ onclick="selectPartner('${escapeAttr(socio.id)}')">
 
 function renderAdminPartner(socio){
 
-const nombre=socio.nombre || 'Sin nombre';
-const vehiculo=socio.vehiculo || '-';
-const capacidad=socio.capacidad_ton ?? '-';
-const estado=socio.estado || '-';
+const nombre =
+socio.nombre || 'Sin nombre';
 
-const disponible=
-String(estado).toLowerCase()==='disponible';
+const vehiculo =
+socio.vehiculo || '-';
+
+const capacidad =
+socio.capacidad_ton ?? '-';
+
+const estado =
+socio.estado || '-';
+
+
+const disponible =
+String(estado)
+.toLowerCase()
+==='disponible';
+
 
 return `
 
@@ -550,19 +966,30 @@ return `
 <div class="top">
 
 <b>
+
 ${disponible?'🟢':'🔴'}
+
 ${escapeHtml(nombre)}
+
 </b>
 
 <span class="small">
+
 ${escapeHtml(estado)}
+
 </span>
 
 </div>
 
 <p>
+
 ${escapeHtml(vehiculo)}
-· ${escapeHtml(String(capacidad))} toneladas
+
+·
+
+${escapeHtml(String(capacidad))}
+toneladas
+
 </p>
 
 </div>
@@ -578,16 +1005,20 @@ ${escapeHtml(vehiculo)}
 
 function selectPartner(id){
 
-selectedPartner=socios.find(
+selectedPartner =
+socios.find(
 s=>String(s.id)===String(id)
 );
+
 
 if(!selectedPartner){
 
 alert('No se encontró el socio.');
 
 return;
+
 }
+
 
 document.getElementById(
 'selectedPartnerCard'
@@ -608,18 +1039,33 @@ ${escapeHtml(selectedPartner.estado)}
 </div>
 
 <p>
-🚚 ${escapeHtml(selectedPartner.vehiculo || '-')}
+
+🚚 ${escapeHtml(
+selectedPartner.vehiculo || '-'
+)}
+
 <br>
+
 ⚖️ Capacidad:
-${escapeHtml(String(selectedPartner.capacidad_ton ?? '-'))}
+${escapeHtml(
+String(selectedPartner.capacidad_ton ?? '-')
+)}
 toneladas
+
 <br>
-📞 ${escapeHtml(String(selectedPartner.telefono || '-'))}
+
+📞 ${escapeHtml(
+String(selectedPartner.telefono || '-')
+)}
+
 </p>
 
-<p class="price">$85.000</p>
+<p class="price">
+$85.000
+</p>
 
 </div>
+
 `;
 
 show('assignment');
@@ -633,50 +1079,94 @@ show('assignment');
 
 async function sendDemand(){
 
-const o=document.getElementById('origin').value.trim();
-const d=document.getElementById('dest').value.trim();
-const c=document.getElementById('cargo').value.trim();
+const o =
+document.getElementById('origin')
+.value.trim();
 
-const b=Number(
-document.getElementById('bags').value
+const d =
+document.getElementById('dest')
+.value.trim();
+
+const c =
+document.getElementById('cargo')
+.value.trim();
+
+const b =
+Number(
+document.getElementById('bags')
+.value
 );
 
-const k=Number(
-document.getElementById('kg').value
+const k =
+Number(
+document.getElementById('kg')
+.value
 );
+
 
 if(!o || !d || !c || !b || !k){
 
-alert('Completa todos los campos.');
+alert(
+'Completa todos los campos.'
+);
 
 return;
+
 }
+
 
 const totalKg=b*k;
 
-const matchingList=
+
+const matchingList =
 document.getElementById('matchingList');
 
-matchingList.innerHTML=
+matchingList.innerHTML =
 '<div class="loading">⏳ Guardando solicitud...</div>';
 
-const result=await supabaseClient
+
+/*
+   IMPORTANTE:
+
+   Tu tabla solicitudes tiene:
+   id
+   origen
+   destino
+   mercancia
+   cantidas
+   unidad
+   estado
+   socio_id
+
+   Por eso usamos esas columnas.
+*/
+
+
+const result =
+await supabaseClient
 .from('solicitudes')
 .insert([{
 
 origen:o,
+
 destino:d,
+
 mercancia:c,
-bultos:b,
-peso_kg:totalKg,
+
+cantidas:b,
+
+unidad:'bultos',
+
 estado:'pendiente'
 
 }])
 .select()
 .single();
 
+
 const data=result.data;
 const error=result.error;
+
 
 if(error){
 
@@ -699,20 +1189,32 @@ ${escapeHtml(error.message)}
 show('matching');
 
 return;
+
 }
 
+
 currentDemand=data;
+
 
 document.getElementById(
 'demandText'
 ).innerHTML=`
 
-<b>Solicitud #${escapeHtml(String(data.id || 'Nueva'))}</b>
+<b>
+Solicitud #${escapeHtml(
+String(data.id || 'Nueva')
+)}
+</b>
 
 <br>
 
-${b} bultos de ${escapeHtml(c)}
-· ${totalKg} kg
+${b} bultos de
+${escapeHtml(c)}
+
+<br>
+
+Peso aproximado:
+${totalKg} kg
 
 <br>
 
@@ -726,7 +1228,8 @@ ${escapeHtml(d)}
 document.getElementById(
 'partnerDemandNumber'
 ).textContent=
-'Solicitud #'+(data.id || 'Nueva');
+'Solicitud #'+
+(data.id || 'Nueva');
 
 
 document.getElementById(
@@ -747,7 +1250,12 @@ ${escapeHtml(d)}
 
 <br>
 
+📦 ${b} bultos
+
+<br>
+
 ⚖️ ${totalKg} kg
+
 `;
 
 
@@ -755,11 +1263,16 @@ document.getElementById(
 'adminDemand'
 ).innerHTML=`
 
-<b>Solicitud #${escapeHtml(String(data.id || 'Nueva'))}</b>
+<b>
+Solicitud #${escapeHtml(
+String(data.id || 'Nueva')
+)}
+</b>
 
 <br>
 
-${b} bultos de ${escapeHtml(c)}
+${b} bultos de
+${escapeHtml(c)}
 
 <br>
 
@@ -772,9 +1285,13 @@ ${escapeHtml(d)}
 
 /* SOCIOS DISPONIBLES */
 
-const disponibles=socios.filter(s=>
-String(s.estado || '').toLowerCase()==='disponible'
+const disponibles =
+socios.filter(s=>
+String(s.estado || '')
+.toLowerCase()
+==='disponible'
 );
+
 
 if(disponibles.length===0){
 
@@ -782,24 +1299,33 @@ matchingList.innerHTML=`
 
 <div class="alert">
 
-⚠️ No hay socios disponibles en este momento.
+⚠️ No hay socios disponibles
+en este momento.
 
 </div>
+
 `;
 
 show('matching');
 
 return;
+
 }
+
 
 matchingList.innerHTML=`
 
 <p>
-Encontramos <b>${disponibles.length}</b>
+
+Encontramos
+<b>${disponibles.length}</b>
 socio(s) disponible(s).
+
 </p>
 
-${disponibles.map(renderMatchingPartner).join('')}
+${disponibles
+.map(renderMatchingPartner)
+.join('')}
 
 `;
 
@@ -809,7 +1335,7 @@ show('matching');
 
 
 /* ==========================================
-   SOCIOS DISPONIBLES
+   SOCIOS PARA SOLICITUD
    ========================================== */
 
 function renderMatchingPartner(socio){
@@ -821,7 +1347,12 @@ return `
 <div class="top">
 
 <b>
-🟢 ${escapeHtml(socio.nombre || 'Socio')}
+
+🟢
+${escapeHtml(
+socio.nombre || 'Socio'
+)}
+
 </b>
 
 <span class="pill">
@@ -832,12 +1363,19 @@ Disponible
 
 <p>
 
-🚚 ${escapeHtml(socio.vehiculo || '-')}
+🚚
+${escapeHtml(
+socio.vehiculo || '-'
+)}
 
 <br>
 
 ⚖️ Capacidad:
-${escapeHtml(String(socio.capacidad_ton ?? '-'))}
+
+${escapeHtml(
+String(socio.capacidad_ton ?? '-')
+)}
+
 toneladas
 
 </p>
@@ -865,24 +1403,41 @@ async function acceptService(){
 
 if(!currentDemand){
 
-alert('No hay una solicitud seleccionada.');
+alert(
+'No hay una solicitud seleccionada.'
+);
 
 return;
+
 }
+
 
 if(!selectedPartner){
 
-alert('Selecciona un socio primero.');
+alert(
+'Selecciona un socio primero.'
+);
 
 return;
+
 }
 
-const result=await supabaseClient
+
+const result =
+await supabaseClient
 .from('solicitudes')
 .update({
-estado:'asignada'
+
+estado:'asignada',
+
+socio_id:selectedPartner.id
+
 })
-.eq('id',currentDemand.id);
+.eq(
+'id',
+currentDemand.id
+);
+
 
 if(result.error){
 
@@ -892,44 +1447,57 @@ result.error.message
 );
 
 return;
+
 }
 
 
-/* MARCAR SOCIO OCUPADO */
+/* SOCIO OCUPADO */
 
 await supabaseClient
 .from('socios')
 .update({
 estado:'ocupado'
 })
-.eq('id',selectedPartner.id);
+.eq(
+'id',
+selectedPartner.id
+);
 
 
 document.getElementById(
 'activePartner'
-).textContent=
+).textContent =
 selectedPartner.nombre;
+
 
 document.getElementById(
 'deliveredPartner'
-).textContent=
+).textContent =
 selectedPartner.nombre;
+
 
 document.getElementById(
 'activeServiceText'
 ).innerHTML=`
 
-🚚 ${escapeHtml(selectedPartner.vehiculo || '-')}
+🚚 ${escapeHtml(
+selectedPartner.vehiculo || '-'
+)}
 
 <br>
 
-📍 ${escapeHtml(currentDemand.origen || '')}
+📍 ${escapeHtml(
+currentDemand.origen || ''
+)}
 
 →
 
-${escapeHtml(currentDemand.destino || '')}
+${escapeHtml(
+currentDemand.destino || ''
+)}
 
 `;
+
 
 await loadPartners();
 
@@ -939,62 +1507,104 @@ show('active');
 
 
 /* ==========================================
-   ACEPTAR DESDE PANEL SOCIO
+   ACEPTAR DEMANDA SOCIO
    ========================================== */
 
 async function acceptPartnerDemand(){
 
 if(!currentDemand){
 
-alert('Primero crea una solicitud.');
+alert(
+'Primero crea una solicitud desde Solicitar.'
+);
 
 show('request');
 
 return;
+
 }
+
 
 if(!selectedPartner){
 
-const disponibles=socios.filter(s=>
-String(s.estado || '').toLowerCase()==='disponible'
+const disponibles =
+socios.filter(s=>
+String(s.estado || '')
+.toLowerCase()
+==='disponible'
 );
 
-if(disponibles.length){
-selectedPartner=disponibles[0];
+if(disponibles.length>0){
+
+selectedPartner=
+disponibles[0];
+
 }
 
 }
+
 
 if(!selectedPartner){
 
-alert('No hay un socio disponible.');
+alert(
+'No hay un socio disponible.'
+);
 
 return;
+
 }
 
+
+const result =
 await supabaseClient
 .from('solicitudes')
 .update({
-estado:'asignada'
+
+estado:'asignada',
+
+socio_id:selectedPartner.id
+
 })
-.eq('id',currentDemand.id);
+.eq(
+'id',
+currentDemand.id
+);
+
+
+if(result.error){
+
+alert(
+'No se pudo aceptar el servicio: '+
+result.error.message
+);
+
+return;
+
+}
+
 
 await supabaseClient
 .from('socios')
 .update({
 estado:'ocupado'
 })
-.eq('id',selectedPartner.id);
+.eq(
+'id',
+selectedPartner.id
+);
+
 
 document.getElementById(
 'activePartner'
 ).textContent=
 selectedPartner.nombre;
 
+
 document.getElementById(
 'deliveredPartner'
 ).textContent=
 selectedPartner.nombre;
+
 
 await loadPartners();
 
@@ -1014,14 +1624,21 @@ if(!currentDemand){
 show('home');
 
 return;
+
 }
 
-const result=await supabaseClient
+
+const result =
+await supabaseClient
 .from('solicitudes')
 .update({
 estado:'entregada'
 })
-.eq('id',currentDemand.id);
+.eq(
+'id',
+currentDemand.id
+);
+
 
 if(result.error){
 
@@ -1031,10 +1648,11 @@ result.error.message
 );
 
 return;
+
 }
 
 
-/* VOLVER A DISPONIBLE */
+/* SOCIO DISPONIBLE */
 
 if(selectedPartner){
 
@@ -1043,9 +1661,13 @@ await supabaseClient
 .update({
 estado:'disponible'
 })
-.eq('id',selectedPartner.id);
+.eq(
+'id',
+selectedPartner.id
+);
 
 }
+
 
 await loadPartners();
 
