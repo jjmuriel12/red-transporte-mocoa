@@ -1244,6 +1244,58 @@ function renderAdminPartner(socio){
 
 
 /* =====================================================
+   PRECIO ESTIMADO
+   (Cálculo simple de referencia. Ajusta las tarifas
+   base y por unidad según tus costos reales.)
+   ===================================================== */
+
+function estimatePrice(demand){
+
+  const BASE = 40000;
+
+  const PRECIO_POR_UNIDAD = {
+    bultos: 350,
+    kg: 120,
+    toneladas: 45000,
+    unidades: 300
+  };
+
+
+  if(!demand){
+    return BASE;
+  }
+
+
+  const cantidad =
+  Number(demand.cantidas) || 0;
+
+
+  const unidad =
+  (demand.unidad || '').toLowerCase();
+
+
+  const tarifa =
+  PRECIO_POR_UNIDAD[unidad] ?? 200;
+
+
+  const total =
+  BASE + (cantidad * tarifa);
+
+
+  return Math.round(total / 1000) * 1000;
+
+}
+
+
+function formatPrice(value){
+
+  return '$' + Number(value)
+  .toLocaleString('es-CO');
+
+}
+
+
+/* =====================================================
    SELECCIONAR SOCIO
    ===================================================== */
 
@@ -1324,7 +1376,15 @@ function selectPartner(id){
 
 
     <p class="price">
-    💰 $85.000
+    💰 ${escapeHtml(
+      formatPrice(
+        estimatePrice(currentDemand)
+      )
+    )}
+    </p>
+
+    <p class="small">
+    Precio estimado, sujeto a confirmación del socio.
     </p>
 
   </div>
@@ -1344,6 +1404,15 @@ function selectPartner(id){
 async function sendDemand(){
 
   if(!checkSupabase())
+    return;
+
+
+  const submitBtn =
+  document.querySelector(
+    '#request .btn:not(.alt)'
+  );
+
+  if(submitBtn && submitBtn.disabled)
     return;
 
 
@@ -1407,7 +1476,34 @@ async function sendDemand(){
   }
 
 
+  if(quantity <= 0){
+
+    requestError.innerHTML = `
+
+    <div class="error">
+
+    ❌ La cantidad debe ser mayor a cero.
+
+    </div>
+
+    `;
+
+    return;
+
+  }
+
+
   requestError.innerHTML = '';
+
+
+  if(submitBtn){
+
+    submitBtn.disabled = true;
+
+    submitBtn.textContent =
+    '⏳ Enviando...';
+
+  }
 
 
   const matchingList =
@@ -1636,6 +1732,12 @@ async function sendDemand(){
 
 
     /* SOCIOS DISPONIBLES */
+    /* Se recarga la lista de socios desde Supabase
+       antes de filtrar, para no usar datos viejos
+       que puedan estar en memoria. */
+
+    await loadPartners();
+
 
     const disponibles =
     socios.filter(s =>
@@ -1703,6 +1805,17 @@ async function sendDemand(){
     </div>
 
     `;
+
+  }finally{
+
+    if(submitBtn){
+
+      submitBtn.disabled = false;
+
+      submitBtn.textContent =
+      '🚀 Buscar socio disponible';
+
+    }
 
   }
 
@@ -2317,6 +2430,20 @@ function resetApp(){
     'when'
   ).value =
   'Ahora';
+
+
+  const requestErrorBox =
+  document.getElementById('requestError');
+
+  if(requestErrorBox)
+    requestErrorBox.innerHTML = '';
+
+
+  const assignmentErrorBox =
+  document.getElementById('assignmentError');
+
+  if(assignmentErrorBox)
+    assignmentErrorBox.innerHTML = '';
 
 
   show('home');
