@@ -222,10 +222,6 @@ input,select{
   border-radius:8px;
   font-size:11px;
 }
-
-.hidden{
-  display:none;
-}
 </style>
 </head>
 
@@ -240,7 +236,8 @@ input,select{
 
 <main>
 
-<!-- INICIO -->
+<!-- ================= INICIO ================= -->
+
 <section id="home" class="screen active">
 
 <h1>¿Necesitas transporte?</h1>
@@ -271,7 +268,8 @@ Indica origen, destino, mercancía y cantidad.
 </section>
 
 
-<!-- SOLICITUD -->
+<!-- ================= SOLICITUD ================= -->
+
 <section id="request" class="screen">
 
 <h2>📦 Nueva solicitud</h2>
@@ -325,20 +323,28 @@ Volver
 </section>
 
 
-<!-- SOCIOS DISPONIBLES -->
+<!-- ================= SOCIOS DISPONIBLES ================= -->
+
 <section id="matching" class="screen">
 
 <h2>🔎 Socios disponibles</h2>
 
 <div class="alert">
+
 <b>Solicitud creada</b>
-<p id="demandText">Buscando socios...</p>
+
+<p id="demandText">
+Buscando socios...
+</p>
+
 </div>
 
 <div id="matchingList">
+
 <div class="loading">
 Buscando socios disponibles...
 </div>
+
 </div>
 
 <button class="btn alt" onclick="show('request')">
@@ -348,7 +354,8 @@ Nueva solicitud
 </section>
 
 
-<!-- ASIGNACION -->
+<!-- ================= ASIGNACION ================= -->
+
 <section id="assignment" class="screen">
 
 <h2>🎯 Socio seleccionado</h2>
@@ -368,7 +375,8 @@ Volver
 </section>
 
 
-<!-- SERVICIO ACTIVO -->
+<!-- ================= SERVICIO ACTIVO ================= -->
+
 <section id="active" class="screen">
 
 <h2>✅ Servicio confirmado</h2>
@@ -412,7 +420,8 @@ Servicio asignado correctamente.
 </section>
 
 
-<!-- ENTREGA -->
+<!-- ================= ENTREGA ================= -->
+
 <section id="delivered" class="screen">
 
 <h2>📦 Entrega realizada</h2>
@@ -428,7 +437,9 @@ El socio <b id="deliveredPartner">-</b>
 ha terminado el servicio.
 </p>
 
-<h3>Disponible para nuevas solicitudes</h3>
+<h3>
+Disponible para nuevas solicitudes
+</h3>
 
 </div>
 
@@ -439,22 +450,28 @@ Nueva solicitud
 </section>
 
 
-<!-- PANEL SOCIO -->
+<!-- ================= PANEL SOCIO ================= -->
+
 <section id="partnerHome" class="screen">
 
 <h2>🚚 Panel del socio</h2>
 
 <div class="card">
+
 <b>Socios registrados</b>
+
 <p>
 Los socios aparecen automáticamente desde Supabase.
 </p>
+
 </div>
 
 <div id="partnerList">
+
 <div class="loading">
 Cargando socios...
 </div>
+
 </div>
 
 <button class="btn" onclick="openPartnerDemand()">
@@ -472,7 +489,8 @@ Volver
 </section>
 
 
-<!-- DEMANDA DEL SOCIO -->
+<!-- ================= DEMANDA SOCIO ================= -->
+
 <section id="partnerDemand" class="screen">
 
 <h2>🔔 Demanda disponible</h2>
@@ -504,7 +522,8 @@ Volver
 </section>
 
 
-<!-- CENTRAL -->
+<!-- ================= CENTRAL ================= -->
+
 <section id="admin" class="screen">
 
 <h2>🖥️ Central de operaciones</h2>
@@ -536,13 +555,21 @@ Cargando...
 
 <div class="map">
 
-<div class="marker" style="left:18%;top:30%">🟢</div>
+<div class="marker" style="left:18%;top:30%">
+🟢
+</div>
 
-<div class="marker" style="left:55%;top:18%">🟢</div>
+<div class="marker" style="left:55%;top:18%">
+🟢
+</div>
 
-<div class="marker" style="left:70%;top:55%">🔴</div>
+<div class="marker" style="left:70%;top:55%">
+🔴
+</div>
 
-<div class="marker" style="left:35%;top:68%">🟡</div>
+<div class="marker" style="left:35%;top:68%">
+🟡
+</div>
 
 <div style="
 position:absolute;
@@ -584,7 +611,8 @@ No hay solicitudes cargadas.
 </section>
 
 
-<!-- NAVEGACION -->
+<!-- ================= NAVEGACION ================= -->
+
 <div class="nav">
 
 <button onclick="show('home')">
@@ -609,7 +637,8 @@ Central
 </div>
 
 
-<!-- SUPABASE -->
+<!-- ================= SUPABASE ================= -->
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
@@ -622,13 +651,8 @@ const SUPABASE_URL =
 'https://lmmbbivyhhjepjfengtt.supabase.co';
 
 /*
-  IMPORTANTE:
-  AQUÍ DEBES PEGAR LA PUBLISHABLE KEY DE SUPABASE.
-
-  NO pongas la contraseña de tu cuenta.
-  NO pongas la service_role key.
-
-  Debe ser la clave pública/publishable.
+   Esta es la Publishable Key.
+   Se usa para conectar la página con Supabase.
 */
 
 const SUPABASE_KEY =
@@ -636,18 +660,14 @@ const SUPABASE_KEY =
 
 
 /* =====================================================
-   CONEXIÓN
+   CONEXIÓN SUPABASE
    ===================================================== */
 
 let supabaseClient = null;
 
 try{
 
-  if(
-    SUPABASE_KEY &&
-    SUPABASE_KEY !==
-    'sb_publishable_3rK7v9Jhd0ZRv02vU4JTeg_5Q8iXArI'
-  ){
+  if(SUPABASE_KEY){
 
     supabaseClient =
     window.supabase.createClient(
@@ -679,7 +699,7 @@ let selectedPartner = null;
 
 
 /* =====================================================
-   PANTALLAS
+   CAMBIAR PANTALLA
    ===================================================== */
 
 function show(id){
@@ -716,19 +736,11 @@ function checkSupabase(){
 
     <div class="error">
 
-    ❌ Falta configurar la clave de Supabase.
+    ❌ No se pudo iniciar Supabase.
 
     <br><br>
 
-    Abre <b>index.html</b> y busca:
-
-    <br><br>
-
-    <b>sb_publishable_3rK7v9Jhd0ZRv02vU4JTeg_5Q8iXArI</b>
-
-    <br><br>
-
-    Reemplázala por la Publishable key de tu proyecto.
+    Revisa la Publishable Key de Supabase.
 
     </div>
 
@@ -740,11 +752,19 @@ function checkSupabase(){
     const adminPartners =
     document.getElementById('adminPartners');
 
-    if(partnerList)
-      partnerList.innerHTML = message;
+    if(partnerList){
 
-    if(adminPartners)
-      adminPartners.innerHTML = message;
+      partnerList.innerHTML =
+      message;
+
+    }
+
+    if(adminPartners){
+
+      adminPartners.innerHTML =
+      message;
+
+    }
 
     return false;
 
@@ -792,14 +812,17 @@ async function loadPartners(){
     .order('id');
 
 
-    const data = result.data;
+    const data =
+    result.data;
 
-    const error = result.error;
+    const error =
+    result.error;
 
 
     if(error){
 
       console.error(error);
+
 
       const message = `
 
@@ -815,18 +838,30 @@ async function loadPartners(){
 
       `;
 
-      if(partnerList)
-        partnerList.innerHTML = message;
 
-      if(adminPartners)
-        adminPartners.innerHTML = message;
+      if(partnerList){
+
+        partnerList.innerHTML =
+        message;
+
+      }
+
+
+      if(adminPartners){
+
+        adminPartners.innerHTML =
+        message;
+
+      }
+
 
       return;
 
     }
 
 
-    socios = data || [];
+    socios =
+    data || [];
 
 
     /* PANEL SOCIOS */
@@ -882,9 +917,11 @@ async function loadPartners(){
 
     const disponibles =
     socios.filter(s =>
+
       String(s.estado || '')
       .toLowerCase()
       === 'disponible'
+
     ).length;
 
 
@@ -899,33 +936,47 @@ async function loadPartners(){
       <div class="row">
 
         <div>
-          <h3>🟢 ${disponibles}</h3>
+
+          <h3>
+          🟢 ${disponibles}
+          </h3>
+
           <span class="small">
           Disponibles
           </span>
+
         </div>
 
         <div>
-          <h3>🔴 ${ocupados}</h3>
+
+          <h3>
+          🔴 ${ocupados}
+          </h3>
+
           <span class="small">
           Ocupados
           </span>
+
         </div>
 
       </div>
 
       <p>
+
       <b>${socios.length}</b>
       socios registrados.
+
       </p>
 
       `;
 
     }
 
+
   }catch(error){
 
     console.error(error);
+
 
     const message = `
 
@@ -941,11 +992,21 @@ async function loadPartners(){
 
     `;
 
-    if(partnerList)
-      partnerList.innerHTML = message;
 
-    if(adminPartners)
-      adminPartners.innerHTML = message;
+    if(partnerList){
+
+      partnerList.innerHTML =
+      message;
+
+    }
+
+
+    if(adminPartners){
+
+      adminPartners.innerHTML =
+      message;
+
+    }
 
   }
 
@@ -961,17 +1022,23 @@ function renderPartnerCard(socio){
   const nombre =
   socio.nombre || 'Sin nombre';
 
+
   const telefono =
   socio.telefono || 'No registrado';
 
+
   const vehiculo =
-  socio.vehiculo || 'Vehículo no registrado';
+  socio.vehiculo ||
+  'Vehículo no registrado';
+
 
   const capacidad =
   socio.capacidad_ton ?? '-';
 
+
   const estado =
-  socio.estado || 'sin estado';
+  socio.estado ||
+  'sin estado';
 
 
   const disponible =
@@ -987,15 +1054,21 @@ function renderPartnerCard(socio){
     <div class="top">
 
       <b>
+
       ${disponible ? '🟢' : '🔴'}
+
       ${escapeHtml(nombre)}
+
       </b>
 
       <span class="pill">
+
       ${escapeHtml(estado)}
+
       </span>
 
     </div>
+
 
     <p>
 
@@ -1004,18 +1077,25 @@ function renderPartnerCard(socio){
     <br>
 
     ⚖️ Capacidad:
-    ${escapeHtml(String(capacidad))} t
+    ${escapeHtml(
+      String(capacidad)
+    )}
+    t
 
     <br>
 
-    📞 ${escapeHtml(String(telefono))}
+    📞 ${escapeHtml(
+      String(telefono)
+    )}
 
     </p>
+
 
     ${
       disponible
       ?
       `
+
       <button
       class="btn"
       onclick="selectPartner('${escapeAttr(socio.id)}')">
@@ -1023,6 +1103,7 @@ function renderPartnerCard(socio){
       🎯 Seleccionar socio
 
       </button>
+
       `
       :
       ''
@@ -1036,7 +1117,7 @@ function renderPartnerCard(socio){
 
 
 /* =====================================================
-   CENTRAL
+   SOCIO EN CENTRAL
    ===================================================== */
 
 function renderAdminPartner(socio){
@@ -1044,11 +1125,14 @@ function renderAdminPartner(socio){
   const nombre =
   socio.nombre || 'Sin nombre';
 
+
   const vehiculo =
   socio.vehiculo || '-';
 
+
   const capacidad =
   socio.capacidad_ton ?? '-';
+
 
   const estado =
   socio.estado || '-';
@@ -1067,19 +1151,34 @@ function renderAdminPartner(socio){
     <div class="top">
 
       <b>
+
       ${disponible ? '🟢' : '🔴'}
+
       ${escapeHtml(nombre)}
+
       </b>
 
       <span class="small">
+
       ${escapeHtml(estado)}
+
       </span>
 
     </div>
 
+
     <p>
+
     🚚 ${escapeHtml(vehiculo)}
-    · ${escapeHtml(String(capacidad))} t
+
+    ·
+
+    ${escapeHtml(
+      String(capacidad)
+    )}
+
+    t
+
     </p>
 
   </div>
@@ -1123,10 +1222,14 @@ function selectPartner(id){
     <div class="top">
 
       <b>
-      🟢 ${escapeHtml(
+
+      🟢
+
+      ${escapeHtml(
         selectedPartner.nombre ||
         'Socio'
       )}
+
       </b>
 
       <span class="pill">
@@ -1134,6 +1237,7 @@ function selectPartner(id){
       </span>
 
     </div>
+
 
     <p>
 
@@ -1144,11 +1248,13 @@ function selectPartner(id){
     <br>
 
     ⚖️ Capacidad:
+
     ${escapeHtml(
       String(
         selectedPartner.capacidad_ton ?? '-'
       )
     )}
+
     toneladas
 
     <br>
@@ -1160,6 +1266,7 @@ function selectPartner(id){
     )}
 
     </p>
+
 
     <p class="price">
     💰 $85.000
@@ -1186,30 +1293,35 @@ async function sendDemand(){
 
 
   const origin =
-  document.getElementById('origin')
-  .value.trim();
+  document.getElementById(
+    'origin'
+  ).value.trim();
 
 
   const dest =
-  document.getElementById('dest')
-  .value.trim();
+  document.getElementById(
+    'dest'
+  ).value.trim();
 
 
   const cargo =
-  document.getElementById('cargo')
-  .value.trim();
+  document.getElementById(
+    'cargo'
+  ).value.trim();
 
 
   const quantity =
   Number(
-    document.getElementById('quantity')
-    .value
+    document.getElementById(
+      'quantity'
+    ).value
   );
 
 
   const unit =
-  document.getElementById('unit')
-  .value;
+  document.getElementById(
+    'unit'
+  ).value;
 
 
   const requestError =
@@ -1264,10 +1376,8 @@ async function sendDemand(){
 
 
   /*
-    IMPORTANTE:
-
-    Usamos únicamente las columnas
-    que existen en tu tabla:
+    ESTAS SON LAS COLUMNAS QUE
+    YA TIENES EN solicitudes:
 
     origen
     destino
@@ -1281,19 +1391,19 @@ async function sendDemand(){
 
   const insertData = {
 
-    origen: origin,
+    origen:origin,
 
-    destino: dest,
+    destino:dest,
 
-    mercancia: cargo,
+    mercancia:cargo,
 
-    cantidas: quantity,
+    cantidas:quantity,
 
-    unidad: unit,
+    unidad:unit,
 
-    estado: 'pendiente',
+    estado:'pendiente',
 
-    socio_id: null
+    socio_id:null
 
   };
 
@@ -1303,14 +1413,19 @@ async function sendDemand(){
     const result =
     await supabaseClient
     .from('solicitudes')
-    .insert([insertData])
+    .insert([
+      insertData
+    ])
     .select()
     .single();
 
 
-    const data = result.data;
+    const data =
+    result.data;
 
-    const error = result.error;
+
+    const error =
+    result.error;
 
 
     if(error){
@@ -1326,7 +1441,9 @@ async function sendDemand(){
 
       <br><br>
 
-      ${escapeHtml(error.message)}
+      ${escapeHtml(
+        error.message
+      )}
 
       </div>
 
@@ -1337,7 +1454,8 @@ async function sendDemand(){
     }
 
 
-    currentDemand = data;
+    currentDemand =
+    data;
 
 
     document.getElementById(
@@ -1345,9 +1463,11 @@ async function sendDemand(){
     ).innerHTML = `
 
     <b>
+
     Solicitud #${escapeHtml(
       String(data.id)
     )}
+
     </b>
 
     <br><br>
@@ -1355,13 +1475,19 @@ async function sendDemand(){
     📦 ${escapeHtml(
       String(quantity)
     )}
+
     ${escapeHtml(unit)}
-    de ${escapeHtml(cargo)}
+
+    de
+
+    ${escapeHtml(cargo)}
 
     <br>
 
     📍 ${escapeHtml(origin)}
+
     →
+
     ${escapeHtml(dest)}
 
     `;
@@ -1379,22 +1505,29 @@ async function sendDemand(){
     ).innerHTML = `
 
     📍 Recoger:
+
     ${escapeHtml(origin)}
 
     <br>
 
     📍 Entregar:
+
     ${escapeHtml(dest)}
 
     <br>
 
-    📦 ${escapeHtml(cargo)}
+    📦 Mercancía:
+
+    ${escapeHtml(cargo)}
 
     <br>
 
-    ⚖️ ${escapeHtml(
+    ⚖️ Cantidad:
+
+    ${escapeHtml(
       String(quantity)
     )}
+
     ${escapeHtml(unit)}
 
     `;
@@ -1405,9 +1538,11 @@ async function sendDemand(){
     ).innerHTML = `
 
     <b>
+
     Solicitud #${escapeHtml(
       String(data.id)
     )}
+
     </b>
 
     <br>
@@ -1415,18 +1550,25 @@ async function sendDemand(){
     📦 ${escapeHtml(
       String(quantity)
     )}
+
     ${escapeHtml(unit)}
-    de ${escapeHtml(cargo)}
+
+    de
+
+    ${escapeHtml(cargo)}
 
     <br>
 
     📍 ${escapeHtml(origin)}
+
     →
+
     ${escapeHtml(dest)}
 
     <br>
 
     Estado:
+
     <b>pendiente</b>
 
     `;
@@ -1436,9 +1578,11 @@ async function sendDemand(){
 
     const disponibles =
     socios.filter(s =>
+
       String(s.estado || '')
       .toLowerCase()
       === 'disponible'
+
     );
 
 
@@ -1465,10 +1609,15 @@ async function sendDemand(){
     <p>
 
     Encontramos
-    <b>${disponibles.length}</b>
+
+    <b>
+    ${disponibles.length}
+    </b>
+
     socio(s) disponible(s).
 
     </p>
+
 
     ${disponibles
       .map(renderMatchingPartner)
@@ -1476,9 +1625,11 @@ async function sendDemand(){
 
     `;
 
+
   }catch(error){
 
     console.error(error);
+
 
     matchingList.innerHTML = `
 
@@ -1514,16 +1665,24 @@ function renderMatchingPartner(socio){
     <div class="top">
 
       <b>
-      🟢 ${escapeHtml(
-        socio.nombre || 'Socio'
+
+      🟢
+
+      ${escapeHtml(
+        socio.nombre ||
+        'Socio'
       )}
+
       </b>
 
       <span class="pill">
+
       Disponible
+
       </span>
 
     </div>
+
 
     <p>
 
@@ -1534,14 +1693,17 @@ function renderMatchingPartner(socio){
     <br>
 
     ⚖️ Capacidad:
+
     ${escapeHtml(
       String(
         socio.capacidad_ton ?? '-'
       )
     )}
+
     toneladas
 
     </p>
+
 
     <button
     class="btn"
@@ -1603,7 +1765,7 @@ async function acceptService(){
     .from('solicitudes')
     .update({
 
-      estado: 'asignada',
+      estado:'asignada',
 
       socio_id:
       selectedPartner.id
@@ -1673,7 +1835,7 @@ async function acceptService(){
     `;
 
 
-    /* Marcar socio como ocupado */
+    /* MARCAR SOCIO COMO OCUPADO */
 
     await supabaseClient
     .from('socios')
@@ -1690,6 +1852,7 @@ async function acceptService(){
 
 
     loadPartners();
+
 
   }catch(error){
 
@@ -1736,7 +1899,9 @@ async function openPartnerDemand(){
       )
       .order(
         'id',
-        {ascending:false}
+        {
+          ascending:false
+        }
       )
       .limit(1)
       .maybeSingle();
@@ -1759,6 +1924,7 @@ async function openPartnerDemand(){
         result.data;
 
       }
+
 
     }catch(error){
 
@@ -1801,6 +1967,7 @@ async function openPartnerDemand(){
   ).innerHTML = `
 
   📍 Recoger:
+
   ${escapeHtml(
     currentDemand.origen || '-'
   )}
@@ -1808,6 +1975,7 @@ async function openPartnerDemand(){
   <br>
 
   📍 Entregar:
+
   ${escapeHtml(
     currentDemand.destino || '-'
   )}
@@ -1815,6 +1983,7 @@ async function openPartnerDemand(){
   <br>
 
   📦 Mercancía:
+
   ${escapeHtml(
     currentDemand.mercancia || '-'
   )}
@@ -1822,11 +1991,13 @@ async function openPartnerDemand(){
   <br>
 
   ⚖️ Cantidad:
+
   ${escapeHtml(
     String(
       currentDemand.cantidas ?? '-'
     )
   )}
+
   ${escapeHtml(
     currentDemand.unidad || ''
   )}
@@ -1860,18 +2031,15 @@ async function acceptPartnerDemand(){
   }
 
 
-  /*
-    Si no se ha seleccionado socio,
-    usamos el primer socio disponible.
-  */
-
   if(!selectedPartner){
 
     const disponibles =
     socios.filter(s =>
+
       String(s.estado || '')
       .toLowerCase()
       === 'disponible'
+
     );
 
 
@@ -1930,7 +2098,9 @@ async function acceptPartnerDemand(){
     await supabaseClient
     .from('socios')
     .update({
+
       estado:'ocupado'
+
     })
     .eq(
       'id',
@@ -1954,6 +2124,7 @@ async function acceptPartnerDemand(){
 
 
     loadPartners();
+
 
   }catch(error){
 
@@ -1992,7 +2163,9 @@ async function deliver(){
     await supabaseClient
     .from('solicitudes')
     .update({
+
       estado:'entregada'
+
     })
     .eq(
       'id',
@@ -2012,14 +2185,16 @@ async function deliver(){
     }
 
 
-    /* Volver a poner socio disponible */
+    /* VOLVER A PONER SOCIO DISPONIBLE */
 
     if(selectedPartner){
 
       await supabaseClient
       .from('socios')
       .update({
+
         estado:'disponible'
+
       })
       .eq(
         'id',
@@ -2033,6 +2208,7 @@ async function deliver(){
 
 
     loadPartners();
+
 
   }catch(error){
 
@@ -2054,6 +2230,7 @@ function resetApp(){
   currentDemand = null;
 
   selectedPartner = null;
+
 
   document.getElementById(
     'origin'
@@ -2091,11 +2268,31 @@ function resetApp(){
 function escapeHtml(value){
 
   return String(value)
-  .replaceAll('&','&amp;')
-  .replaceAll('<','&lt;')
-  .replaceAll('>','&gt;')
-  .replaceAll('"','&quot;')
-  .replaceAll("'","&#039;");
+
+  .replaceAll(
+    '&',
+    '&amp;'
+  )
+
+  .replaceAll(
+    '<',
+    '&lt;'
+  )
+
+  .replaceAll(
+    '>',
+    '&gt;'
+  )
+
+  .replaceAll(
+    '"',
+    '&quot;'
+  )
+
+  .replaceAll(
+    "'",
+    '&#039;'
+  );
 
 }
 
@@ -2103,8 +2300,16 @@ function escapeHtml(value){
 function escapeAttr(value){
 
   return String(value)
-  .replaceAll('\\','\\\\')
-  .replaceAll("'","\\'");
+
+  .replaceAll(
+    '\\',
+    '\\\\'
+  )
+
+  .replaceAll(
+    "'",
+    "\\'"
+  );
 
 }
 
@@ -2114,12 +2319,13 @@ function escapeAttr(value){
    ===================================================== */
 
 document.addEventListener(
-'DOMContentLoaded',
-function(){
+  'DOMContentLoaded',
+  function(){
 
-  loadPartners();
+    loadPartners();
 
-});
+  }
+);
 
 </script>
 
