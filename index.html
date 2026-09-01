@@ -647,7 +647,9 @@ Central
 
 </main>
 </div>
-  <!-- ================= SUPABASE ================= -->
+
+
+<!-- ================= SUPABASE ================= -->
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -885,7 +887,7 @@ async function loadPartners(){
 
       ${
         error.code === '42501' || (error.message && error.message.toLowerCase().includes('row-level security'))
-        ? '<br><br>⚠️ Esto suele significar que la tabla <b>socios</b> tiene RLS activado sin una política que permita SELECT con la clave pública.'
+        ? '<br><br>⚠️ Esto suele significar que la tabla <b>socios</b> tiene RLS activado sin una política que permita SELECT con la clave pública. Revisa la sección "Solución RLS" que te compartí.'
         : ''
       }
 
@@ -1316,7 +1318,26 @@ function selectPartner(id){
       String(
         selectedPartner.telefono || '-'
       )
-      /* =====================================================
+    )}
+
+    </p>
+
+
+    <p class="price">
+    💰 $85.000
+    </p>
+
+  </div>
+
+  `;
+
+
+  show('assignment');
+
+}
+
+
+/* =====================================================
    CREAR SOLICITUD
    ===================================================== */
 
@@ -1481,7 +1502,7 @@ async function sendDemand(){
       }
       ${
         error.code === 'PGRST204' || error.code === '42703'
-        ? '<br><br>⚠️ Es posible que el nombre de alguna columna no coincida (por ejemplo "cantidas" vs "cantidad").'
+        ? '<br><br>⚠️ Es posible que el nombre de alguna columna no coincida (por ejemplo "cantidas" vs "cantidad"). Revisa los nombres exactos de columnas en tu tabla.'
         : ''
       }
 
@@ -1903,6 +1924,8 @@ async function acceptService(){
   }
 
 }
+
+
 /* =====================================================
    DEMANDA DEL SOCIO
    ===================================================== */
@@ -2191,3 +2214,183 @@ async function deliver(){
     await supabaseClient
     .from('solicitudes')
     .update({
+
+      estado:'entregada'
+
+    })
+    .eq(
+      'id',
+      currentDemand.id
+    );
+
+
+    if(result.error){
+
+      alert(
+        'No se pudo finalizar: ' +
+        formatSupabaseError(result.error)
+      );
+
+      return;
+
+    }
+
+
+    /* VOLVER A PONER SOCIO DISPONIBLE */
+
+    if(selectedPartner){
+
+      await supabaseClient
+      .from('socios')
+      .update({
+
+        estado:'disponible'
+
+      })
+      .eq(
+        'id',
+        selectedPartner.id
+      );
+
+    }
+
+
+    show('delivered');
+
+
+    loadPartners();
+
+
+  }catch(error){
+
+    alert(
+      error.message
+    );
+
+  }
+
+}
+
+
+/* =====================================================
+   REINICIAR
+   ===================================================== */
+
+function resetApp(){
+
+  currentDemand = null;
+
+  selectedPartner = null;
+
+
+  document.getElementById(
+    'origin'
+  ).value =
+  'Ferretería - Mocoa';
+
+
+  document.getElementById(
+    'dest'
+  ).value =
+  'Vereda El Rumiyaco';
+
+
+  document.getElementById(
+    'cargo'
+  ).value =
+  'Cemento';
+
+
+  document.getElementById(
+    'quantity'
+  ).value =
+  '100';
+
+
+  document.getElementById(
+    'unit'
+  ).value =
+  'bultos';
+
+
+  document.getElementById(
+    'when'
+  ).value =
+  'Ahora';
+
+
+  show('home');
+
+}
+
+
+/* =====================================================
+   SEGURIDAD
+   ===================================================== */
+
+function escapeHtml(value){
+
+  return String(value)
+
+  .replaceAll(
+    '&',
+    '&amp;'
+  )
+
+  .replaceAll(
+    '<',
+    '&lt;'
+  )
+
+  .replaceAll(
+    '>',
+    '&gt;'
+  )
+
+  .replaceAll(
+    '"',
+    '&quot;'
+  )
+
+  .replaceAll(
+    "'",
+    '&#039;'
+  );
+
+}
+
+
+function escapeAttr(value){
+
+  return String(value)
+
+  .replaceAll(
+    '\\',
+    '\\\\'
+  )
+
+  .replaceAll(
+    "'",
+    "\\'"
+  );
+
+}
+
+
+/* =====================================================
+   INICIO
+   ===================================================== */
+
+document.addEventListener(
+  'DOMContentLoaded',
+  function(){
+
+    loadPartners();
+
+  }
+);
+
+</script>
+
+</body>
+</html>
