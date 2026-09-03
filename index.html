@@ -308,6 +308,34 @@ hr{
   margin:18px 0;
 }
 
+/* NUEVO */
+
+.live{
+  display:flex;
+  align-items:center;
+  gap:7px;
+  font-size:11px;
+  color:#28702f;
+  margin-top:8px;
+}
+
+.live-dot{
+  width:8px;
+  height:8px;
+  border-radius:50%;
+  background:#20a43a;
+  box-shadow:0 0 0 4px #20a43a22;
+}
+
+.busy-box{
+  background:#fff0f0;
+  border:1px solid #efb1b1;
+  color:#982323;
+  padding:12px;
+  border-radius:10px;
+  margin-top:10px;
+}
+
 </style>
 
 </head>
@@ -331,14 +359,9 @@ hr{
 <main>
 
 
-<!-- =====================================================
-     INICIO
-===================================================== -->
+<!-- INICIO -->
 
-<section
-  id="home"
-  class="screen active"
->
+<section id="home" class="screen active">
 
 <div class="logo-box">
 🚛
@@ -389,14 +412,9 @@ La central buscará los socios disponibles.
 </section>
 
 
-<!-- =====================================================
-     SOLICITUD
-===================================================== -->
+<!-- SOLICITUD -->
 
-<section
-  id="request"
-  class="screen"
->
+<section id="request" class="screen">
 
 <h2>
 📦 Nueva solicitud
@@ -519,14 +537,9 @@ Volver
 </section>
 
 
-<!-- =====================================================
-     MATCHING
-===================================================== -->
+<!-- MATCHING -->
 
-<section
-  id="matching"
-  class="screen"
->
+<section id="matching" class="screen">
 
 <h2>
 🔎 Socios disponibles
@@ -541,6 +554,11 @@ Solicitud creada
 <p id="demandText">
 Buscando socios...
 </p>
+
+<div class="live">
+<span class="live-dot"></span>
+Estado actualizado automáticamente
+</div>
 
 </div>
 
@@ -562,14 +580,9 @@ Nueva solicitud
 </section>
 
 
-<!-- =====================================================
-     ASIGNACIÓN
-===================================================== -->
+<!-- ASIGNACIÓN -->
 
-<section
-  id="assignment"
-  class="screen"
->
+<section id="assignment" class="screen">
 
 <h2>
 🎯 Socio seleccionado
@@ -597,14 +610,9 @@ Volver
 </section>
 
 
-<!-- =====================================================
-     SERVICIO ACTIVO
-===================================================== -->
+<!-- SERVICIO ACTIVO -->
 
-<section
-  id="active"
-  class="screen"
->
+<section id="active" class="screen">
 
 <h2>
 ✅ Servicio confirmado
@@ -673,14 +681,9 @@ Estado del servicio
 </section>
 
 
-<!-- =====================================================
-     ENTREGA
-===================================================== -->
+<!-- ENTREGA -->
 
-<section
-  id="delivered"
-  class="screen"
->
+<section id="delivered" class="screen">
 
 <h2>
 📦 Entrega realizada
@@ -720,14 +723,9 @@ Nueva solicitud
 </section>
 
 
-<!-- =====================================================
-     PANEL SOCIO
-===================================================== -->
+<!-- PANEL SOCIO -->
 
-<section
-  id="partnerHome"
-  class="screen"
->
+<section id="partnerHome" class="screen">
 
 <h2>
 🚚 Panel del socio
@@ -740,8 +738,13 @@ Socios registrados
 </b>
 
 <p>
-Los socios se cargan automáticamente desde Supabase.
+Los socios se actualizan automáticamente.
 </p>
+
+<div class="live">
+<span class="live-dot"></span>
+Conectado a la red
+</div>
 
 </div>
 
@@ -777,14 +780,9 @@ Volver
 </section>
 
 
-<!-- =====================================================
-     DEMANDA SOCIO
-===================================================== -->
+<!-- DEMANDA SOCIO -->
 
-<section
-  id="partnerDemand"
-  class="screen"
->
+<section id="partnerDemand" class="screen">
 
 <h2>
 🔔 Demanda disponible
@@ -824,14 +822,9 @@ Volver
 </section>
 
 
-<!-- =====================================================
-     LOGIN ADMIN
-===================================================== -->
+<!-- LOGIN ADMIN -->
 
-<section
-  id="adminLogin"
-  class="screen"
->
+<section id="adminLogin" class="screen">
 
 <div class="login-box">
 
@@ -892,14 +885,9 @@ Volver
 </section>
 
 
-<!-- =====================================================
-     CENTRAL
-===================================================== -->
+<!-- CENTRAL -->
 
-<section
-  id="admin"
-  class="screen"
->
+<section id="admin" class="screen">
 
 <h2>
 🖥️ Central de operaciones
@@ -1028,9 +1016,7 @@ No hay solicitudes cargadas.
 </section>
 
 
-<!-- =====================================================
-     NAVEGACIÓN
-===================================================== -->
+<!-- NAVEGACIÓN -->
 
 <div class="nav">
 
@@ -1057,9 +1043,7 @@ Central
 </div>
 
 
-<!-- =====================================================
-     SUPABASE
-===================================================== -->
+<!-- SUPABASE -->
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -1067,7 +1051,7 @@ Central
 
 
 /* =====================================================
-   CONFIGURACIÓN SUPABASE
+   CONFIGURACIÓN
 ===================================================== */
 
 const SUPABASE_URL =
@@ -1076,17 +1060,12 @@ const SUPABASE_URL =
 const SUPABASE_KEY =
 'sb_publishable_3rK7v9Jhd0ZRv02vU4JTeg_5Q8iXArI';
 
-
-/* =====================================================
-   ADMINISTRADOR AUTORIZADO
-===================================================== */
-
 const ADMIN_EMAIL =
 'jjmuriel@hotmail.com';
 
 
 /* =====================================================
-   CLIENTE SUPABASE
+   SUPABASE
 ===================================================== */
 
 let supabaseClient = null;
@@ -1095,9 +1074,7 @@ let supabaseInitError = null;
 
 try{
 
-  if(
-    typeof window.supabase === 'undefined'
-  ){
+  if(typeof window.supabase === 'undefined'){
 
     throw new Error(
       'No se cargó la librería de Supabase.'
@@ -1115,10 +1092,7 @@ try{
 
   supabaseInitError = error;
 
-  console.error(
-    'Error iniciando Supabase:',
-    error
-  );
+  console.error(error);
 
 }
 
@@ -1132,6 +1106,8 @@ let socios = [];
 let currentDemand = null;
 
 let selectedPartner = null;
+
+let refreshTimer = null;
 
 
 /* =====================================================
@@ -1167,24 +1143,16 @@ function formatSupabaseError(error){
   const parts = [];
 
   if(error.message)
-    parts.push(
-      'Mensaje: ' + error.message
-    );
+    parts.push('Mensaje: ' + error.message);
 
   if(error.code)
-    parts.push(
-      'Código: ' + error.code
-    );
+    parts.push('Código: ' + error.code);
 
   if(error.details)
-    parts.push(
-      'Detalles: ' + error.details
-    );
+    parts.push('Detalles: ' + error.details);
 
   if(error.hint)
-    parts.push(
-      'Sugerencia: ' + error.hint
-    );
+    parts.push('Sugerencia: ' + error.hint);
 
   return parts.join('\n');
 
@@ -1227,10 +1195,8 @@ function show(id){
 
     });
 
-
   const target =
     document.getElementById(id);
-
 
   if(target){
 
@@ -1255,10 +1221,6 @@ function openPartnerHome(){
 }
 
 
-/* =====================================================
-   ABRIR CENTRAL
-===================================================== */
-
 async function openAdmin(){
 
   if(!checkSupabase())
@@ -1272,10 +1234,7 @@ async function openAdmin(){
     } =
       await supabaseClient.auth.getSession();
 
-
     if(error){
-
-      console.error(error);
 
       show('adminLogin');
 
@@ -1283,12 +1242,8 @@ async function openAdmin(){
 
     }
 
-
     const session =
       data.session;
-
-
-    /* No hay sesión */
 
     if(!session){
 
@@ -1298,43 +1253,14 @@ async function openAdmin(){
 
     }
 
-
-    /* Obtener correo */
-
     const email =
       String(
         session.user.email || ''
       ).toLowerCase().trim();
 
-
-    /* Comprobar administrador */
-
     if(email !== ADMIN_EMAIL){
 
       await supabaseClient.auth.signOut();
-
-
-      const errorBox =
-        document.getElementById(
-          'adminLoginError'
-        );
-
-
-      if(errorBox){
-
-        errorBox.innerHTML = `
-
-          <div class="error">
-
-            ❌ Este usuario no tiene permiso
-            para entrar a la Central.
-
-          </div>
-
-        `;
-
-      }
-
 
       show('adminLogin');
 
@@ -1342,20 +1268,13 @@ async function openAdmin(){
 
     }
 
-
-    /* Administrador autorizado */
-
     show('admin');
 
     await loadPartners();
 
-
   }catch(error){
 
-    console.error(
-      'Error verificando administrador:',
-      error
-    );
+    console.error(error);
 
     show('adminLogin');
 
@@ -1365,7 +1284,7 @@ async function openAdmin(){
 
 
 /* =====================================================
-   LOGIN ADMINISTRADOR
+   LOGIN
 ===================================================== */
 
 async function loginAdmin(){
@@ -1373,42 +1292,34 @@ async function loginAdmin(){
   if(!checkSupabase())
     return;
 
-
   const email =
     document.getElementById(
       'adminEmail'
     ).value.trim().toLowerCase();
-
 
   const password =
     document.getElementById(
       'adminPassword'
     ).value;
 
-
   const errorBox =
     document.getElementById(
       'adminLoginError'
     );
-
 
   const button =
     document.getElementById(
       'adminLoginBtn'
     );
 
-
   errorBox.innerHTML = '';
-
 
   if(!email || !password){
 
     errorBox.innerHTML = `
 
       <div class="error">
-
         ❌ Escribe el correo y la contraseña.
-
       </div>
 
     `;
@@ -1417,12 +1328,10 @@ async function loginAdmin(){
 
   }
 
-
   button.disabled = true;
 
   button.textContent =
     '⏳ Verificando...';
-
 
   try{
 
@@ -1432,17 +1341,12 @@ async function loginAdmin(){
     } =
       await supabaseClient.auth.signInWithPassword({
 
-        email: email,
-
-        password: password
+        email,
+        password
 
       });
 
-
     if(error){
-
-      console.error(error);
-
 
       errorBox.innerHTML = `
 
@@ -1462,22 +1366,14 @@ async function loginAdmin(){
 
     }
 
-
     const loggedEmail =
       String(
         data.user?.email || ''
       ).toLowerCase().trim();
 
-
-    /*
-      COMPROBAR QUE EL CORREO
-      SEA EL ADMINISTRADOR
-    */
-
     if(loggedEmail !== ADMIN_EMAIL){
 
       await supabaseClient.auth.signOut();
-
 
       errorBox.innerHTML = `
 
@@ -1494,34 +1390,19 @@ async function loginAdmin(){
 
     }
 
-
-    /*
-      ADMINISTRADOR CORRECTO
-    */
-
     document.getElementById(
       'adminEmail'
     ).value = '';
-
 
     document.getElementById(
       'adminPassword'
     ).value = '';
 
-
-    errorBox.innerHTML = '';
-
-
     show('admin');
-
 
     await loadPartners();
 
-
   }catch(error){
-
-    console.error(error);
-
 
     errorBox.innerHTML = `
 
@@ -1550,15 +1431,10 @@ async function loginAdmin(){
 }
 
 
-/* =====================================================
-   CERRAR SESIÓN ADMIN
-===================================================== */
-
 async function logoutAdmin(){
 
   if(!checkSupabase())
     return;
-
 
   try{
 
@@ -1566,13 +1442,9 @@ async function logoutAdmin(){
 
   }catch(error){
 
-    console.error(
-      'Error cerrando sesión:',
-      error
-    );
+    console.error(error);
 
   }
-
 
   show('home');
 
@@ -1588,48 +1460,20 @@ async function loadPartners(){
   if(!checkSupabase())
     return;
 
-
   const partnerList =
     document.getElementById(
       'partnerList'
     );
-
 
   const adminPartners =
     document.getElementById(
       'adminPartners'
     );
 
-
   const networkStats =
     document.getElementById(
       'networkStats'
     );
-
-
-  if(partnerList){
-
-    partnerList.innerHTML =
-      '<div class="loading">Cargando socios...</div>';
-
-  }
-
-
-  if(adminPartners){
-
-    adminPartners.innerHTML =
-      '<div class="loading">Cargando socios...</div>';
-
-  }
-
-
-  if(networkStats){
-
-    networkStats.innerHTML =
-      'Cargando...';
-
-  }
-
 
   try{
 
@@ -1642,11 +1486,9 @@ async function loadPartners(){
         .select('*')
         .order('id');
 
-
     if(error){
 
       console.error(error);
-
 
       const message = `
 
@@ -1658,66 +1500,112 @@ async function loadPartners(){
             formatSupabaseError(error)
           )}</code>
 
-          <br>
-
-          Revisa que exista la tabla
-          <b>socios</b> y que tenga una política
-          SELECT para <b>anon</b>.
-
         </div>
 
       `;
 
-
       if(partnerList)
         partnerList.innerHTML = message;
 
-
       if(adminPartners)
         adminPartners.innerHTML = message;
-
 
       return;
 
     }
 
-
     socios = data || [];
-
 
     renderPartners();
 
     updateNetworkStats();
 
+    /*
+      Si el socio seleccionado ya está ocupado
+      en Supabase, lo quitamos de la selección.
+    */
+
+    if(selectedPartner){
+
+      const actualizado =
+        socios.find(
+          s =>
+            String(s.id) ===
+            String(selectedPartner.id)
+        );
+
+      if(
+        actualizado &&
+        String(actualizado.estado)
+          .toLowerCase() !== 'disponible'
+      ){
+
+        selectedPartner = null;
+
+      }
+
+    }
 
   }catch(error){
 
     console.error(error);
 
-
-    const message = `
-
-      <div class="error">
-
-        ❌ Error de conexión.
-
-        <code>${escapeHtml(
-          error.message || String(error)
-        )}</code>
-
-      </div>
-
-    `;
-
-
-    if(partnerList)
-      partnerList.innerHTML = message;
-
-
-    if(adminPartners)
-      adminPartners.innerHTML = message;
-
   }
+
+}
+
+
+/* =====================================================
+   ACTUALIZACIÓN AUTOMÁTICA
+===================================================== */
+
+function startLiveUpdates(){
+
+  if(refreshTimer)
+    clearInterval(refreshTimer);
+
+  /*
+    Cada 2 segundos vuelve a consultar Supabase.
+
+    Así si otra aplicación ocupa a Gabriel,
+    esta aplicación lo verá como OCUPADO.
+  */
+
+  refreshTimer =
+    setInterval(
+      async () => {
+
+        await loadPartners();
+
+        /*
+          Si estamos mostrando matching,
+          reconstruimos solamente los socios
+          que siguen disponibles.
+        */
+
+        const matching =
+          document.getElementById(
+            'matchingList'
+          );
+
+        const matchingScreen =
+          document.getElementById(
+            'matching'
+          );
+
+        if(
+          matching &&
+          matchingScreen &&
+          matchingScreen.classList.contains('active')
+        ){
+
+          renderMatchingList();
+
+        }
+
+      },
+      2000
+    );
 
 }
 
@@ -1733,12 +1621,10 @@ function renderPartners(){
       'partnerList'
     );
 
-
   const adminPartners =
     document.getElementById(
       'adminPartners'
     );
-
 
   if(partnerList){
 
@@ -1747,14 +1633,7 @@ function renderPartners(){
       partnerList.innerHTML = `
 
         <div class="empty">
-
           🚚 No hay socios registrados.
-
-          <br><br>
-
-          Agrega socios en la tabla
-          <b>socios</b> de Supabase.
-
         </div>
 
       `;
@@ -1770,7 +1649,6 @@ function renderPartners(){
 
   }
 
-
   if(adminPartners){
 
     if(socios.length === 0){
@@ -1778,9 +1656,7 @@ function renderPartners(){
       adminPartners.innerHTML = `
 
         <div class="empty">
-
           No hay socios registrados.
-
         </div>
 
       `;
@@ -1827,7 +1703,6 @@ function renderPartnerCard(socio){
       .toLowerCase()
       === 'disponible';
 
-
   return `
 
     <div class="card">
@@ -1852,7 +1727,6 @@ function renderPartnerCard(socio){
 
       </div>
 
-
       <p>
 
         🚚 ${escapeHtml(vehiculo)}
@@ -1869,7 +1743,6 @@ function renderPartnerCard(socio){
 
       </p>
 
-
       ${
         disponible
 
@@ -1877,20 +1750,24 @@ function renderPartnerCard(socio){
 
         `
 
-          <button
-            class="btn"
-            onclick="selectPartner('${escapeAttr(socio.id)}')"
-          >
-
-            🎯 Seleccionar socio
-
-          </button>
+        <button
+          class="btn"
+          onclick="selectPartner('${escapeAttr(socio.id)}')"
+        >
+          🎯 Seleccionar socio
+        </button>
 
         `
 
         :
 
-        ''
+        `
+
+        <div class="busy-box">
+          🔴 Este socio está ocupado.
+        </div>
+
+        `
 
       }
 
@@ -1902,7 +1779,7 @@ function renderPartnerCard(socio){
 
 
 /* =====================================================
-   SOCIO CENTRAL
+   CENTRAL
 ===================================================== */
 
 function renderAdminPartner(socio){
@@ -1923,7 +1800,6 @@ function renderAdminPartner(socio){
     String(estado)
       .toLowerCase()
       === 'disponible';
-
 
   return `
 
@@ -1977,25 +1853,20 @@ function updateNetworkStats(){
       'networkStats'
     );
 
-
   if(!networkStats)
     return;
 
-
   const disponibles =
-    socios.filter(s =>
-
-      String(s.estado || '')
-        .toLowerCase()
-        === 'disponible'
-
+    socios.filter(
+      s =>
+        String(s.estado || '')
+          .toLowerCase()
+          === 'disponible'
     ).length;
-
 
   const ocupados =
     socios.length -
     disponibles;
-
 
   networkStats.innerHTML = `
 
@@ -2043,17 +1914,24 @@ function updateNetworkStats(){
    SELECCIONAR SOCIO
 ===================================================== */
 
-function selectPartner(id){
+async function selectPartner(id){
 
-  selectedPartner =
+  /*
+    MUY IMPORTANTE:
+    antes de mostrarlo como seleccionado,
+    consultamos nuevamente Supabase.
+  */
+
+  await loadPartners();
+
+  const socio =
     socios.find(
-      socio =>
-        String(socio.id)
-        === String(id)
+      s =>
+        String(s.id) ===
+        String(id)
     );
 
-
-  if(!selectedPartner){
+  if(!socio){
 
     alert(
       'No se encontró el socio.'
@@ -2063,12 +1941,34 @@ function selectPartner(id){
 
   }
 
+  /*
+    Si otra aplicación ya lo ocupó,
+    esta aplicación NO lo puede seleccionar.
+  */
+
+  if(
+    String(socio.estado || '')
+      .toLowerCase()
+      !== 'disponible'
+  ){
+
+    alert(
+      '🔴 Este socio acaba de ser ocupado por otra aplicación.\n\n' +
+      'La lista se actualizará automáticamente.'
+    );
+
+    await loadPartners();
+
+    return;
+
+  }
+
+  selectedPartner = socio;
 
   const card =
     document.getElementById(
       'selectedPartnerCard'
     );
-
 
   card.innerHTML = `
 
@@ -2123,11 +2023,9 @@ function selectPartner(id){
 
   `;
 
-
   document.getElementById(
     'assignmentError'
   ).innerHTML = '';
-
 
   show('assignment');
 
@@ -2143,24 +2041,20 @@ async function sendDemand(){
   if(!checkSupabase())
     return;
 
-
   const origin =
     document.getElementById(
       'origin'
     ).value.trim();
-
 
   const dest =
     document.getElementById(
       'dest'
     ).value.trim();
 
-
   const cargo =
     document.getElementById(
       'cargo'
     ).value.trim();
-
 
   const quantity =
     Number(
@@ -2169,30 +2063,25 @@ async function sendDemand(){
       ).value
     );
 
-
   const unit =
     document.getElementById(
       'unit'
     ).value;
-
 
   const when =
     document.getElementById(
       'when'
     ).value;
 
-
   const requestError =
     document.getElementById(
       'requestError'
     );
 
-
   const button =
     document.getElementById(
       'sendDemandBtn'
     );
-
 
   if(
     !origin ||
@@ -2216,50 +2105,42 @@ async function sendDemand(){
 
   }
 
-
   requestError.innerHTML = '';
-
 
   button.disabled = true;
 
   button.textContent =
     '⏳ Creando solicitud...';
 
-
   show('matching');
-
 
   document.getElementById(
     'matchingList'
   ).innerHTML = `
 
     <div class="loading">
-
-      ⏳ Guardando solicitud en Supabase...
-
+      ⏳ Guardando solicitud...
     </div>
 
   `;
 
-
   const insertData = {
 
-    origen: origin,
+    origen:origin,
 
-    destino: dest,
+    destino:dest,
 
-    mercancia: cargo,
+    mercancia:cargo,
 
-    cantidas: quantity,
+    cantidas:quantity,
 
-    unidad: unit,
+    unidad:unit,
 
-    estado: 'pendiente',
+    estado:'pendiente',
 
-    socio_id: null
+    socio_id:null
 
   };
-
 
   try{
 
@@ -2273,14 +2154,7 @@ async function sendDemand(){
         .select()
         .single();
 
-
     if(error){
-
-      console.error(
-        'ERROR INSERT:',
-        error
-      );
-
 
       document.getElementById(
         'matchingList'
@@ -2294,56 +2168,6 @@ async function sendDemand(){
             formatSupabaseError(error)
           )}</code>
 
-          ${
-            error.code === '42501'
-
-            ?
-
-            `
-
-              <br><br>
-
-              ⚠️ <b>
-              Supabase está bloqueando
-              el INSERT mediante RLS.
-              </b>
-
-              <br><br>
-
-              Revisa la política INSERT
-              de la tabla <b>solicitudes</b>.
-
-            `
-
-            :
-
-            ''
-
-          }
-
-          ${
-            error.code === 'PGRST204'
-
-            ?
-
-            `
-
-              <br><br>
-
-              ⚠️ Una columna no coincide
-              con la estructura de la tabla.
-
-              Revisa especialmente
-              <b>cantidas</b>.
-
-            `
-
-            :
-
-            ''
-
-          }
-
         </div>
 
       `;
@@ -2352,10 +2176,7 @@ async function sendDemand(){
 
     }
 
-
-    currentDemand =
-      data;
-
+    currentDemand = data;
 
     document.getElementById(
       'demandText'
@@ -2393,46 +2214,36 @@ async function sendDemand(){
 
     `;
 
-
     document.getElementById(
       'partnerDemandNumber'
     ).textContent =
       'Solicitud #' +
       String(data.id);
 
-
     document.getElementById(
       'partnerDemandText'
     ).innerHTML = `
 
       📍 Recoger:
-
       ${escapeHtml(origin)}
 
       <br>
 
       📍 Entregar:
-
       ${escapeHtml(dest)}
 
       <br>
 
       📦 Mercancía:
-
       ${escapeHtml(cargo)}
 
       <br>
 
       ⚖️ Cantidad:
-
-      ${escapeHtml(
-        String(quantity)
-      )}
-
+      ${escapeHtml(String(quantity))}
       ${escapeHtml(unit)}
 
     `;
-
 
     document.getElementById(
       'adminDemand'
@@ -2446,96 +2257,29 @@ async function sendDemand(){
 
       <br>
 
-      📦 ${escapeHtml(
-        String(quantity)
-      )}
-
+      📦 ${escapeHtml(String(quantity))}
       ${escapeHtml(unit)}
-
       de
-
       ${escapeHtml(cargo)}
 
       <br>
 
       📍 ${escapeHtml(origin)}
-
       →
-
       ${escapeHtml(dest)}
 
       <br>
 
       Estado:
-
-      <b>
-        pendiente
-      </b>
+      <b>pendiente</b>
 
     `;
 
-
     await loadPartners();
 
-
-    const disponibles =
-      socios.filter(s =>
-
-        String(s.estado || '')
-          .toLowerCase()
-          === 'disponible'
-
-      );
-
-
-    if(disponibles.length === 0){
-
-      document.getElementById(
-        'matchingList'
-      ).innerHTML = `
-
-        <div class="alert">
-
-          ⚠️ La solicitud fue creada correctamente,
-
-          pero no hay socios disponibles
-          en este momento.
-
-        </div>
-
-      `;
-
-    }else{
-
-      document.getElementById(
-        'matchingList'
-      ).innerHTML = `
-
-        <p>
-
-          Encontramos
-
-          <b>
-            ${disponibles.length}
-          </b>
-
-          socio(s) disponible(s).
-
-        </p>
-
-        ${disponibles
-          .map(renderMatchingPartner)
-          .join('')}
-
-      `;
-
-    }
-
+    renderMatchingList();
 
   }catch(error){
-
-    console.error(error);
-
 
     document.getElementById(
       'matchingList'
@@ -2567,8 +2311,71 @@ async function sendDemand(){
 
 
 /* =====================================================
-   MATCHING
+   LISTA MATCHING
 ===================================================== */
+
+function renderMatchingList(){
+
+  const matchingList =
+    document.getElementById(
+      'matchingList'
+    );
+
+  if(!matchingList)
+    return;
+
+  const disponibles =
+    socios.filter(
+      s =>
+        String(s.estado || '')
+          .toLowerCase()
+          === 'disponible'
+    );
+
+  if(disponibles.length === 0){
+
+    matchingList.innerHTML = `
+
+      <div class="alert">
+
+        ⚠️ No hay socios disponibles
+        en este momento.
+
+        <br><br>
+
+        La aplicación seguirá
+        actualizando automáticamente.
+
+      </div>
+
+    `;
+
+    return;
+
+  }
+
+  matchingList.innerHTML = `
+
+    <p>
+
+      Encontramos
+
+      <b>
+        ${disponibles.length}
+      </b>
+
+      socio(s) disponible(s).
+
+    </p>
+
+    ${disponibles
+      .map(renderMatchingPartner)
+      .join('')}
+
+  `;
+
+}
+
 
 function renderMatchingPartner(socio){
 
@@ -2640,7 +2447,6 @@ async function acceptService(){
   if(!checkSupabase())
     return;
 
-
   if(!currentDemand){
 
     alert(
@@ -2650,7 +2456,6 @@ async function acceptService(){
     return;
 
   }
-
 
   if(!selectedPartner){
 
@@ -2662,29 +2467,107 @@ async function acceptService(){
 
   }
 
-
   const errorBox =
     document.getElementById(
       'assignmentError'
     );
-
 
   const button =
     document.getElementById(
       'assignBtn'
     );
 
-
   button.disabled = true;
 
   button.textContent =
-    '⏳ Asignando...';
-
+    '⏳ Verificando disponibilidad...';
 
   try{
 
+    /*
+      ==================================================
+      PASO 1
+      OCUPAR SOCIO SOLO SI SIGUE DISPONIBLE
+      ==================================================
+    */
+
     const {
-      error
+      data:claimedPartner,
+      error:claimError
+    } =
+      await supabaseClient
+        .from('socios')
+        .update({
+
+          estado:'ocupado'
+
+        })
+        .eq(
+          'id',
+          selectedPartner.id
+        )
+        .eq(
+          'estado',
+          'disponible'
+        )
+        .select()
+        .maybeSingle();
+
+
+    if(claimError){
+
+      throw claimError;
+
+    }
+
+
+    /*
+      SI NO DEVOLVIÓ FILA,
+      OTRA APP GANÓ EL SOCIO.
+    */
+
+    if(!claimedPartner){
+
+      selectedPartner = null;
+
+      await loadPartners();
+
+      errorBox.innerHTML = `
+
+        <div class="error">
+
+          ❌ <b>Gabriel u otro socio acaba de
+          ser ocupado.</b>
+
+          <br><br>
+
+          Otra aplicación lo asignó primero.
+
+          <br><br>
+
+          La lista ya fue actualizada.
+
+        </div>
+
+      `;
+
+      show('matching');
+
+      return;
+
+    }
+
+
+    /*
+      ==================================================
+      PASO 2
+      ASIGNAR SOLICITUD SOLO SI SIGUE PENDIENTE
+      ==================================================
+    */
+
+    const {
+      data:assignedDemand,
+      error:demandError
     } =
       await supabaseClient
         .from('solicitudes')
@@ -2699,54 +2582,91 @@ async function acceptService(){
         .eq(
           'id',
           currentDemand.id
+        )
+        .eq(
+          'estado',
+          'pendiente'
+        )
+        .select()
+        .maybeSingle();
+
+
+    if(demandError){
+
+      /*
+        Si falló la solicitud,
+        liberamos el socio.
+      */
+
+      await supabaseClient
+        .from('socios')
+        .update({
+          estado:'disponible'
+        })
+        .eq(
+          'id',
+          selectedPartner.id
+        )
+        .eq(
+          'estado',
+          'ocupado'
         );
 
+      throw demandError;
 
-    if(error){
+    }
+
+
+    if(!assignedDemand){
+
+      /*
+        La solicitud ya fue tomada por otra aplicación.
+      */
+
+      await supabaseClient
+        .from('socios')
+        .update({
+          estado:'disponible'
+        })
+        .eq(
+          'id',
+          selectedPartner.id
+        )
+        .eq(
+          'estado',
+          'ocupado'
+        );
+
+      selectedPartner = null;
+
+      await loadPartners();
 
       errorBox.innerHTML = `
 
         <div class="error">
 
-          ❌ No se pudo asignar.
-
-          <code>${escapeHtml(
-            formatSupabaseError(error)
-          )}</code>
+          ❌ Esta solicitud ya fue tomada
+          por otra aplicación.
 
         </div>
 
       `;
+
+      show('matching');
 
       return;
 
     }
 
 
-    const {
-      error: partnerError
-    } =
-      await supabaseClient
-        .from('socios')
-        .update({
+    /*
+      ==================================================
+      TODO CORRECTO
+      ==================================================
+    */
 
-          estado:'ocupado'
-
-        })
-        .eq(
-          'id',
-          selectedPartner.id
-        );
-
-
-    if(partnerError){
-
-      console.error(
-        'Error actualizando socio:',
-        partnerError
-      );
-
-    }
+    currentDemand =
+      assignedDemand;
 
 
     document.getElementById(
@@ -2755,13 +2675,11 @@ async function acceptService(){
       selectedPartner.nombre ||
       'Socio';
 
-
     document.getElementById(
       'deliveredPartner'
     ).textContent =
       selectedPartner.nombre ||
       'Socio';
-
 
     document.getElementById(
       'activeServiceText'
@@ -2786,9 +2704,7 @@ async function acceptService(){
       <br><br>
 
       📦 ${escapeHtml(
-        String(
-          currentDemand.mercancia || ''
-        )
+        currentDemand.mercancia || ''
       )}
 
       <br>
@@ -2805,24 +2721,22 @@ async function acceptService(){
 
     `;
 
-
     show('active');
-
 
     await loadPartners();
 
-
   }catch(error){
+
+    console.error(error);
 
     errorBox.innerHTML = `
 
       <div class="error">
 
-        ❌ Error:
+        ❌ No se pudo asignar el servicio.
 
         <code>${escapeHtml(
-          error.message ||
-          String(error)
+          formatSupabaseError(error)
         )}</code>
 
       </div>
@@ -2850,7 +2764,6 @@ async function openPartnerDemand(){
   if(!checkSupabase())
     return;
 
-
   try{
 
     const {
@@ -2872,7 +2785,6 @@ async function openPartnerDemand(){
         )
         .limit(1)
         .maybeSingle();
-
 
     if(error){
 
@@ -2899,19 +2811,8 @@ async function openPartnerDemand(){
 
     }
 
-
-    if(data){
-
-      currentDemand =
-        data;
-
-    }else{
-
-      currentDemand =
-        null;
-
-    }
-
+    currentDemand =
+      data || null;
 
   }catch(error){
 
@@ -2938,7 +2839,6 @@ async function openPartnerDemand(){
 
   }
 
-
   if(!currentDemand){
 
     document.getElementById(
@@ -2946,11 +2846,9 @@ async function openPartnerDemand(){
     ).innerHTML =
       'No hay solicitudes pendientes.';
 
-
     document.getElementById(
       'partnerAcceptBtn'
     ).disabled = true;
-
 
     show('partnerDemand');
 
@@ -2958,27 +2856,21 @@ async function openPartnerDemand(){
 
   }
 
-
   document.getElementById(
     'partnerAcceptBtn'
   ).disabled = false;
-
 
   document.getElementById(
     'partnerDemandNumber'
   ).textContent =
     'Solicitud #' +
-    String(
-      currentDemand.id
-    );
-
+    String(currentDemand.id);
 
   document.getElementById(
     'partnerDemandText'
   ).innerHTML = `
 
     📍 Recoger:
-
     ${escapeHtml(
       currentDemand.origen || '-'
     )}
@@ -2986,7 +2878,6 @@ async function openPartnerDemand(){
     <br>
 
     📍 Entregar:
-
     ${escapeHtml(
       currentDemand.destino || '-'
     )}
@@ -2994,7 +2885,6 @@ async function openPartnerDemand(){
     <br>
 
     📦 Mercancía:
-
     ${escapeHtml(
       currentDemand.mercancia || '-'
     )}
@@ -3002,7 +2892,6 @@ async function openPartnerDemand(){
     <br>
 
     ⚖️ Cantidad:
-
     ${escapeHtml(
       String(
         currentDemand.cantidas ?? '-'
@@ -3014,7 +2903,6 @@ async function openPartnerDemand(){
     )}
 
   `;
-
 
   show('partnerDemand');
 
@@ -3030,7 +2918,6 @@ async function acceptPartnerDemand(){
   if(!checkSupabase())
     return;
 
-
   if(!currentDemand){
 
     alert(
@@ -3041,18 +2928,27 @@ async function acceptPartnerDemand(){
 
   }
 
+  /*
+    Recargamos socios para no utilizar
+    información vieja.
+  */
+
+  await loadPartners();
+
+  /*
+    Si no hay socio seleccionado,
+    tomamos uno disponible.
+  */
 
   if(!selectedPartner){
 
     const disponibles =
-      socios.filter(s =>
-
-        String(s.estado || '')
-          .toLowerCase()
-          === 'disponible'
-
+      socios.filter(
+        s =>
+          String(s.estado || '')
+            .toLowerCase()
+            === 'disponible'
       );
-
 
     if(disponibles.length > 0){
 
@@ -3062,7 +2958,6 @@ async function acceptPartnerDemand(){
     }
 
   }
-
 
   if(!selectedPartner){
 
@@ -3074,11 +2969,59 @@ async function acceptPartnerDemand(){
 
   }
 
-
   try{
 
+    /*
+      PRIMERO intentamos ocupar
+      el socio de forma segura.
+    */
+
     const {
-      error
+      data:claimedPartner,
+      error:claimError
+    } =
+      await supabaseClient
+        .from('socios')
+        .update({
+
+          estado:'ocupado'
+
+        })
+        .eq(
+          'id',
+          selectedPartner.id
+        )
+        .eq(
+          'estado',
+          'disponible'
+        )
+        .select()
+        .maybeSingle();
+
+    if(claimError)
+      throw claimError;
+
+    if(!claimedPartner){
+
+      selectedPartner = null;
+
+      await loadPartners();
+
+      alert(
+        '🔴 Ese socio ya fue ocupado por otra aplicación.'
+      );
+
+      return;
+
+    }
+
+    /*
+      AHORA asignamos la solicitud.
+    */
+
+    const {
+      data:assignedDemand,
+      error:demandError
     } =
       await supabaseClient
         .from('solicitudes')
@@ -3097,45 +3040,70 @@ async function acceptPartnerDemand(){
         .eq(
           'estado',
           'pendiente'
+        )
+        .select()
+        .maybeSingle();
+
+    if(demandError){
+
+      await supabaseClient
+        .from('socios')
+        .update({
+          estado:'disponible'
+        })
+        .eq(
+          'id',
+          selectedPartner.id
+        )
+        .eq(
+          'estado',
+          'ocupado'
         );
 
+      throw demandError;
 
-    if(error){
+    }
+
+    if(!assignedDemand){
+
+      await supabaseClient
+        .from('socios')
+        .update({
+          estado:'disponible'
+        })
+        .eq(
+          'id',
+          selectedPartner.id
+        )
+        .eq(
+          'estado',
+          'ocupado'
+        );
+
+      selectedPartner = null;
+
+      await loadPartners();
 
       alert(
-        'No se pudo aceptar:\n\n' +
-        formatSupabaseError(error)
+        'Esta solicitud ya fue aceptada por otro socio.'
       );
 
       return;
 
     }
 
-
-    await supabaseClient
-      .from('socios')
-      .update({
-
-        estado:'ocupado'
-
-      })
-      .eq(
-        'id',
-        selectedPartner.id
-      );
-
+    currentDemand =
+      assignedDemand;
 
     document.getElementById(
       'activePartner'
     ).textContent =
       selectedPartner.nombre;
 
-
     document.getElementById(
       'deliveredPartner'
     ).textContent =
       selectedPartner.nombre;
-
 
     document.getElementById(
       'activeServiceText'
@@ -3157,20 +3125,23 @@ async function acceptPartnerDemand(){
         currentDemand.destino || ''
       )}
 
-    `;
+      <br><br>
 
+      📦 ${escapeHtml(
+        currentDemand.mercancia || ''
+      )}
+
+    `;
 
     show('active');
 
-
     await loadPartners();
-
 
   }catch(error){
 
     alert(
       'Error:\n\n' +
-      error.message
+      formatSupabaseError(error)
     );
 
   }
@@ -3187,7 +3158,6 @@ async function deliver(){
   if(!checkSupabase())
     return;
 
-
   if(!currentDemand){
 
     show('home');
@@ -3196,22 +3166,20 @@ async function deliver(){
 
   }
 
-
   const button =
     document.getElementById(
       'deliverBtn'
     );
-
 
   button.disabled = true;
 
   button.textContent =
     '⏳ Registrando entrega...';
 
-
   try{
 
     const {
+      data,
       error
     } =
       await supabaseClient
@@ -3224,8 +3192,13 @@ async function deliver(){
         .eq(
           'id',
           currentDemand.id
-        );
-
+        )
+        .eq(
+          'estado',
+          'asignada'
+        )
+        .select()
+        .maybeSingle();
 
     if(error){
 
@@ -3238,11 +3211,20 @@ async function deliver(){
 
     }
 
+    if(!data){
+
+      alert(
+        'La solicitud ya fue actualizada.'
+      );
+
+      return;
+
+    }
 
     if(selectedPartner){
 
       const {
-        error: partnerError
+        error:partnerError
       } =
         await supabaseClient
           .from('socios')
@@ -3254,31 +3236,26 @@ async function deliver(){
           .eq(
             'id',
             selectedPartner.id
+          )
+          .eq(
+            'estado',
+            'ocupado'
           );
 
-
-      if(partnerError){
-
-        console.error(
-          partnerError
-        );
-
-      }
+      if(partnerError)
+        console.error(partnerError);
 
     }
 
-
     show('delivered');
 
-
     await loadPartners();
-
 
   }catch(error){
 
     alert(
       'Error:\n\n' +
-      error.message
+      formatSupabaseError(error)
     );
 
   }finally{
@@ -3303,21 +3280,17 @@ function resetApp(){
 
   selectedPartner = null;
 
-
   document.getElementById(
     'selectedPartnerCard'
   ).innerHTML = '';
-
 
   document.getElementById(
     'requestError'
   ).innerHTML = '';
 
-
   document.getElementById(
     'assignmentError'
   ).innerHTML = '';
-
 
   show('request');
 
@@ -3334,8 +3307,15 @@ document.addEventListener(
 
     await loadPartners();
 
+    /*
+      ACTUALIZACIÓN AUTOMÁTICA
+    */
+
+    startLiveUpdates();
+
   }
 );
+
 
 </script>
 
