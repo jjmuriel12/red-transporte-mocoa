@@ -1,13 +1,14 @@
-```html
 <!doctype html>
 <html lang="es">
 <head>
+
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 
 <title>Red Transporte Mocoa</title>
 
 <style>
+
 *{
   box-sizing:border-box;
 }
@@ -115,6 +116,10 @@ p{
   color:#173b57;
 }
 
+.btn.danger{
+  background:#b52a2a;
+}
+
 label{
   display:block;
   font-size:12px;
@@ -129,6 +134,12 @@ select{
   border:1px solid #cdd7de;
   border-radius:9px;
   font-size:14px;
+}
+
+input:focus,
+select:focus{
+  outline:none;
+  border-color:#1670ad;
 }
 
 .row{
@@ -250,6 +261,7 @@ select{
   border-radius:8px;
   font-size:11px;
   border:0;
+  cursor:pointer;
 }
 
 .status-line{
@@ -267,7 +279,27 @@ select{
   font-size:48px;
   margin:10px 0;
 }
+
+.login-icon{
+  text-align:center;
+  font-size:55px;
+  margin:10px 0;
+}
+
+.admin-header{
+  background:#173b57;
+  color:white;
+  padding:12px;
+  border-radius:12px;
+  margin-bottom:15px;
+}
+
+.admin-header small{
+  opacity:.8;
+}
+
 </style>
+
 </head>
 
 <body>
@@ -275,13 +307,20 @@ select{
 <div class="app">
 
 <header>
-  <div class="brand">🚛 RED TRANSPORTE MOCOA</div>
-  <div class="sub">
-    Red local de transporte de mercancías
-  </div>
+
+<div class="brand">
+🚛 RED TRANSPORTE MOCOA
+</div>
+
+<div class="sub">
+Red local de transporte de mercancías
+</div>
+
 </header>
 
+
 <main>
+
 
 <!-- =====================================================
      INICIO
@@ -293,34 +332,118 @@ select{
 🚛
 </div>
 
-<h1>¿Necesitas transporte?</h1>
+<h1>
+¿Necesitas transporte?
+</h1>
 
 <p>
 Encuentra un socio transportador disponible en Mocoa.
 </p>
 
 <div class="card">
-<b>📦 Solicita tu transporte</b>
+
+<b>
+📦 Solicita tu transporte
+</b>
 
 <p>
 Indica origen, destino, mercancía y cantidad.
 La central buscará los socios disponibles.
 </p>
+
 </div>
 
-<button class="btn" onclick="show('request')">
+<button
+class="btn"
+onclick="show('request')">
+
 📦 Solicitar transporte
+
 </button>
 
-<button class="btn alt" onclick="openPartnerHome()">
+<button
+class="btn alt"
+onclick="openPartnerHome()">
+
 🚚 Soy socio transportador
+
 </button>
 
-<button class="btn alt" onclick="openAdmin()">
+<button
+class="btn alt"
+onclick="openAdmin()">
+
 🖥️ Central de operaciones
+
 </button>
 
 </section>
+
+
+
+<!-- =====================================================
+     LOGIN ADMIN
+===================================================== -->
+
+<section id="adminLogin" class="screen">
+
+<div class="login-icon">
+🔐
+</div>
+
+<h2>
+Acceso administrador
+</h2>
+
+<p>
+Esta sección está protegida. Solo el administrador autorizado puede ingresar a la Central de operaciones.
+</p>
+
+<div class="card">
+
+<label>
+Correo electrónico
+</label>
+
+<input
+id="adminEmail"
+type="email"
+autocomplete="username"
+placeholder="Correo del administrador">
+
+<label>
+Contraseña
+</label>
+
+<input
+id="adminPassword"
+type="password"
+autocomplete="current-password"
+placeholder="Contraseña">
+
+<button
+id="adminLoginBtn"
+class="btn"
+onclick="adminLogin()">
+
+🔐 Ingresar a la central
+
+</button>
+
+<div id="adminLoginError"></div>
+
+</div>
+
+<button
+class="btn alt"
+onclick="show('home')">
+
+Volver
+
+</button>
+
+</section>
+
 
 
 <!-- =====================================================
@@ -329,9 +452,13 @@ La central buscará los socios disponibles.
 
 <section id="request" class="screen">
 
-<h2>📦 Nueva solicitud</h2>
+<h2>
+📦 Nueva solicitud
+</h2>
 
-<label>Origen</label>
+<label>
+Origen
+</label>
 
 <input
 id="origin"
@@ -339,7 +466,9 @@ value="Ferretería - Mocoa"
 placeholder="Lugar de recogida">
 
 
-<label>Destino</label>
+<label>
+Destino
+</label>
 
 <input
 id="dest"
@@ -347,7 +476,9 @@ value="Vereda El Rumiyaco"
 placeholder="Lugar de entrega">
 
 
-<label>Mercancía</label>
+<label>
+Mercancía
+</label>
 
 <input
 id="cargo"
@@ -359,7 +490,9 @@ placeholder="Ej: cemento, arena, alimentos">
 
 <div>
 
-<label>Cantidad</label>
+<label>
+Cantidad
+</label>
 
 <input
 id="quantity"
@@ -371,7 +504,9 @@ value="100">
 
 <div>
 
-<label>Unidad</label>
+<label>
+Unidad
+</label>
 
 <select id="unit">
 
@@ -443,17 +578,22 @@ Volver
 </section>
 
 
+
 <!-- =====================================================
      MATCHING
 ===================================================== -->
 
 <section id="matching" class="screen">
 
-<h2>🔎 Socios disponibles</h2>
+<h2>
+🔎 Socios disponibles
+</h2>
 
 <div class="alert">
 
-<b>Solicitud creada</b>
+<b>
+Solicitud creada
+</b>
 
 <p id="demandText">
 Buscando socios...
@@ -480,13 +620,16 @@ Nueva solicitud
 </section>
 
 
+
 <!-- =====================================================
      ASIGNACIÓN
 ===================================================== -->
 
 <section id="assignment" class="screen">
 
-<h2>🎯 Socio seleccionado</h2>
+<h2>
+🎯 Socio seleccionado
+</h2>
 
 <div id="selectedPartnerCard"></div>
 
@@ -512,13 +655,16 @@ Volver
 </section>
 
 
+
 <!-- =====================================================
      SERVICIO ACTIVO
 ===================================================== -->
 
 <section id="active" class="screen">
 
-<h2>✅ Servicio confirmado</h2>
+<h2>
+✅ Servicio confirmado
+</h2>
 
 <div class="success">
 
@@ -528,7 +674,9 @@ Servicio asignado correctamente.
 
 <div class="card">
 
-<b>Socio transportador</b>
+<b>
+Socio transportador
+</b>
 
 <h3 id="activePartner">
 -
@@ -546,7 +694,9 @@ Servicio asignado correctamente.
 
 <div class="card">
 
-<b>Estado del servicio</b>
+<b>
+Estado del servicio
+</b>
 
 <div class="status-line">
 🟢 Solicitud asignada
@@ -582,13 +732,16 @@ onclick="deliver()">
 </section>
 
 
+
 <!-- =====================================================
      ENTREGA
 ===================================================== -->
 
 <section id="delivered" class="screen">
 
-<h2>📦 Entrega realizada</h2>
+<h2>
+📦 Entrega realizada
+</h2>
 
 <div class="card">
 
@@ -627,17 +780,22 @@ Nueva solicitud
 </section>
 
 
+
 <!-- =====================================================
      PANEL SOCIO
 ===================================================== -->
 
 <section id="partnerHome" class="screen">
 
-<h2>🚚 Panel del socio</h2>
+<h2>
+🚚 Panel del socio
+</h2>
 
 <div class="card">
 
-<b>Socios registrados</b>
+<b>
+Socios registrados
+</b>
 
 <p>
 Los socios se cargan automáticamente desde Supabase.
@@ -680,13 +838,16 @@ Volver
 </section>
 
 
+
 <!-- =====================================================
      DEMANDA SOCIO
 ===================================================== -->
 
 <section id="partnerDemand" class="screen">
 
-<h2>🔔 Demanda disponible</h2>
+<h2>
+🔔 Demanda disponible
+</h2>
 
 <div class="card">
 
@@ -726,19 +887,33 @@ Volver
 </section>
 
 
+
 <!-- =====================================================
-     CENTRAL
+     CENTRAL ADMIN
 ===================================================== -->
 
 <section id="admin" class="screen">
 
-<h2>🖥️ Central de operaciones</h2>
+<div class="admin-header">
 
-<div class="card">
+<b>
+🖥️ CENTRAL DE OPERACIONES
+</b>
+
+<br>
+
+<small>
+Administrador: jjmuriel@hotmail.com
+</small>
+
+</div>
+
 
 <div class="top">
 
-<b>Estado de la red</b>
+<h2>
+Estado de la red
+</h2>
 
 <button
 class="badge"
@@ -750,6 +925,9 @@ onclick="loadPartners()">
 
 </div>
 
+
+<div class="card">
+
 <div id="networkStats">
 Cargando...
 </div>
@@ -759,7 +937,9 @@ Cargando...
 
 <div class="card">
 
-<b>📍 Mapa operativo</b>
+<b>
+📍 Mapa operativo
+</b>
 
 <div class="map">
 
@@ -816,7 +996,9 @@ font-size:11px">
 
 <div class="card">
 
-<b>🚚 Socios en la red</b>
+<b>
+🚚 Socios en la red
+</b>
 
 <div id="adminPartners">
 
@@ -829,7 +1011,9 @@ Cargando socios...
 
 <div class="card">
 
-<b>📦 Última solicitud</b>
+<b>
+📦 Última solicitud
+</b>
 
 <p id="adminDemand">
 
@@ -839,7 +1023,26 @@ No hay solicitudes cargadas.
 
 </div>
 
+
+<button
+class="btn danger"
+onclick="adminLogout()">
+
+🚪 Cerrar sesión de administrador
+
+</button>
+
+
+<button
+class="btn alt"
+onclick="show('home')">
+
+Volver al inicio
+
+</button>
+
 </section>
+
 
 
 <!-- =====================================================
@@ -866,8 +1069,11 @@ Central
 
 </div>
 
+
 </main>
+
 </div>
+
 
 
 <!-- =====================================================
@@ -878,8 +1084,9 @@ Central
 
 <script>
 
+
 /* =====================================================
-   CONFIGURACIÓN
+   CONFIGURACIÓN SUPABASE
 ===================================================== */
 
 const SUPABASE_URL =
@@ -890,7 +1097,15 @@ const SUPABASE_KEY =
 
 
 /* =====================================================
-   CLIENTE
+   ADMINISTRADOR AUTORIZADO
+===================================================== */
+
+const ADMIN_EMAIL =
+'jjmuriel@hotmail.com';
+
+
+/* =====================================================
+   CLIENTE SUPABASE
 ===================================================== */
 
 let supabaseClient = null;
@@ -1018,10 +1233,425 @@ function checkSupabase(){
 
 
 /* =====================================================
+   VERIFICAR ADMIN
+===================================================== */
+
+async function isAdmin(){
+
+  if(!checkSupabase())
+    return false;
+
+
+  try{
+
+    const {
+      data,
+      error
+    } =
+      await supabaseClient
+        .auth
+        .getSession();
+
+
+    if(error){
+
+      console.error(
+        'Error comprobando sesión:',
+        error
+      );
+
+      return false;
+
+    }
+
+
+    const session =
+      data?.session;
+
+
+    if(!session ||
+       !session.user){
+
+      return false;
+
+    }
+
+
+    const email =
+      String(
+        session.user.email || ''
+      )
+      .trim()
+      .toLowerCase();
+
+
+    return email ===
+      ADMIN_EMAIL.toLowerCase();
+
+
+  }catch(error){
+
+    console.error(error);
+
+    return false;
+
+  }
+
+}
+
+
+/* =====================================================
+   ABRIR CENTRAL
+===================================================== */
+
+async function openAdmin(){
+
+  const autorizado =
+    await isAdmin();
+
+
+  if(autorizado){
+
+    show('admin');
+
+    await loadPartners();
+
+    return;
+
+  }
+
+
+  const emailInput =
+    document.getElementById(
+      'adminEmail'
+    );
+
+
+  const passwordInput =
+    document.getElementById(
+      'adminPassword'
+    );
+
+
+  const errorBox =
+    document.getElementById(
+      'adminLoginError'
+    );
+
+
+  if(emailInput)
+    emailInput.value =
+      ADMIN_EMAIL;
+
+
+  if(passwordInput)
+    passwordInput.value = '';
+
+
+  if(errorBox)
+    errorBox.innerHTML = '';
+
+
+  show('adminLogin');
+
+}
+
+
+/* =====================================================
+   LOGIN ADMIN
+===================================================== */
+
+async function adminLogin(){
+
+  if(!checkSupabase())
+    return;
+
+
+  const email =
+    document.getElementById(
+      'adminEmail'
+    )
+    .value
+    .trim();
+
+
+  const password =
+    document.getElementById(
+      'adminPassword'
+    )
+    .value;
+
+
+  const errorBox =
+    document.getElementById(
+      'adminLoginError'
+    );
+
+
+  const button =
+    document.getElementById(
+      'adminLoginBtn'
+    );
+
+
+  errorBox.innerHTML = '';
+
+
+  if(!email || !password){
+
+    errorBox.innerHTML = `
+
+    <div class="error">
+
+    ❌ Escribe el correo y la contraseña.
+
+    </div>
+
+    `;
+
+    return;
+
+  }
+
+
+  if(
+    email.toLowerCase()
+    !== ADMIN_EMAIL.toLowerCase()
+  ){
+
+    errorBox.innerHTML = `
+
+    <div class="error">
+
+    ❌ Este correo no tiene permiso
+    para administrar la aplicación.
+
+    </div>
+
+    `;
+
+    return;
+
+  }
+
+
+  button.disabled = true;
+
+  button.textContent =
+    '⏳ Verificando...';
+
+
+  try{
+
+    const {
+      data,
+      error
+    } =
+      await supabaseClient
+        .auth
+        .signInWithPassword({
+
+          email:email,
+
+          password:password
+
+        });
+
+
+    if(error){
+
+      console.error(
+        'LOGIN ERROR:',
+        error
+      );
+
+
+      errorBox.innerHTML = `
+
+      <div class="error">
+
+      ❌ No se pudo iniciar sesión.
+
+      <code>${escapeHtml(
+        formatSupabaseError(error)
+      )}</code>
+
+      </div>
+
+      `;
+
+      return;
+
+    }
+
+
+    const user =
+      data?.user;
+
+
+    if(!user){
+
+      errorBox.innerHTML = `
+
+      <div class="error">
+
+      ❌ Supabase no devolvió
+      un usuario válido.
+
+      </div>
+
+      `;
+
+      return;
+
+    }
+
+
+    const loggedEmail =
+      String(
+        user.email || ''
+      )
+      .trim()
+      .toLowerCase();
+
+
+    if(
+      loggedEmail !==
+      ADMIN_EMAIL.toLowerCase()
+    ){
+
+      await supabaseClient
+        .auth
+        .signOut();
+
+
+      errorBox.innerHTML = `
+
+      <div class="error">
+
+      ❌ Este usuario no está autorizado
+      para administrar la aplicación.
+
+      </div>
+
+      `;
+
+      return;
+
+    }
+
+
+    document.getElementById(
+      'adminEmail'
+    ).value = '';
+
+
+    document.getElementById(
+      'adminPassword'
+    ).value = '';
+
+
+    show('admin');
+
+
+    await loadPartners();
+
+
+  }catch(error){
+
+    console.error(error);
+
+
+    errorBox.innerHTML = `
+
+    <div class="error">
+
+    ❌ Error de conexión.
+
+    <code>${escapeHtml(
+      error.message ||
+      String(error)
+    )}</code>
+
+    </div>
+
+    `;
+
+  }finally{
+
+    button.disabled = false;
+
+    button.textContent =
+      '🔐 Ingresar a la central';
+
+  }
+
+}
+
+
+/* =====================================================
+   CERRAR SESIÓN ADMIN
+===================================================== */
+
+async function adminLogout(){
+
+  if(!supabaseClient)
+    return;
+
+
+  try{
+
+    const {
+      error
+    } =
+      await supabaseClient
+        .auth
+        .signOut();
+
+
+    if(error){
+
+      console.error(
+        'Error cerrando sesión:',
+        error
+      );
+
+    }
+
+  }catch(error){
+
+    console.error(error);
+
+  }
+
+
+  show('home');
+
+}
+
+
+/* =====================================================
    NAVEGACIÓN
 ===================================================== */
 
 function show(id){
+
+  /*
+    PROTECCIÓN EXTRA:
+
+    Si alguien intenta mostrar
+    "admin" directamente, verificamos
+    la sesión antes de permitirlo.
+  */
+
+  if(id === 'admin'){
+
+    openAdmin();
+
+    return;
+
+  }
+
 
   document
     .querySelectorAll('.screen')
@@ -1053,15 +1683,6 @@ function show(id){
 function openPartnerHome(){
 
   show('partnerHome');
-
-  loadPartners();
-
-}
-
-
-function openAdmin(){
-
-  show('admin');
 
   loadPartners();
 
@@ -1108,6 +1729,14 @@ async function loadPartners(){
 
     adminPartners.innerHTML =
       '<div class="loading">Cargando socios...</div>';
+
+  }
+
+
+  if(networkStats){
+
+    networkStats.innerHTML =
+      'Cargando...';
 
   }
 
@@ -1719,24 +2348,6 @@ async function sendDemand(){
   `;
 
 
-  /*
-    IMPORTANTE:
-
-    Esta versión utiliza exactamente:
-
-    origen
-    destino
-    mercancia
-    cantidas
-    unidad
-    estado
-    socio_id
-
-    Si tu tabla utiliza "cantidad" en vez de
-    "cantidas", cambia el nombre aquí.
-  */
-
-
   const insertData = {
 
     origen: origin,
@@ -1754,14 +2365,6 @@ async function sendDemand(){
     socio_id: null
 
   };
-
-
-  /*
-    Si tienes una columna "cuando", puedes
-    agregarla a la tabla y descomentar:
-
-    cuando: when
-  */
 
 
   try{
@@ -1809,12 +2412,6 @@ async function sendDemand(){
         ⚠️ <b>Supabase está bloqueando
         el INSERT mediante RLS.</b>
 
-        <br><br>
-
-        En Supabase → SQL Editor ejecuta
-        la política INSERT para
-        <b>anon</b>.
-
         `
 
         :
@@ -1859,8 +2456,6 @@ async function sendDemand(){
       data;
 
 
-    /* TEXTO SOLICITUD */
-
     document.getElementById(
       'demandText'
     ).innerHTML = `
@@ -1897,8 +2492,6 @@ async function sendDemand(){
 
     `;
 
-
-    /* DEMANDA SOCIO */
 
     document.getElementById(
       'partnerDemandNumber'
@@ -1940,8 +2533,6 @@ async function sendDemand(){
     `;
 
 
-    /* CENTRAL */
-
     document.getElementById(
       'adminDemand'
     ).innerHTML = `
@@ -1980,11 +2571,6 @@ async function sendDemand(){
 
     `;
 
-
-    /*
-      RECARGAR SOCIOS PARA ASEGURAR
-      QUE TENEMOS LA INFORMACIÓN ACTUAL.
-    */
 
     await loadPartners();
 
@@ -2078,7 +2664,7 @@ async function sendDemand(){
 
 
 /* =====================================================
-   SOCIOS PARA MATCHING
+   MATCHING
 ===================================================== */
 
 function renderMatchingPartner(socio){
@@ -2235,10 +2821,6 @@ async function acceptService(){
     }
 
 
-    /*
-      Marcar socio como ocupado.
-    */
-
     const {
       error: partnerError
     } =
@@ -2364,11 +2946,6 @@ async function openPartnerDemand(){
   if(!checkSupabase())
     return;
 
-
-  /*
-    Buscar siempre la solicitud pendiente
-    más reciente.
-  */
 
   try{
 
@@ -2560,14 +3137,6 @@ async function acceptPartnerDemand(){
 
   }
 
-
-  /*
-    Si no se ha seleccionado un socio,
-    usamos el primer socio disponible.
-
-    Para producción será mejor tener
-    un usuario/socio autenticado.
-  */
 
   if(!selectedPartner){
 
@@ -2764,10 +3333,6 @@ async function deliver(){
     }
 
 
-    /*
-      Liberar socio.
-    */
-
     if(selectedPartner){
 
       const {
@@ -2854,25 +3419,90 @@ function resetApp(){
 
 
 /* =====================================================
-   CARGA INICIAL
+   COMPROBAR SESIÓN AL CARGAR
 ===================================================== */
 
 document.addEventListener(
   'DOMContentLoaded',
-  () => {
+  async () => {
+
+    if(!supabaseClient)
+      return;
+
 
     /*
-      Intentamos cargar los socios
-      inmediatamente.
+      Si existe una sesión guardada,
+      comprobamos si pertenece al admin.
     */
+
+    const autorizado =
+      await isAdmin();
+
+
+    if(autorizado){
+
+      console.log(
+        'Administrador autenticado.'
+      );
+
+    }
+
 
     loadPartners();
 
   }
 );
 
+
+/* =====================================================
+   CONTROL DE CAMBIOS DE SESIÓN
+===================================================== */
+
+if(supabaseClient){
+
+  supabaseClient
+    .auth
+    .onAuthStateChange(
+      async (event, session) => {
+
+        console.log(
+          'Cambio de autenticación:',
+          event
+        );
+
+
+        /*
+          Si alguien cierra sesión,
+          no permitimos quedarse en Central.
+        */
+
+        if(event === 'SIGNED_OUT'){
+
+          const adminScreen =
+            document.getElementById(
+              'admin'
+            );
+
+
+          if(
+            adminScreen &&
+            adminScreen.classList.contains(
+              'active'
+            )
+          ){
+
+            show('home');
+
+          }
+
+        }
+
+      }
+    );
+
+}
+
 </script>
 
 </body>
 </html>
-```
