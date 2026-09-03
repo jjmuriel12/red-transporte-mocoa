@@ -1,9 +1,9 @@
 ```html
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 
 <title>Red Transporte Mocoa</title>
 
@@ -16,21 +16,22 @@ body{
   margin:0;
   background:#eef2f5;
   color:#18232d;
-  font-family:Arial,Helvetica,sans-serif;
+  font-family:Arial,sans-serif;
 }
 
-.ap.app{
+.app{
   max-width:480px;
-  min-height:100vh;
-  margin:auto;
+  margin:16px auto;
   background:#fff;
+  min-height:800px;
+  border-radius:24px;
   overflow:hidden;
-  box-shadow:0 8px 30px rgba(0,0,0,.12);
+  box-shadow:0 8px 30px #0002;
 }
 
 header{
   background:#173b57;
-  color:white;
+  color:#fff;
   padding:20px;
 }
 
@@ -64,7 +65,7 @@ h1{
 
 h2{
   font-size:20px;
-  margin:8px 0 15px;
+  margin:8px 0;
 }
 
 h3{
@@ -114,14 +115,6 @@ p{
   color:#173b57;
 }
 
-.btn.success-btn{
-  background:#2e8b57;
-}
-
-.btn.danger{
-  background:#b52d2d;
-}
-
 label{
   display:block;
   font-size:12px;
@@ -136,13 +129,6 @@ select{
   border:1px solid #cdd7de;
   border-radius:9px;
   font-size:14px;
-  background:white;
-}
-
-input:focus,
-select:focus{
-  outline:none;
-  border-color:#1670ad;
 }
 
 .row{
@@ -150,15 +136,8 @@ select:focus{
   gap:9px;
 }
 
-.row > div{
+.row>div{
   flex:1;
-}
-
-.top{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:8px;
 }
 
 .pill{
@@ -172,13 +151,24 @@ select:focus{
 }
 
 .pill.red{
-  background:#ffe9e9;
-  color:#8a2222;
+  background:#ffeaea;
+  color:#9b2222;
 }
 
-.pill.yellow{
-  background:#fff5dd;
-  color:#8a6500;
+.price{
+  font-size:21px;
+  font-weight:800;
+}
+
+.small{
+  font-size:12px;
+}
+
+.top{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:8px;
 }
 
 .alert{
@@ -203,7 +193,7 @@ select:focus{
   border:1px solid #e0a0a0;
   border-radius:6px;
   padding:8px;
-  margin-top:7px;
+  margin-top:8px;
   font-size:11px;
   word-break:break-word;
   white-space:pre-wrap;
@@ -223,25 +213,6 @@ select:focus{
   color:#687681;
 }
 
-.empty{
-  text-align:center;
-  padding:20px;
-  color:#687681;
-}
-
-.small{
-  font-size:12px;
-}
-
-.badge{
-  background:#edf1f4;
-  padding:5px 8px;
-  border-radius:8px;
-  border:0;
-  font-size:11px;
-  cursor:pointer;
-}
-
 .nav{
   display:flex;
   gap:6px;
@@ -259,19 +230,6 @@ select:focus{
   cursor:pointer;
 }
 
-.stat{
-  flex:1;
-  background:#f5f7f9;
-  border-radius:12px;
-  padding:12px;
-  text-align:center;
-}
-
-.stat h3{
-  margin:0;
-  font-size:22px;
-}
-
 .map{
   height:220px;
   background:linear-gradient(135deg,#e8f0e5,#dce9f2);
@@ -286,11 +244,28 @@ select:focus{
   font-size:28px;
 }
 
-footer{
-  text-align:center;
-  color:#9aa6ad;
+.badge{
+  background:#edf1f4;
+  padding:4px 8px;
+  border-radius:8px;
   font-size:11px;
-  padding:15px 0 5px;
+  border:0;
+}
+
+.status-line{
+  padding:8px 0;
+}
+
+.empty{
+  text-align:center;
+  padding:20px;
+  color:#687681;
+}
+
+.logo-box{
+  text-align:center;
+  font-size:48px;
+  margin:10px 0;
 }
 </style>
 </head>
@@ -314,6 +289,10 @@ footer{
 
 <section id="home" class="screen active">
 
+<div class="logo-box">
+🚛
+</div>
+
 <h1>¿Necesitas transporte?</h1>
 
 <p>
@@ -321,37 +300,24 @@ Encuentra un socio transportador disponible en Mocoa.
 </p>
 
 <div class="card">
-
 <b>📦 Solicita tu transporte</b>
 
 <p>
 Indica origen, destino, mercancía y cantidad.
+La central buscará los socios disponibles.
 </p>
-
 </div>
 
-<button
-class="btn"
-onclick="show('request')">
-
+<button class="btn" onclick="show('request')">
 📦 Solicitar transporte
-
 </button>
 
-<button
-class="btn alt"
-onclick="openPartnerPanel()">
-
+<button class="btn alt" onclick="openPartnerHome()">
 🚚 Soy socio transportador
-
 </button>
 
-<button
-class="btn alt"
-onclick="openAdminPanel()">
-
+<button class="btn alt" onclick="openAdmin()">
 🖥️ Central de operaciones
-
 </button>
 
 </section>
@@ -386,7 +352,7 @@ placeholder="Lugar de entrega">
 <input
 id="cargo"
 value="Cemento"
-placeholder="Tipo de mercancía">
+placeholder="Ej: cemento, arena, alimentos">
 
 
 <div class="row">
@@ -398,8 +364,7 @@ placeholder="Tipo de mercancía">
 <input
 id="quantity"
 type="number"
-min="0.01"
-step="0.01"
+min="1"
 value="100">
 
 </div>
@@ -455,7 +420,7 @@ Programado
 
 
 <button
-id="sendDemandButton"
+id="sendDemandBtn"
 class="btn"
 onclick="sendDemand()">
 
@@ -479,7 +444,7 @@ Volver
 
 
 <!-- =====================================================
-     SOCIOS DISPONIBLES
+     MATCHING
 ===================================================== -->
 
 <section id="matching" class="screen">
@@ -504,7 +469,6 @@ Buscando socios disponibles...
 
 </div>
 
-
 <button
 class="btn alt"
 onclick="show('request')">
@@ -527,7 +491,7 @@ Nueva solicitud
 <div id="selectedPartnerCard"></div>
 
 <button
-id="acceptServiceButton"
+id="assignBtn"
 class="btn"
 onclick="acceptService()">
 
@@ -554,15 +518,11 @@ Volver
 
 <section id="active" class="screen">
 
-<h2>🚚 Servicio activo</h2>
+<h2>✅ Servicio confirmado</h2>
 
 <div class="success">
 
-<b>Servicio confirmado.</b>
-
-<br>
-
-El transporte está en proceso.
+Servicio asignado correctamente.
 
 </div>
 
@@ -578,32 +538,41 @@ El transporte está en proceso.
 -
 </p>
 
-<div class="pill red">
+<div class="pill">
 🔴 EN SERVICIO
 </div>
 
 </div>
 
-
 <div class="card">
 
 <b>Estado del servicio</b>
 
-<p id="serviceStatus">
+<div class="status-line">
+🟢 Solicitud asignada
+</div>
 
-🟢 Solicitud asignada<br>
-🚚 Transporte en camino<br>
-📦 Mercancía recogida<br>
-🛣️ En tránsito<br>
+<div class="status-line">
+🚚 Transporte en camino
+</div>
+
+<div class="status-line">
+📦 Mercancía recogida
+</div>
+
+<div class="status-line">
+🛣️ En tránsito
+</div>
+
+<div class="status-line">
 ⬜ Entregado
-
-</p>
+</div>
 
 </div>
 
-
 <button
-class="btn success-btn"
+id="deliverBtn"
+class="btn"
 onclick="deliver()">
 
 📦 Confirmar entrega
@@ -624,7 +593,9 @@ onclick="deliver()">
 <div class="card">
 
 <div class="pill">
+
 🟢 SERVICIO FINALIZADO
+
 </div>
 
 <p>
@@ -669,7 +640,7 @@ Nueva solicitud
 <b>Socios registrados</b>
 
 <p>
-Selecciona tu vehículo para revisar la demanda.
+Los socios se cargan automáticamente desde Supabase.
 </p>
 
 </div>
@@ -682,7 +653,6 @@ Cargando socios...
 
 </div>
 
-
 <button
 class="btn"
 onclick="openPartnerDemand()">
@@ -691,7 +661,6 @@ onclick="openPartnerDemand()">
 
 </button>
 
-
 <button
 class="btn alt"
 onclick="loadPartners()">
@@ -699,7 +668,6 @@ onclick="loadPartners()">
 🔄 Actualizar socios
 
 </button>
-
 
 <button
 class="btn alt"
@@ -730,36 +698,20 @@ Solicitud
 No hay solicitud disponible.
 </p>
 
-
 <div class="alert">
 
-Revisa la capacidad de tu vehículo
-antes de aceptar.
+Revisa la capacidad de tu vehículo antes de aceptar.
 
 </div>
 
-
-<label>
-Selecciona tu vehículo
-</label>
-
-<select id="partnerSelector">
-
-<option value="">
-Selecciona tu socio
-</option>
-
-</select>
-
-
 <button
+id="partnerAcceptBtn"
 class="btn"
 onclick="acceptPartnerDemand()">
 
 ✅ Aceptar servicio
 
 </button>
-
 
 <button
 class="btn alt"
@@ -786,13 +738,11 @@ Volver
 
 <div class="top">
 
-<b>
-Estado de la red
-</b>
+<b>Estado de la red</b>
 
 <button
 class="badge"
-onclick="refreshAdmin()">
+onclick="loadPartners()">
 
 🔄 Actualizar
 
@@ -809,9 +759,7 @@ Cargando...
 
 <div class="card">
 
-<b>
-📍 Mapa operativo
-</b>
+<b>📍 Mapa operativo</b>
 
 <div class="map">
 
@@ -847,7 +795,8 @@ style="left:35%;top:68%">
 
 </div>
 
-<div style="
+<div
+style="
 position:absolute;
 left:8px;
 bottom:12px;
@@ -867,12 +816,12 @@ font-size:11px">
 
 <div class="card">
 
-<b>
-🚚 Socios en la red
-</b>
+<b>🚚 Socios en la red</b>
 
 <div id="adminPartners">
+
 Cargando socios...
+
 </div>
 
 </div>
@@ -880,26 +829,13 @@ Cargando socios...
 
 <div class="card">
 
-<b>
-📦 Última solicitud
-</b>
+<b>📦 Última solicitud</b>
 
 <p id="adminDemand">
+
 No hay solicitudes cargadas.
+
 </p>
-
-</div>
-
-
-<div class="card">
-
-<b>
-📊 Resumen de servicios
-</b>
-
-<div id="adminServices">
-Cargando...
-</div>
 
 </div>
 
@@ -920,23 +856,17 @@ Inicio
 Solicitar
 </button>
 
-<button onclick="openPartnerPanel()">
+<button onclick="openPartnerHome()">
 Socios
 </button>
 
-<button onclick="openAdminPanel()">
+<button onclick="openAdmin()">
 Central
 </button>
 
 </div>
 
-
-<footer>
-Red Transporte Mocoa
-</footer>
-
 </main>
-
 </div>
 
 
@@ -949,7 +879,7 @@ Red Transporte Mocoa
 <script>
 
 /* =====================================================
-   CONFIGURACIÓN SUPABASE
+   CONFIGURACIÓN
 ===================================================== */
 
 const SUPABASE_URL =
@@ -967,7 +897,6 @@ let supabaseClient = null;
 
 let supabaseInitError = null;
 
-
 try{
 
   if(
@@ -975,11 +904,10 @@ try{
   ){
 
     throw new Error(
-      'No se pudo cargar supabase-js.'
+      'No se cargó la librería de Supabase.'
     );
 
   }
-
 
   supabaseClient =
     window.supabase.createClient(
@@ -987,13 +915,14 @@ try{
       SUPABASE_KEY
     );
 
-
 }catch(error){
 
-  supabaseInitError =
-    error;
+  supabaseInitError = error;
 
-  console.error(error);
+  console.error(
+    'Error iniciando Supabase:',
+    error
+  );
 
 }
 
@@ -1010,20 +939,97 @@ let selectedPartner = null;
 
 
 /* =====================================================
+   UTILIDADES
+===================================================== */
+
+function escapeHtml(value){
+
+  return String(value ?? '')
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;')
+    .replace(/'/g,'&#039;');
+
+}
+
+
+function escapeAttr(value){
+
+  return String(value ?? '')
+    .replace(/\\/g,'\\\\')
+    .replace(/'/g,"\\'");
+
+}
+
+
+function formatSupabaseError(error){
+
+  if(!error)
+    return 'Error desconocido.';
+
+  const parts = [];
+
+  if(error.message)
+    parts.push(
+      'Mensaje: ' + error.message
+    );
+
+  if(error.code)
+    parts.push(
+      'Código: ' + error.code
+    );
+
+  if(error.details)
+    parts.push(
+      'Detalles: ' + error.details
+    );
+
+  if(error.hint)
+    parts.push(
+      'Sugerencia: ' + error.hint
+    );
+
+  return parts.join('\n');
+
+}
+
+
+function checkSupabase(){
+
+  if(!supabaseClient){
+
+    alert(
+      'No se pudo iniciar Supabase.\n\n' +
+      (
+        supabaseInitError
+        ? supabaseInitError.message
+        : 'Error desconocido.'
+      )
+    );
+
+    return false;
+
+  }
+
+  return true;
+
+}
+
+
+/* =====================================================
    NAVEGACIÓN
 ===================================================== */
 
 function show(id){
 
   document
-  .querySelectorAll('.screen')
-  .forEach(screen => {
+    .querySelectorAll('.screen')
+    .forEach(screen => {
 
-    screen.classList.remove(
-      'active'
-    );
+      screen.classList.remove('active');
 
-  });
+    });
 
 
   const target =
@@ -1032,16 +1038,19 @@ function show(id){
 
   if(target){
 
-    target.classList.add(
-      'active'
-    );
+    target.classList.add('active');
+
+    window.scrollTo({
+      top:0,
+      behavior:'smooth'
+    });
 
   }
 
 }
 
 
-function openPartnerPanel(){
+function openPartnerHome(){
 
   show('partnerHome');
 
@@ -1050,113 +1059,11 @@ function openPartnerPanel(){
 }
 
 
-function openAdminPanel(){
+function openAdmin(){
 
   show('admin');
 
-  refreshAdmin();
-
-}
-
-
-/* =====================================================
-   SEGURIDAD HTML
-===================================================== */
-
-function escapeHtml(value){
-
-  return String(
-    value ?? ''
-  )
-  .replace(/&/g,'&amp;')
-  .replace(/</g,'&lt;')
-  .replace(/>/g,'&gt;')
-  .replace(/"/g,'&quot;')
-  .replace(/'/g,'&#039;');
-
-}
-
-
-/* =====================================================
-   ERROR
-===================================================== */
-
-function formatSupabaseError(error){
-
-  if(!error){
-
-    return 'Error desconocido.';
-
-  }
-
-
-  const parts = [];
-
-
-  if(error.message){
-
-    parts.push(
-      'Mensaje: ' +
-      error.message
-    );
-
-  }
-
-
-  if(error.code){
-
-    parts.push(
-      'Código: ' +
-      error.code
-    );
-
-  }
-
-
-  if(error.details){
-
-    parts.push(
-      'Detalles: ' +
-      error.details
-    );
-
-  }
-
-
-  if(error.hint){
-
-    parts.push(
-      'Sugerencia: ' +
-      error.hint
-    );
-
-  }
-
-
-  return parts.join('\n');
-
-}
-
-
-/* =====================================================
-   COMPROBAR SUPABASE
-===================================================== */
-
-function checkSupabase(){
-
-  if(supabaseClient){
-
-    return true;
-
-  }
-
-
-  alert(
-    'No se pudo conectar con Supabase.'
-  );
-
-
-  return false;
+  loadPartners();
 
 }
 
@@ -1167,11 +1074,8 @@ function checkSupabase(){
 
 async function loadPartners(){
 
-  if(!checkSupabase()){
-
+  if(!checkSupabase())
     return;
-
-  }
 
 
   const partnerList =
@@ -1183,6 +1087,12 @@ async function loadPartners(){
   const adminPartners =
     document.getElementById(
       'adminPartners'
+    );
+
+
+  const networkStats =
+    document.getElementById(
+      'networkStats'
     );
 
 
@@ -1204,75 +1114,88 @@ async function loadPartners(){
 
   try{
 
-    const result =
+    const {
+      data,
+      error
+    } =
       await supabaseClient
-      .from('socios')
-      .select('*')
-      .order(
-        'id',
-        {
-          ascending:true
-        }
-      );
+        .from('socios')
+        .select('*')
+        .order('id');
 
 
-    if(result.error){
+    if(error){
 
-      throw result.error;
+      console.error(error);
+
+      const message = `
+
+      <div class="error">
+
+      ❌ No se pudieron cargar los socios.
+
+      <code>${escapeHtml(
+        formatSupabaseError(error)
+      )}</code>
+
+      <br>
+
+      Revisa que exista la tabla
+      <b>socios</b> y que tenga una política
+      SELECT para <b>anon</b>.
+
+      </div>
+
+      `;
+
+
+      if(partnerList)
+        partnerList.innerHTML = message;
+
+
+      if(adminPartners)
+        adminPartners.innerHTML = message;
+
+
+      return;
 
     }
 
 
-    socios =
-      result.data || [];
+    socios = data || [];
 
 
-    renderPartnerList();
+    renderPartners();
 
-    renderAdminPartners();
 
-    renderNetworkStats();
-
-    populatePartnerSelector();
+    updateNetworkStats();
 
 
   }catch(error){
 
     console.error(error);
 
+    const message = `
 
-    const html = `
+    <div class="error">
 
-      <div class="error">
+    ❌ Error de conexión.
 
-        ❌ No se pudieron cargar
-        los socios.
+    <code>${escapeHtml(
+      error.message || String(error)
+    )}</code>
 
-        <code>
-          ${escapeHtml(
-            formatSupabaseError(error)
-          )}
-        </code>
-
-      </div>
+    </div>
 
     `;
 
 
-    if(partnerList){
-
-      partnerList.innerHTML =
-        html;
-
-    }
+    if(partnerList)
+      partnerList.innerHTML = message;
 
 
-    if(adminPartners){
-
-      adminPartners.innerHTML =
-        html;
-
-    }
+    if(adminPartners)
+      adminPartners.innerHTML = message;
 
   }
 
@@ -1280,50 +1203,78 @@ async function loadPartners(){
 
 
 /* =====================================================
-   LISTA SOCIOS
+   RENDER SOCIOS
 ===================================================== */
 
-function renderPartnerList(){
+function renderPartners(){
 
-  const box =
+  const partnerList =
     document.getElementById(
       'partnerList'
     );
 
 
-  if(!box){
+  const adminPartners =
+    document.getElementById(
+      'adminPartners'
+    );
 
-    return;
 
-  }
+  if(partnerList){
 
+    if(socios.length === 0){
 
-  if(!socios.length){
-
-    box.innerHTML = `
+      partnerList.innerHTML = `
 
       <div class="empty">
 
-        🚚 No hay socios registrados.
+      🚚 No hay socios registrados.
 
-        <br><br>
+      <br><br>
 
-        Agrega socios en la tabla
-        <b>socios</b> de Supabase.
+      Agrega socios en la tabla
+      <b>socios</b> de Supabase.
 
       </div>
 
-    `;
+      `;
 
-    return;
+    }else{
+
+      partnerList.innerHTML =
+        socios
+          .map(renderPartnerCard)
+          .join('');
+
+    }
 
   }
 
 
-  box.innerHTML =
-    socios
-    .map(renderPartnerCard)
-    .join('');
+  if(adminPartners){
+
+    if(socios.length === 0){
+
+      adminPartners.innerHTML = `
+
+      <div class="empty">
+
+      No hay socios registrados.
+
+      </div>
+
+      `;
+
+    }else{
+
+      adminPartners.innerHTML =
+        socios
+          .map(renderAdminPartner)
+          .join('');
+
+    }
+
+  }
 
 }
 
@@ -1335,3441 +1286,94 @@ function renderPartnerList(){
 function renderPartnerCard(socio){
 
   const nombre =
-    socio.nombre ||
-    'Sin nombre';
+    socio.nombre || 'Sin nombre';
 
+  const telefono =
+    socio.telefono || 'No registrado';
 
   const vehiculo =
     socio.vehiculo ||
     'Vehículo no registrado';
 
-
-  const telefono =
-    socio.telefono ||
-    'No registrado';
-
-
   const capacidad =
-    socio.capacidad_ton ??
-    '-';
-
+    socio.capacidad_ton ?? '-';
 
   const estado =
     socio.estado ||
     'sin estado';
 
-
   const disponible =
     String(estado)
-    .toLowerCase()
-    === 'disponible';
+      .toLowerCase()
+      === 'disponible';
 
 
   return `
 
-    <div class="card">
+  <div class="card">
 
-      <div class="top">
+    <div class="top">
 
-        <b>
+      <b>
 
-          ${disponible ? '🟢' : '🔴'}
+      ${disponible ? '🟢' : '🔴'}
 
-          ${escapeHtml(nombre)}
+      ${escapeHtml(nombre)}
 
-        </b>
+      </b>
 
+      <span class="pill ${
+        disponible ? '' : 'red'
+      }">
 
-        <span class="${
-          disponible
-          ? 'pill'
-          : 'pill red'
-        }">
+      ${escapeHtml(estado)}
 
-          ${escapeHtml(estado)}
-
-        </span>
-
-      </div>
-
-
-      <p>
-
-        🚚 ${escapeHtml(
-          vehiculo
-        )}
-
-        <br>
-
-        ⚖️ Capacidad:
-        ${escapeHtml(
-          String(capacidad)
-        )}
-        t
-
-        <br>
-
-        📞 ${escapeHtml(
-          String(telefono)
-        )}
-
-      </p>
-
-
-      ${
-        disponible
-        ?
-        `
-
-        <button
-        class="btn"
-        onclick="selectPartner('${escapeHtml(socio.id)}')">
-
-          🎯 Seleccionar socio
-
-        </button>
-
-        `
-        :
-        ''
-      }
-
-    </div>
-
-  `;
-
-}
-
-
-/* =====================================================
-   SOCIOS CENTRAL
-===================================================== */
-
-function renderAdminPartners(){
-
-  const box =
-    document.getElementById(
-      'adminPartners'
-    );
-
-
-  if(!box){
-
-    return;
-
-  }
-
-
-  if(!socios.length){
-
-    box.innerHTML =
-      '<p>No hay socios registrados.</p>';
-
-    return;
-
-  }
-
-
-  box.innerHTML =
-    socios
-    .map(socio => {
-
-      const disponible =
-        String(
-          socio.estado || ''
-        ).toLowerCase()
-        === 'disponible';
-
-
-      return `
-
-        <div class="card dark">
-
-          <div class="top">
-
-            <b>
-
-              ${disponible ? '🟢' : '🔴'}
-
-              ${escapeHtml(
-                socio.nombre ||
-                'Sin nombre'
-              )}
-
-            </b>
-
-            <span class="small">
-
-              ${escapeHtml(
-                socio.estado ||
-                '-'
-              )}
-
-            </span>
-
-          </div>
-
-
-          <p>
-
-            🚚 ${escapeHtml(
-              socio.vehiculo ||
-              '-'
-            )}
-
-            ·
-
-            ${escapeHtml(
-              String(
-                socio.capacidad_ton ??
-                '-'
-              )
-            )}
-
-            t
-
-          </p>
-
-        </div>
-
-      `;
-
-    })
-    .join('');
-
-}
-
-
-/* =====================================================
-   ESTADÍSTICAS
-===================================================== */
-
-function renderNetworkStats(){
-
-  const box =
-    document.getElementById(
-      'networkStats'
-    );
-
-
-  if(!box){
-
-    return;
-
-  }
-
-
-  const disponibles =
-    socios.filter(
-      socio =>
-        String(
-          socio.estado || ''
-        ).toLowerCase()
-        === 'disponible'
-    ).length;
-
-
-  const ocupados =
-    socios.length -
-    disponibles;
-
-
-  box.innerHTML = `
-
-    <div class="row">
-
-      <div class="stat">
-
-        <h3>
-          🟢 ${disponibles}
-        </h3>
-
-        <span class="small">
-          Disponibles
-        </span>
-
-      </div>
-
-
-      <div class="stat">
-
-        <h3>
-          🔴 ${ocupados}
-        </h3>
-
-        <span class="small">
-          Ocupados
-        </span>
-
-      </div>
+      </span>
 
     </div>
 
 
     <p>
 
-      <b>${socios.length}</b>
-      socios registrados.
+    🚚 ${escapeHtml(vehiculo)}
+
+    <br>
+
+    ⚖️ Capacidad:
+    ${escapeHtml(String(capacidad))}
+    t
+
+    <br>
+
+    📞 ${escapeHtml(String(telefono))}
 
     </p>
 
-  `;
-
-}
-
-
-/* =====================================================
-   SELECTOR DE SOCIO
-===================================================== */
-
-function populatePartnerSelector(){
-
-  const selector =
-    document.getElementById(
-      'partnerSelector'
-    );
-
-
-  if(!selector){
-
-    return;
-
-  }
-
-
-  const disponibles =
-    socios.filter(
-      socio =>
-        String(
-          socio.estado || ''
-        ).toLowerCase()
-        === 'disponible'
-    );
-
-
-  selector.innerHTML = `
-
-    <option value="">
-      Selecciona tu socio
-    </option>
 
     ${
-      disponibles
-      .map(socio => `
+      disponible
 
-        <option value="${escapeHtml(
-          socio.id
-        )}">
+      ?
 
-          ${escapeHtml(
-            socio.nombre ||
-            'Socio'
-          )}
-
-          -
-
-          ${escapeHtml(
-            socio.vehiculo ||
-            'Vehículo'
-          )}
-
-        </option>
-
-      `)
-      .join('')
-    }
-
-  `;
-
-}
-
-
-/* =====================================================
-   SELECCIONAR SOCIO
-===================================================== */
-
-function selectPartner(id){
-
-  selectedPartner =
-    socios.find(
-      socio =>
-        String(socio.id)
-        === String(id)
-    );
-
-
-  if(!selectedPartner){
-
-    alert(
-      'No se encontró el socio.'
-    );
-
-    return;
-
-  }
-
-
-  document.getElementById(
-    'selectedPartnerCard'
-  ).innerHTML = `
-
-    <div class="card">
-
-      <div class="top">
-
-        <b>
-
-          🟢
-
-          ${escapeHtml(
-            selectedPartner.nombre ||
-            'Socio'
-          )}
-
-        </b>
-
-        <span class="pill">
-          Disponible
-        </span>
-
-      </div>
-
-
-      <p>
-
-        🚚 ${escapeHtml(
-          selectedPartner.vehiculo ||
-          '-'
-        )}
-
-        <br>
-
-        ⚖️ Capacidad:
-
-        ${escapeHtml(
-          String(
-            selectedPartner.capacidad_ton ??
-            '-'
-          )
-        )}
-
-        toneladas
-
-        <br>
-
-        📞 ${escapeHtml(
-          String(
-            selectedPartner.telefono ||
-            '-'
-          )
-        )}
-
-      </p>
-
-    </div>
-
-  `;
-
-
-  show('assignment');
-
-}
-
-
-/* =====================================================
-   CREAR DEMANDA
-===================================================== */
-
-async function sendDemand(){
-
-  if(!checkSupabase()){
-
-    return;
-
-  }
-
-
-  const origin =
-    document.getElementById(
-      'origin'
-    ).value.trim();
-
-
-  const dest =
-    document.getElementById(
-      'dest'
-    ).value.trim();
-
-
-  const cargo =
-    document.getElementById(
-      'cargo'
-    ).value.trim();
-
-
-  const quantity =
-    Number(
-      document.getElementById(
-        'quantity'
-      ).value
-    );
-
-
-  const unit =
-    document.getElementById(
-      'unit'
-    ).value;
-
-
-  const when =
-    document.getElementById(
-      'when'
-    ).value;
-
-
-  const errorBox =
-    document.getElementById(
-      'requestError'
-    );
-
-
-  if(
-    !origin ||
-    !dest ||
-    !cargo ||
-    !Number.isFinite(quantity) ||
-    quantity <= 0
-  ){
-
-    errorBox.innerHTML = `
-
-      <div class="error">
-
-        ❌ Completa correctamente
-        todos los campos.
-
-      </div>
-
-    `;
-
-    return;
-
-  }
-
-
-  errorBox.innerHTML = '';
-
-
-  const button =
-    document.getElementById(
-      'sendDemandButton'
-    );
-
-
-  button.disabled = true;
-
-  button.textContent =
-    '⏳ Creando solicitud...';
-
-
-  try{
-
-    /*
-      IMPORTANTE:
-
-      Aquí se utiliza "cantidas" porque
-      ese es el nombre usado por el
-      código original.
-
-      Si tu columna en Supabase se llama
-      "cantidad", cambia "cantidas"
-      por "cantidad".
-    */
-
-
-    const insertData = {
-
-      origen:origin,
-
-      destino:dest,
-
-      mercancia:cargo,
-
-      cantidas:quantity,
-
-      unidad:unit,
-
-      estado:'pendiente',
-
-      socio_id:null
-
-    };
-
-
-    const result =
-      await supabaseClient
-      .from('solicitudes')
-      .insert([insertData])
-      .select()
-      .single();
-
-
-    if(result.error){
-
-      throw result.error;
-
-    }
-
-
-    currentDemand =
-      result.data;
-
-
-    selectedPartner = null;
-
-
-    document.getElementById(
-      'demandText'
-    ).innerHTML = `
-
-      <b>
-        Solicitud #${escapeHtml(
-          String(
-            currentDemand.id
-          )
-        )}
-      </b>
-
-      <br><br>
-
-      📦 ${escapeHtml(
-        String(quantity)
-      )}
-
-      ${escapeHtml(unit)}
-
-      de
-
-      ${escapeHtml(cargo)}
-
-      <br>
-
-      📍 ${escapeHtml(origin)}
-
-      →
-
-      ${escapeHtml(dest)}
-
-      <br>
-
-      🕐 ${escapeHtml(when)}
-
-    `;
-
-
-    updatePartnerDemand();
-
-    updateAdminDemand();
-
-
-    await loadPartners();
-
-
-    const disponibles =
-      socios.filter(
-        socio =>
-          String(
-            socio.estado || ''
-          ).toLowerCase()
-          === 'disponible'
-      );
-
-
-    if(!disponibles.length){
-
-      document.getElementById(
-        'matchingList'
-      ).innerHTML = `
-
-        <div class="alert">
-
-          ⚠️ No hay socios disponibles
-          en este momento.
-
-        </div>
-
-      `;
-
-    }else{
-
-      document.getElementById(
-        'matchingList'
-      ).innerHTML = `
-
-        <p>
-
-          Encontramos
-
-          <b>
-            ${disponibles.length}
-          </b>
-
-          socio(s) disponible(s).
-
-        </p>
-
-        ${disponibles
-          .map(
-            renderMatchingPartner
-          )
-          .join('')}
-
-      `;
-
-    }
-
-
-    show('matching');
-
-
-  }catch(error){
-
-    console.error(error);
-
-
-    document.getElementById(
-      'matchingList'
-    ).innerHTML = `
-
-      <div class="error">
-
-        ❌ No se pudo crear
-        la solicitud.
-
-        <code>
-          ${escapeHtml(
-            formatSupabaseError(error)
-          )}
-        </code>
-
-        ${
-          error.code === '42501'
-          ?
-          `
-
-          <br><br>
-
-          ⚠️ Supabase está bloqueando
-          el INSERT mediante RLS.
-
-          <br><br>
-
-          Debes crear una política
-          INSERT para el rol anon.
-
-          `
-          :
-          ''
-        }
-
-      </div>
-
-    `;
-
-
-    show('matching');
-
-  }finally{
-
-    button.disabled = false;
-
-    button.textContent =
-      '🚀 Buscar socio disponible';
-
-  }
-
-}
-
-
-/* =====================================================
-   MATCHING
-===================================================== */
-
-function renderMatchingPartner(socio){
-
-  return `
-
-    <div class="card">
-
-      <div class="top">
-
-        <b>
-
-          🟢
-
-          ${escapeHtml(
-            socio.nombre ||
-            'Socio'
-          )}
-
-        </b>
-
-        <span class="pill">
-          Disponible
-        </span>
-
-      </div>
-
-
-      <p>
-
-        🚚 ${escapeHtml(
-          socio.vehiculo ||
-          '-'
-        )}
-
-        <br>
-
-        ⚖️ Capacidad:
-
-        ${escapeHtml(
-          String(
-            socio.capacidad_ton ??
-            '-'
-          )
-        )}
-
-        toneladas
-
-      </p>
-
+      `
 
       <button
       class="btn"
-      onclick="selectPartner('${escapeHtml(socio.id)}')">
+      onclick="selectPartner('${escapeAttr(socio.id)}')">
 
-        🎯 Seleccionar
+      🎯 Seleccionar socio
 
       </button>
 
-    </div>
+      `
 
-  `;
+      :
 
-}
-
-
-/* =====================================================
-   ASIGNAR DESDE CLIENTE
-===================================================== */
-
-async function acceptService(){
-
-  if(!checkSupabase()){
-
-    return;
-
-  }
-
-
-  if(!currentDemand){
-
-    alert(
-      'No existe una solicitud activa.'
-    );
-
-    return;
-
-  }
-
-
-  if(!selectedPartner){
-
-    alert(
-      'Selecciona un socio.'
-    );
-
-    return;
-
-  }
-
-
-  const errorBox =
-    document.getElementById(
-      'assignmentError'
-    );
-
-
-  const button =
-    document.getElementById(
-      'acceptServiceButton'
-    );
-
-
-  button.disabled = true;
-
-  button.textContent =
-    '⏳ Asignando...';
-
-
-  try{
-
-    /*
-      Solo actualizamos si continúa
-      pendiente.
-    */
-
-
-    const result =
-      await supabaseClient
-      .from('solicitudes')
-      .update({
-
-        estado:'asignada',
-
-        socio_id:
-          selectedPartner.id
-
-      })
-      .eq(
-        'id',
-        currentDemand.id
-      )
-      .eq(
-        'estado',
-        'pendiente'
-      )
-      .select()
-      .maybeSingle();
-
-
-    if(result.error){
-
-      throw result.error;
-
-    }
-
-
-    if(!result.data){
-
-      throw new Error(
-        'La solicitud ya fue asignada.'
-      );
-
-    }
-
-
-    currentDemand =
-      result.data;
-
-
-    /*
-      Cambiar socio a ocupado.
-    */
-
-
-    const partnerResult =
-      await supabaseClient
-      .from('socios')
-      .update({
-
-        estado:'ocupado'
-
-      })
-      .eq(
-        'id',
-        selectedPartner.id
-      )
-      .eq(
-        'estado',
-        'disponible'
-      );
-
-
-    if(partnerResult.error){
-
-      console.warn(
-        partnerResult.error
-      );
-
-    }
-
-
-    renderActiveService();
-
-
-    show('active');
-
-
-    await loadPartners();
-
-
-  }catch(error){
-
-    errorBox.innerHTML = `
-
-      <div class="error">
-
-        ❌ No se pudo asignar.
-
-        <code>
-          ${escapeHtml(
-            formatSupabaseError(error)
-          )}
-        </code>
-
-      </div>
-
-    `;
-
-  }finally{
-
-    button.disabled = false;
-
-    button.textContent =
-      '✅ Asignar servicio';
-
-  }
-
-}
-
-
-/* =====================================================
-   SERVICIO ACTIVO
-===================================================== */
-
-function renderActiveService(){
-
-  if(
-    !currentDemand ||
-    !selectedPartner
-  ){
-
-    return;
-
-  }
-
-
-  document.getElementById(
-    'activePartner'
-  ).textContent =
-    selectedPartner.nombre ||
-    'Socio';
-
-
-  document.getElementById(
-    'deliveredPartner'
-  ).textContent =
-    selectedPartner.nombre ||
-    'Socio';
-
-
-  document.getElementById(
-    'activeServiceText'
-  ).innerHTML = `
-
-    🚚 ${escapeHtml(
-      selectedPartner.vehiculo ||
-      '-'
-    )}
-
-    <br><br>
-
-    📍 ${escapeHtml(
-      currentDemand.origen ||
-      '-'
-    )}
-
-    →
-
-    ${escapeHtml(
-      currentDemand.destino ||
-      '-'
-    )}
-
-    <br><br>
-
-    📦 ${escapeHtml(
-      String(
-        currentDemand.cantidas ??
-        '-'
-      )
-    )}
-
-    ${escapeHtml(
-      currentDemand.unidad ||
       ''
-    )}
-
-    de
-
-    ${escapeHtml(
-      currentDemand.mercancia ||
-      ''
-    )}
-
-  `;
-
-}
-
-
-/* =====================================================
-   DEMANDA DEL SOCIO
-===================================================== */
-
-async function openPartnerDemand(){
-
-  if(!checkSupabase()){
-
-    return;
-
-  }
-
-
-  try{
-
-    /*
-      Buscar siempre una solicitud
-      pendiente reciente.
-    */
-
-
-    const result =
-      await supabaseClient
-      .from('solicitudes')
-      .select('*')
-      .eq(
-        'estado',
-        'pendiente'
-      )
-      .order(
-        'id',
-        {
-          ascending:false
-        }
-      )
-      .limit(1)
-      .maybeSingle();
-
-
-    if(result.error){
-
-      throw result.error;
 
     }
 
-
-    currentDemand =
-      result.data ||
-      null;
-
-
-    updatePartnerDemand();
-
-
-    await loadPartners();
-
-
-    show('partnerDemand');
-
-
-  }catch(error){
-
-    document.getElementById(
-      'partnerDemandText'
-    ).innerHTML = `
-
-      <div class="error">
-
-        ❌ Error consultando
-        solicitudes.
-
-        <code>
-          ${escapeHtml(
-            formatSupabaseError(error)
-          )}
-        </code>
-
-      </div>
-
-    `;
-
-
-    show('partnerDemand');
-
-  }
-
-}
-
-
-/* =====================================================
-   TEXTO DEMANDA
-===================================================== */
-
-function updatePartnerDemand(){
-
-  const number =
-    document.getElementById(
-      'partnerDemandNumber'
-    );
-
-
-  const text =
-    document.getElementById(
-      'partnerDemandText'
-    );
-
-
-  if(!currentDemand){
-
-    number.textContent =
-      'Sin solicitudes';
-
-
-    text.innerHTML =
-      'No hay solicitudes pendientes.';
-
-    return;
-
-  }
-
-
-  number.textContent =
-    'Solicitud #' +
-    String(
-      currentDemand.id
-    );
-
-
-  text.innerHTML = `
-
-    📍 Recoger:
-
-    ${escapeHtml(
-      currentDemand.origen ||
-      '-'
-    )}
-
-    <br>
-
-    📍 Entregar:
-
-    ${escapeHtml(
-      currentDemand.destino ||
-      '-'
-    )}
-
-    <br>
-
-    📦 Mercancía:
-
-    ${escapeHtml(
-      currentDemand.mercancia ||
-      '-'
-    )}
-
-    <br>
-
-    ⚖️ Cantidad:
-
-    ${escapeHtml(
-      String(
-        currentDemand.cantidas ??
-        '-'
-      )
-    )}
-
-    ${escapeHtml(
-      currentDemand.unidad ||
-      ''
-    )}
-
-  `;
-
-}
-
-
-/* =====================================================
-   ACEPTAR COMO SOCIO
-===================================================== */
-
-async function acceptPartnerDemand(){
-
-  if(!checkSupabase()){
-
-    return;
-
-  }
-
-
-  if(!currentDemand){
-
-    alert(
-      'No hay solicitud pendiente.'
-    );
-
-    return;
-
-  }
-
-
-  const selector =
-    document.getElementById(
-      'partnerSelector'
-    );
-
-
-  const partnerId =
-    selector.value;
-
-
-  if(!partnerId){
-
-    alert(
-      'Selecciona tu vehículo.'
-    );
-
-    return;
-
-  }
-
-
-  const partner =
-    socios.find(
-      socio =>
-        String(socio.id)
-        === String(partnerId)
-    );
-
-
-  if(!partner){
-
-    alert(
-      'No se encontró el socio.'
-    );
-
-    return;
-
-  }
-
-
-  const estado =
-    String(
-      partner.estado ||
-      ''
-    ).toLowerCase();
-
-
-  if(estado !== 'disponible'){
-
-    alert(
-      'Este socio ya no está disponible.'
-    );
-
-    await loadPartners();
-
-    return;
-
-  }
-
-
-  /*
-    Comprobación de capacidad
-    si la carga está expresada
-    en toneladas.
-  */
-
-
-  if(
-    currentDemand.unidad
-    ===
-    'toneladas'
-  ){
-
-    const cantidad =
-      Number(
-        currentDemand.cantidas
-      );
-
-
-    const capacidad =
-      Number(
-        partner.capacidad_ton
-      );
-
-
-    if(
-      Number.isFinite(cantidad) &&
-      Number.isFinite(capacidad) &&
-      cantidad > capacidad
-    ){
-
-      alert(
-        'La carga supera la capacidad registrada del vehículo.'
-      );
-
-      return;
-
-    }
-
-  }
-
-
-  try{
-
-    /*
-      Reservar socio.
-    */
-
-
-    const partnerResult =
-      await supabaseClient
-      .from('socios')
-      .update({
-
-        estado:'ocupado'
-
-      })
-      .eq(
-        'id',
-        partner.id
-      )
-      .eq(
-        'estado',
-        'disponible'
-      )
-      .select()
-      .maybeSingle();
-
-
-    if(partnerResult.error){
-
-      throw partnerResult.error;
-
-    }
-
-
-    if(!partnerResult.data){
-
-      throw new Error(
-        'El socio ya no está disponible.'
-      );
-
-    }
-
-
-    /*
-      Asignar solicitud.
-    */
-
-
-    const demandResult =
-      await supabaseClient
-      .from('solicitudes')
-      .update({
-
-        estado:'asignada',
-
-        socio_id:
-          partner.id
-
-      })
-      .eq(
-        'id',
-        currentDemand.id
-      )
-      .eq(
-        'estado',
-        'pendiente'
-      )
-      .select()
-      .maybeSingle();
-
-
-    if(demandResult.error){
-
-      /*
-        Liberar socio si falló
-        la asignación.
-      */
-
-      await supabaseClient
-      .from('socios')
-      .update({
-
-        estado:'disponible'
-
-      })
-      .eq(
-        'id',
-        partner.id
-      );
-
-
-      throw demandResult.error;
-
-    }
-
-
-    if(!demandResult.data){
-
-      await supabaseClient
-      .from('socios')
-      .update({
-
-        estado:'disponible'
-
-      })
-      .eq(
-        'id',
-        partner.id
-      );
-
-
-      throw new Error(
-        'Otro socio ya aceptó esta solicitud.'
-      );
-
-    }
-
-
-    currentDemand =
-      demandResult.data;
-
-
-    selectedPartner =
-      partner;
-
-
-    renderActiveService();
-
-
-    show('active');
-
-
-    await loadPartners();
-
-
-  }catch(error){
-
-    alert(
-
-      'No se pudo aceptar el servicio:\n\n' +
-
-      formatSupabaseError(error)
-
-    );
-
-  }
-
-}
-
-
-/* =====================================================
-   ENTREGAR
-===================================================== */
-
-async function deliver(){
-
-  if(!checkSupabase()){
-
-    return;
-
-  }
-
-
-  if(!currentDemand){
-
-    show('home');
-
-    return;
-
-  }
-
-
-  try{
-
-    const result =
-      await supabaseClient
-      .from('solicitudes')
-      .update({
-
-        estado:'entregada'
-
-      })
-      .eq(
-        'id',
-        currentDemand.id
-      )
-      .eq(
-        'estado',
-        'asignada'
-      )
-      .select()
-      .maybeSingle();
-
-
-    if(result.error){
-
-      throw result.error;
-
-    }
-
-
-    if(!result.data){
-
-      throw new Error(
-        'La solicitud ya fue cerrada.'
-      );
-
-    }
-
-
-    currentDemand =
-      result.data;
-
-
-    /*
-      Liberar vehículo.
-    */
-
-
-    if(selectedPartner){
-
-      const partnerResult =
-        await supabaseClient
-        .from('socios')
-        .update({
-
-          estado:'disponible'
-
-        })
-        .eq(
-          'id',
-          selectedPartner.id
-        );
-
-
-      if(partnerResult.error){
-
-        console.warn(
-          partnerResult.error
-        );
-
-      }
-
-    }
-
-
-    document.getElementById(
-      'deliveredPartner'
-    ).textContent =
-      selectedPartner
-      ? selectedPartner.nombre
-      : 'Socio';
-
-
-    show('delivered');
-
-
-    await loadPartners();
-
-
-    await loadAdminServices();
-
-
-  }catch(error){
-
-    alert(
-
-      'No se pudo confirmar la entrega:\n\n' +
-
-      formatSupabaseError(error)
-
-    );
-
-  }
-
-}
-
-
-/* =====================================================
-   CENTRAL
-===================================================== */
-
-async function refreshAdmin(){
-
-  await loadPartners();
-
-  await loadAdminServices();
-
-}
-
-
-/* =====================================================
-   ÚLTIMA DEMANDA
-===================================================== */
-
-function updateAdminDemand(){
-
-  const box =
-    document.getElementById(
-      'adminDemand'
-    );
-
-
-  if(
-    !box ||
-    !currentDemand
-  ){
-
-    return;
-
-  }
-
-
-  box.innerHTML = `
-
-    <b>
-      Solicitud #${escapeHtml(
-        String(
-          currentDemand.id
-        )
-      )}
-    </b>
-
-    <br><br>
-
-    📦 ${escapeHtml(
-      String(
-        currentDemand.cantidas ??
-        '-'
-      )
-    )}
-
-    ${escapeHtml(
-      currentDemand.unidad ||
-      ''
-    )}
-
-    de
-
-    ${escapeHtml(
-      currentDemand.mercancia ||
-      ''
-    )}
-
-    <br>
-
-    📍 ${escapeHtml(
-      currentDemand.origen ||
-      '-'
-    )}
-
-    →
-
-    ${escapeHtml(
-      currentDemand.destino ||
-      '-'
-    )}
-
-    <br>
-
-    Estado:
-
-    <b>
-      ${escapeHtml(
-        currentDemand.estado ||
-        '-'
-      )}
-    </b>
-
-  `;
-
-}
-
-
-/* =====================================================
-   SERVICIOS
-===================================================== */
-
-async function loadAdminServices(){
-
-  if(!checkSupabase()){
-
-    return;
-
-  }
-
-
-  const box =
-    document.getElementById(
-      'adminServices'
-    );
-
-
-  if(!box){
-
-    return;
-
-  }
-
-
-  try{
-
-    const result =
-      await supabaseClient
-      .from('solicitudes')
-      .select('*')
-      .order(
-        'id',
-        {
-          ascending:false
-        }
-      );
-
-
-    if(result.error){
-
-      throw result.error;
-
-    }
-
-
-    const solicitudes =
-      result.data || [];
-
-
-    const pendientes =
-      solicitudes.filter(
-        s =>
-          s.estado ===
-          'pendiente'
-      ).length;
-
-
-    const asignadas =
-      solicitudes.filter(
-        s =>
-          s.estado ===
-          'asignada'
-      ).length;
-
-
-    const entregadas =
-      solicitudes.filter(
-        s =>
-          s.estado ===
-          'entregada'
-      ).length;
-
-
-    box.innerHTML = `
-
-      <div class="row">
-
-        <div class="stat">
-
-          <h3>
-            ${pendientes}
-          </h3>
-
-          <span class="small">
-            Pendientes
-          </span>
-
-        </div>
-
-
-        <div class="stat">
-
-          <h3>
-            ${asignadas}
-          </h3>
-
-          <span class="small">
-            En servicio
-          </span>
-
-        </div>
-
-
-        <div class="stat">
-
-          <h3>
-            ${entregadas}
-          </h3>
-
-          <span class="small">
-            Entregadas
-          </span>
-
-        </div>
-
-      </div>
-
-    `;
-
-
-    if(
-      !currentDemand &&
-      solicitudes.length
-    ){
-
-      currentDemand =
-        solicitudes[0];
-
-      updateAdminDemand();
-
-    }
-
-
-  }catch(error){
-
-    box.innerHTML = `
-
-      <div class="error">
-
-        ❌ Error cargando servicios.
-
-        <code>
-          ${escapeHtml(
-            formatSupabaseError(error)
-          )}
-        </code>
-
-      </div>
-
-    `;
-
-  }
-
-}
-
-
-/* =====================================================
-   REINICIAR
-===================================================== */
-
-function resetApp(){
-
-  currentDemand = null;
-
-  selectedPartner = null;
-
-
-  document.getElementById(
-    'origin'
-  ).value =
-    'Ferretería - Mocoa';
-
-
-  document.getElementById(
-    'dest'
-  ).value =
-    'Vereda El Rumiyaco';
-
-
-  document.getElementById(
-    'cargo'
-  ).value =
-    'Cemento';
-
-
-  document.getElementById(
-    'quantity'
-  ).value =
-    '100';
-
-
-  document.getElementById(
-    'unit'
-  ).value =
-    'bultos';
-
-
-  document.getElementById(
-    'when'
-  ).value =
-    'Ahora';
-
-
-  document.getElementById(
-    'requestError'
-  ).innerHTML =
-    '';
-
-
-  document.getElementById(
-    'selectedPartnerCard'
-  ).innerHTML =
-    '';
-
-
-  document.getElementById(
-    'assignmentError'
-  ).innerHTML =
-    '';
-
-
-  show('home');
-
-
-  loadPartners();
-
-}
-
-
-/* =====================================================
-   INICIO
-===================================================== */
-
-document.addEventListener(
-  'DOMContentLoaded',
-  async function(){
-
-    console.log(
-      'Red Transporte Mocoa iniciando...'
-    );
-
-
-    if(!supabaseClient){
-
-      console.error(
-        supabaseInitError
-      );
-
-      return;
-
-    }
-
-
-    await loadPartners();
-
-    await loadAdminServices();
-
-  }
-);
-
-</script>
-
-</body>
-</html>p{
-  max-width:480px;
-  min-height:100vh;
-  margin:auto;
-  background:#fff;
-  overflow:hidden;
-  box-shadow:0 8px 30px rgba(0,0,0,.12);
-}
-
-header{
-  background:#173b57;
-  color:white;
-  padding:20px;
-}
-
-.brand{
-  font-size:21px;
-  font-weight:800;
-}
-
-.sub{
-  font-size:12px;
-  opacity:.8;
-  margin-top:5px;
-}
-
-main{
-  padding:20px;
-}
-
-.screen{
-  display:none;
-}
-
-.screen.active{
-  display:block;
-}
-
-h1{
-  font-size:25px;
-  margin:8px 0;
-}
-
-h2{
-  font-size:20px;
-  margin:8px 0 15px;
-}
-
-h3{
-  margin:8px 0;
-}
-
-p{
-  color:#687681;
-  line-height:1.45;
-}
-
-.card{
-  border:1px solid #dce4e9;
-  border-radius:14px;
-  padding:15px;
-  margin:12px 0;
-}
-
-.dark{
-  background:#f5f7f9;
-}
-
-.btn{
-  width:100%;
-  border:0;
-  border-radius:11px;
-  padding:14px;
-  margin-top:10px;
-  background:#1670ad;
-  color:#fff;
-  font-weight:700;
-  font-size:15px;
-  cursor:pointer;
-}
-
-.btn:hover{
-  opacity:.9;
-}
-
-.btn:disabled{
-  opacity:.5;
-  cursor:not-allowed;
-}
-
-.btn.alt{
-  background:#e8edf1;
-  color:#173b57;
-}
-
-.btn.success-btn{
-  background:#2e8b57;
-}
-
-.btn.danger{
-  background:#b52d2d;
-}
-
-label{
-  display:block;
-  font-size:12px;
-  font-weight:700;
-  margin:11px 0 5px;
-}
-
-input,
-select{
-  width:100%;
-  padding:12px;
-  border:1px solid #cdd7de;
-  border-radius:9px;
-  font-size:14px;
-  background:white;
-}
-
-input:focus,
-select:focus{
-  outline:none;
-  border-color:#1670ad;
-}
-
-.row{
-  display:flex;
-  gap:9px;
-}
-
-.row > div{
-  flex:1;
-}
-
-.top{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:8px;
-}
-
-.pill{
-  display:inline-block;
-  padding:5px 8px;
-  border-radius:20px;
-  background:#edf7ef;
-  font-size:12px;
-  color:#28702f;
-  font-weight:700;
-}
-
-.pill.red{
-  background:#ffe9e9;
-  color:#8a2222;
-}
-
-.pill.yellow{
-  background:#fff5dd;
-  color:#8a6500;
-}
-
-.alert{
-  background:#fff5dd;
-  border:1px solid #f1d99b;
-  padding:12px;
-  border-radius:10px;
-}
-
-.error{
-  background:#ffe9e9;
-  border:1px solid #e0a0a0;
-  padding:12px;
-  border-radius:10px;
-  color:#8a2222;
-  margin-top:12px;
-}
-
-.error code{
-  display:block;
-  background:#fff;
-  border:1px solid #e0a0a0;
-  border-radius:6px;
-  padding:8px;
-  margin-top:7px;
-  font-size:11px;
-  word-break:break-word;
-  white-space:pre-wrap;
-}
-
-.success{
-  background:#e8f7eb;
-  border:1px solid #a8d8ae;
-  padding:12px;
-  border-radius:10px;
-  color:#236b2d;
-}
-
-.loading{
-  text-align:center;
-  padding:20px;
-  color:#687681;
-}
-
-.empty{
-  text-align:center;
-  padding:20px;
-  color:#687681;
-}
-
-.small{
-  font-size:12px;
-}
-
-.badge{
-  background:#edf1f4;
-  padding:5px 8px;
-  border-radius:8px;
-  border:0;
-  font-size:11px;
-  cursor:pointer;
-}
-
-.nav{
-  display:flex;
-  gap:6px;
-  margin-top:20px;
-  flex-wrap:wrap;
-}
-
-.nav button{
-  flex:1;
-  min-width:70px;
-  padding:10px 6px;
-  border:0;
-  border-radius:9px;
-  background:#edf1f4;
-  cursor:pointer;
-}
-
-.stat{
-  flex:1;
-  background:#f5f7f9;
-  border-radius:12px;
-  padding:12px;
-  text-align:center;
-}
-
-.stat h3{
-  margin:0;
-  font-size:22px;
-}
-
-.map{
-  height:220px;
-  background:linear-gradient(135deg,#e8f0e5,#dce9f2);
-  border-radius:12px;
-  margin-top:12px;
-  position:relative;
-  overflow:hidden;
-}
-
-.marker{
-  position:absolute;
-  font-size:28px;
-}
-
-footer{
-  text-align:center;
-  color:#9aa6ad;
-  font-size:11px;
-  padding:15px 0 5px;
-}
-</style>
-</head>
-
-<body>
-
-<div class="app">
-
-<header>
-  <div class="brand">🚛 RED TRANSPORTE MOCOA</div>
-  <div class="sub">
-    Red local de transporte de mercancías
   </div>
-</header>
-
-<main>
-
-<!-- =====================================================
-     INICIO
-===================================================== -->
-
-<section id="home" class="screen active">
-
-<h1>¿Necesitas transporte?</h1>
-
-<p>
-Encuentra un socio transportador disponible en Mocoa.
-</p>
-
-<div class="card">
-
-<b>📦 Solicita tu transporte</b>
-
-<p>
-Indica origen, destino, mercancía y cantidad.
-</p>
-
-</div>
-
-<button
-class="btn"
-onclick="show('request')">
-
-📦 Solicitar transporte
-
-</button>
-
-<button
-class="btn alt"
-onclick="openPartnerPanel()">
-
-🚚 Soy socio transportador
-
-</button>
-
-<button
-class="btn alt"
-onclick="openAdminPanel()">
-
-🖥️ Central de operaciones
-
-</button>
-
-</section>
-
-
-<!-- =====================================================
-     SOLICITUD
-===================================================== -->
-
-<section id="request" class="screen">
-
-<h2>📦 Nueva solicitud</h2>
-
-<label>Origen</label>
-
-<input
-id="origin"
-value="Ferretería - Mocoa"
-placeholder="Lugar de recogida">
-
-
-<label>Destino</label>
-
-<input
-id="dest"
-value="Vereda El Rumiyaco"
-placeholder="Lugar de entrega">
-
-
-<label>Mercancía</label>
-
-<input
-id="cargo"
-value="Cemento"
-placeholder="Tipo de mercancía">
-
-
-<div class="row">
-
-<div>
-
-<label>Cantidad</label>
-
-<input
-id="quantity"
-type="number"
-min="0.01"
-step="0.01"
-value="100">
-
-</div>
-
-<div>
-
-<label>Unidad</label>
-
-<select id="unit">
-
-<option value="bultos">
-Bultos
-</option>
-
-<option value="toneladas">
-Toneladas
-</option>
-
-<option value="kg">
-Kilogramos
-</option>
-
-<option value="unidades">
-Unidades
-</option>
-
-</select>
-
-</div>
-
-</div>
-
-
-<label>
-¿Cuándo necesitas el transporte?
-</label>
-
-<select id="when">
-
-<option value="Ahora">
-Ahora
-</option>
-
-<option value="Hoy más tarde">
-Hoy más tarde
-</option>
-
-<option value="Programado">
-Programado
-</option>
-
-</select>
-
-
-<button
-id="sendDemandButton"
-class="btn"
-onclick="sendDemand()">
-
-🚀 Buscar socio disponible
-
-</button>
-
-
-<button
-class="btn alt"
-onclick="show('home')">
-
-Volver
-
-</button>
-
-
-<div id="requestError"></div>
-
-</section>
-
-
-<!-- =====================================================
-     SOCIOS DISPONIBLES
-===================================================== -->
-
-<section id="matching" class="screen">
-
-<h2>🔎 Socios disponibles</h2>
-
-<div class="alert">
-
-<b>Solicitud creada</b>
-
-<p id="demandText">
-Buscando socios...
-</p>
-
-</div>
-
-<div id="matchingList">
-
-<div class="loading">
-Buscando socios disponibles...
-</div>
-
-</div>
-
-
-<button
-class="btn alt"
-onclick="show('request')">
-
-Nueva solicitud
-
-</button>
-
-</section>
-
-
-<!-- =====================================================
-     ASIGNACIÓN
-===================================================== -->
-
-<section id="assignment" class="screen">
-
-<h2>🎯 Socio seleccionado</h2>
-
-<div id="selectedPartnerCard"></div>
-
-<button
-id="acceptServiceButton"
-class="btn"
-onclick="acceptService()">
-
-✅ Asignar servicio
-
-</button>
-
-<button
-class="btn alt"
-onclick="show('matching')">
-
-Volver
-
-</button>
-
-<div id="assignmentError"></div>
-
-</section>
-
-
-<!-- =====================================================
-     SERVICIO ACTIVO
-===================================================== -->
-
-<section id="active" class="screen">
-
-<h2>🚚 Servicio activo</h2>
-
-<div class="success">
-
-<b>Servicio confirmado.</b>
-
-<br>
-
-El transporte está en proceso.
-
-</div>
-
-<div class="card">
-
-<b>Socio transportador</b>
-
-<h3 id="activePartner">
--
-</h3>
-
-<p id="activeServiceText">
--
-</p>
-
-<div class="pill red">
-🔴 EN SERVICIO
-</div>
-
-</div>
-
-
-<div class="card">
-
-<b>Estado del servicio</b>
-
-<p id="serviceStatus">
-
-🟢 Solicitud asignada<br>
-🚚 Transporte en camino<br>
-📦 Mercancía recogida<br>
-🛣️ En tránsito<br>
-⬜ Entregado
-
-</p>
-
-</div>
-
-
-<button
-class="btn success-btn"
-onclick="deliver()">
-
-📦 Confirmar entrega
-
-</button>
-
-</section>
-
-
-<!-- =====================================================
-     ENTREGA
-===================================================== -->
-
-<section id="delivered" class="screen">
-
-<h2>📦 Entrega realizada</h2>
-
-<div class="card">
-
-<div class="pill">
-🟢 SERVICIO FINALIZADO
-</div>
-
-<p>
-
-El socio
-
-<b id="deliveredPartner">
--
-</b>
-
-ha terminado el servicio.
-
-</p>
-
-<h3>
-Disponible para nuevas solicitudes
-</h3>
-
-</div>
-
-<button
-class="btn"
-onclick="resetApp()">
-
-Nueva solicitud
-
-</button>
-
-</section>
-
-
-<!-- =====================================================
-     PANEL SOCIO
-===================================================== -->
-
-<section id="partnerHome" class="screen">
-
-<h2>🚚 Panel del socio</h2>
-
-<div class="card">
-
-<b>Socios registrados</b>
-
-<p>
-Selecciona tu vehículo para revisar la demanda.
-</p>
-
-</div>
-
-<div id="partnerList">
-
-<div class="loading">
-Cargando socios...
-</div>
-
-</div>
-
-
-<button
-class="btn"
-onclick="openPartnerDemand()">
-
-🔔 Ver demanda disponible
-
-</button>
-
-
-<button
-class="btn alt"
-onclick="loadPartners()">
-
-🔄 Actualizar socios
-
-</button>
-
-
-<button
-class="btn alt"
-onclick="show('home')">
-
-Volver
-
-</button>
-
-</section>
-
-
-<!-- =====================================================
-     DEMANDA SOCIO
-===================================================== -->
-
-<section id="partnerDemand" class="screen">
-
-<h2>🔔 Demanda disponible</h2>
-
-<div class="card">
-
-<b id="partnerDemandNumber">
-Solicitud
-</b>
-
-<p id="partnerDemandText">
-No hay solicitud disponible.
-</p>
-
-
-<div class="alert">
-
-Revisa la capacidad de tu vehículo
-antes de aceptar.
-
-</div>
-
-
-<label>
-Selecciona tu vehículo
-</label>
-
-<select id="partnerSelector">
-
-<option value="">
-Selecciona tu socio
-</option>
-
-</select>
-
-
-<button
-class="btn"
-onclick="acceptPartnerDemand()">
-
-✅ Aceptar servicio
-
-</button>
-
-
-<button
-class="btn alt"
-onclick="show('partnerHome')">
-
-Volver
-
-</button>
-
-</div>
-
-</section>
-
-
-<!-- =====================================================
-     CENTRAL
-===================================================== -->
-
-<section id="admin" class="screen">
-
-<h2>🖥️ Central de operaciones</h2>
-
-<div class="card">
-
-<div class="top">
-
-<b>
-Estado de la red
-</b>
-
-<button
-class="badge"
-onclick="refreshAdmin()">
-
-🔄 Actualizar
-
-</button>
-
-</div>
-
-<div id="networkStats">
-Cargando...
-</div>
-
-</div>
-
-
-<div class="card">
-
-<b>
-📍 Mapa operativo
-</b>
-
-<div class="map">
-
-<div
-class="marker"
-style="left:18%;top:30%">
-
-🟢
-
-</div>
-
-<div
-class="marker"
-style="left:55%;top:18%">
-
-🟢
-
-</div>
-
-<div
-class="marker"
-style="left:70%;top:55%">
-
-🔴
-
-</div>
-
-<div
-class="marker"
-style="left:35%;top:68%">
-
-🟡
-
-</div>
-
-<div style="
-position:absolute;
-left:8px;
-bottom:12px;
-background:white;
-padding:6px 9px;
-border-radius:8px;
-font-size:11px">
-
-📍 Mocoa
-
-</div>
-
-</div>
-
-</div>
-
-
-<div class="card">
-
-<b>
-🚚 Socios en la red
-</b>
-
-<div id="adminPartners">
-Cargando socios...
-</div>
-
-</div>
-
-
-<div class="card">
-
-<b>
-📦 Última solicitud
-</b>
-
-<p id="adminDemand">
-No hay solicitudes cargadas.
-</p>
-
-</div>
-
-
-<div class="card">
-
-<b>
-📊 Resumen de servicios
-</b>
-
-<div id="adminServices">
-Cargando...
-</div>
-
-</div>
-
-</section>
-
-
-<!-- =====================================================
-     NAVEGACIÓN
-===================================================== -->
-
-<div class="nav">
-
-<button onclick="show('home')">
-Inicio
-</button>
-
-<button onclick="show('request')">
-Solicitar
-</button>
-
-<button onclick="openPartnerPanel()">
-Socios
-</button>
-
-<button onclick="openAdminPanel()">
-Central
-</button>
-
-</div>
-
-
-<footer>
-Red Transporte Mocoa
-</footer>
-
-</main>
-
-</div>
-
-
-<!-- =====================================================
-     SUPABASE
-===================================================== -->
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-<script>
-
-/* =====================================================
-   CONFIGURACIÓN SUPABASE
-===================================================== */
-
-const SUPABASE_URL =
-'https://lmmbbivyhhjepjfengtt.supabase.co';
-
-const SUPABASE_KEY =
-'sb_publishable_3rK7v9Jhd0ZRv02vU4JTeg_5Q8iXArI';
-
-
-/* =====================================================
-   CLIENTE
-===================================================== */
-
-let supabaseClient = null;
-
-let supabaseInitError = null;
-
-
-try{
-
-  if(
-    typeof window.supabase === 'undefined'
-  ){
-
-    throw new Error(
-      'No se pudo cargar supabase-js.'
-    );
-
-  }
-
-
-  supabaseClient =
-    window.supabase.createClient(
-      SUPABASE_URL,
-      SUPABASE_KEY
-    );
-
-
-}catch(error){
-
-  supabaseInitError =
-    error;
-
-  console.error(error);
-
-}
-
-
-/* =====================================================
-   VARIABLES
-===================================================== */
-
-let socios = [];
-
-let currentDemand = null;
-
-let selectedPartner = null;
-
-
-/* =====================================================
-   NAVEGACIÓN
-===================================================== */
-
-function show(id){
-
-  document
-  .querySelectorAll('.screen')
-  .forEach(screen => {
-
-    screen.classList.remove(
-      'active'
-    );
-
-  });
-
-
-  const target =
-    document.getElementById(id);
-
-
-  if(target){
-
-    target.classList.add(
-      'active'
-    );
-
-  }
-
-}
-
-
-function openPartnerPanel(){
-
-  show('partnerHome');
-
-  loadPartners();
-
-}
-
-
-function openAdminPanel(){
-
-  show('admin');
-
-  refreshAdmin();
-
-}
-
-
-/* =====================================================
-   SEGURIDAD HTML
-===================================================== */
-
-function escapeHtml(value){
-
-  return String(
-    value ?? ''
-  )
-  .replace(/&/g,'&amp;')
-  .replace(/</g,'&lt;')
-  .replace(/>/g,'&gt;')
-  .replace(/"/g,'&quot;')
-  .replace(/'/g,'&#039;');
-
-}
-
-
-/* =====================================================
-   ERROR
-===================================================== */
-
-function formatSupabaseError(error){
-
-  if(!error){
-
-    return 'Error desconocido.';
-
-  }
-
-
-  const parts = [];
-
-
-  if(error.message){
-
-    parts.push(
-      'Mensaje: ' +
-      error.message
-    );
-
-  }
-
-
-  if(error.code){
-
-    parts.push(
-      'Código: ' +
-      error.code
-    );
-
-  }
-
-
-  if(error.details){
-
-    parts.push(
-      'Detalles: ' +
-      error.details
-    );
-
-  }
-
-
-  if(error.hint){
-
-    parts.push(
-      'Sugerencia: ' +
-      error.hint
-    );
-
-  }
-
-
-  return parts.join('\n');
-
-}
-
-
-/* =====================================================
-   COMPROBAR SUPABASE
-===================================================== */
-
-function checkSupabase(){
-
-  if(supabaseClient){
-
-    return true;
-
-  }
-
-
-  alert(
-    'No se pudo conectar con Supabase.'
-  );
-
-
-  return false;
-
-}
-
-
-/* =====================================================
-   CARGAR SOCIOS
-===================================================== */
-
-async function loadPartners(){
-
-  if(!checkSupabase()){
-
-    return;
-
-  }
-
-
-  const partnerList =
-    document.getElementById(
-      'partnerList'
-    );
-
-
-  const adminPartners =
-    document.getElementById(
-      'adminPartners'
-    );
-
-
-  if(partnerList){
-
-    partnerList.innerHTML =
-      '<div class="loading">Cargando socios...</div>';
-
-  }
-
-
-  if(adminPartners){
-
-    adminPartners.innerHTML =
-      '<div class="loading">Cargando socios...</div>';
-
-  }
-
-
-  try{
-
-    const result =
-      await supabaseClient
-      .from('socios')
-      .select('*')
-      .order(
-        'id',
-        {
-          ascending:true
-        }
-      );
-
-
-    if(result.error){
-
-      throw result.error;
-
-    }
-
-
-    socios =
-      result.data || [];
-
-
-    renderPartnerList();
-
-    renderAdminPartners();
-
-    renderNetworkStats();
-
-    populatePartnerSelector();
-
-
-  }catch(error){
-
-    console.error(error);
-
-
-    const html = `
-
-      <div class="error">
-
-        ❌ No se pudieron cargar
-        los socios.
-
-        <code>
-          ${escapeHtml(
-            formatSupabaseError(error)
-          )}
-        </code>
-
-      </div>
-
-    `;
-
-
-    if(partnerList){
-
-      partnerList.innerHTML =
-        html;
-
-    }
-
-
-    if(adminPartners){
-
-      adminPartners.innerHTML =
-        html;
-
-    }
-
-  }
-
-}
-
-
-/* =====================================================
-   LISTA SOCIOS
-===================================================== */
-
-function renderPartnerList(){
-
-  const box =
-    document.getElementById(
-      'partnerList'
-    );
-
-
-  if(!box){
-
-    return;
-
-  }
-
-
-  if(!socios.length){
-
-    box.innerHTML = `
-
-      <div class="empty">
-
-        🚚 No hay socios registrados.
-
-        <br><br>
-
-        Agrega socios en la tabla
-        <b>socios</b> de Supabase.
-
-      </div>
-
-    `;
-
-    return;
-
-  }
-
-
-  box.innerHTML =
-    socios
-    .map(renderPartnerCard)
-    .join('');
-
-}
-
-
-/* =====================================================
-   TARJETA SOCIO
-===================================================== */
-
-function renderPartnerCard(socio){
-
-  const nombre =
-    socio.nombre ||
-    'Sin nombre';
-
-
-  const vehiculo =
-    socio.vehiculo ||
-    'Vehículo no registrado';
-
-
-  const telefono =
-    socio.telefono ||
-    'No registrado';
-
-
-  const capacidad =
-    socio.capacidad_ton ??
-    '-';
-
-
-  const estado =
-    socio.estado ||
-    'sin estado';
-
-
-  const disponible =
-    String(estado)
-    .toLowerCase()
-    === 'disponible';
-
-
-  return `
-
-    <div class="card">
-
-      <div class="top">
-
-        <b>
-
-          ${disponible ? '🟢' : '🔴'}
-
-          ${escapeHtml(nombre)}
-
-        </b>
-
-
-        <span class="${
-          disponible
-          ? 'pill'
-          : 'pill red'
-        }">
-
-          ${escapeHtml(estado)}
-
-        </span>
-
-      </div>
-
-
-      <p>
-
-        🚚 ${escapeHtml(
-          vehiculo
-        )}
-
-        <br>
-
-        ⚖️ Capacidad:
-        ${escapeHtml(
-          String(capacidad)
-        )}
-        t
-
-        <br>
-
-        📞 ${escapeHtml(
-          String(telefono)
-        )}
-
-      </p>
-
-
-      ${
-        disponible
-        ?
-        `
-
-        <button
-        class="btn"
-        onclick="selectPartner('${escapeHtml(socio.id)}')">
-
-          🎯 Seleccionar socio
-
-        </button>
-
-        `
-        :
-        ''
-      }
-
-    </div>
 
   `;
 
@@ -4777,100 +1381,66 @@ function renderPartnerCard(socio){
 
 
 /* =====================================================
-   SOCIOS CENTRAL
+   SOCIO CENTRAL
 ===================================================== */
 
-function renderAdminPartners(){
+function renderAdminPartner(socio){
 
-  const box =
-    document.getElementById(
-      'adminPartners'
-    );
+  const nombre =
+    socio.nombre || 'Sin nombre';
 
+  const vehiculo =
+    socio.vehiculo || '-';
 
-  if(!box){
+  const capacidad =
+    socio.capacidad_ton ?? '-';
 
-    return;
+  const estado =
+    socio.estado || '-';
 
-  }
-
-
-  if(!socios.length){
-
-    box.innerHTML =
-      '<p>No hay socios registrados.</p>';
-
-    return;
-
-  }
+  const disponible =
+    String(estado)
+      .toLowerCase()
+      === 'disponible';
 
 
-  box.innerHTML =
-    socios
-    .map(socio => {
+  return `
 
-      const disponible =
-        String(
-          socio.estado || ''
-        ).toLowerCase()
-        === 'disponible';
+  <div class="card dark">
 
+    <div class="top">
 
-      return `
+      <b>
 
-        <div class="card dark">
+      ${disponible ? '🟢' : '🔴'}
 
-          <div class="top">
+      ${escapeHtml(nombre)}
 
-            <b>
+      </b>
 
-              ${disponible ? '🟢' : '🔴'}
+      <span class="small">
 
-              ${escapeHtml(
-                socio.nombre ||
-                'Sin nombre'
-              )}
+      ${escapeHtml(estado)}
 
-            </b>
+      </span>
 
-            <span class="small">
+    </div>
 
-              ${escapeHtml(
-                socio.estado ||
-                '-'
-              )}
+    <p>
 
-            </span>
+    🚚 ${escapeHtml(vehiculo)}
 
-          </div>
+    ·
 
+    ${escapeHtml(String(capacidad))}
 
-          <p>
+    t
 
-            🚚 ${escapeHtml(
-              socio.vehiculo ||
-              '-'
-            )}
+    </p>
 
-            ·
+  </div>
 
-            ${escapeHtml(
-              String(
-                socio.capacidad_ton ??
-                '-'
-              )
-            )}
-
-            t
-
-          </p>
-
-        </div>
-
-      `;
-
-    })
-    .join('');
+  `;
 
 }
 
@@ -4879,28 +1449,25 @@ function renderAdminPartners(){
    ESTADÍSTICAS
 ===================================================== */
 
-function renderNetworkStats(){
+function updateNetworkStats(){
 
-  const box =
+  const networkStats =
     document.getElementById(
       'networkStats'
     );
 
 
-  if(!box){
-
+  if(!networkStats)
     return;
-
-  }
 
 
   const disponibles =
-    socios.filter(
-      socio =>
-        String(
-          socio.estado || ''
-        ).toLowerCase()
+    socios.filter(s =>
+
+      String(s.estado || '')
+        .toLowerCase()
         === 'disponible'
+
     ).length;
 
 
@@ -4909,110 +1476,42 @@ function renderNetworkStats(){
     disponibles;
 
 
-  box.innerHTML = `
+  networkStats.innerHTML = `
 
-    <div class="row">
+  <div class="row">
 
-      <div class="stat">
+    <div>
 
-        <h3>
-          🟢 ${disponibles}
-        </h3>
+      <h3>
+      🟢 ${disponibles}
+      </h3>
 
-        <span class="small">
-          Disponibles
-        </span>
-
-      </div>
-
-
-      <div class="stat">
-
-        <h3>
-          🔴 ${ocupados}
-        </h3>
-
-        <span class="small">
-          Ocupados
-        </span>
-
-      </div>
+      <span class="small">
+      Disponibles
+      </span>
 
     </div>
 
+    <div>
 
-    <p>
+      <h3>
+      🔴 ${ocupados}
+      </h3>
 
-      <b>${socios.length}</b>
-      socios registrados.
+      <span class="small">
+      Ocupados
+      </span>
 
-    </p>
+    </div>
 
-  `;
+  </div>
 
-}
+  <p>
 
+  <b>${socios.length}</b>
+  socios registrados.
 
-/* =====================================================
-   SELECTOR DE SOCIO
-===================================================== */
-
-function populatePartnerSelector(){
-
-  const selector =
-    document.getElementById(
-      'partnerSelector'
-    );
-
-
-  if(!selector){
-
-    return;
-
-  }
-
-
-  const disponibles =
-    socios.filter(
-      socio =>
-        String(
-          socio.estado || ''
-        ).toLowerCase()
-        === 'disponible'
-    );
-
-
-  selector.innerHTML = `
-
-    <option value="">
-      Selecciona tu socio
-    </option>
-
-    ${
-      disponibles
-      .map(socio => `
-
-        <option value="${escapeHtml(
-          socio.id
-        )}">
-
-          ${escapeHtml(
-            socio.nombre ||
-            'Socio'
-          )}
-
-          -
-
-          ${escapeHtml(
-            socio.vehiculo ||
-            'Vehículo'
-          )}
-
-        </option>
-
-      `)
-      .join('')
-    }
+  </p>
 
   `;
 
@@ -5044,66 +1543,67 @@ function selectPartner(id){
   }
 
 
-  document.getElementById(
-    'selectedPartnerCard'
-  ).innerHTML = `
-
-    <div class="card">
-
-      <div class="top">
-
-        <b>
-
-          🟢
-
-          ${escapeHtml(
-            selectedPartner.nombre ||
-            'Socio'
-          )}
-
-        </b>
-
-        <span class="pill">
-          Disponible
-        </span>
-
-      </div>
+  const card =
+    document.getElementById(
+      'selectedPartnerCard'
+    );
 
 
-      <p>
+  card.innerHTML = `
 
-        🚚 ${escapeHtml(
-          selectedPartner.vehiculo ||
-          '-'
-        )}
+  <div class="card">
 
-        <br>
+    <div class="top">
 
-        ⚖️ Capacidad:
+      <b>
+      🟢 ${escapeHtml(
+        selectedPartner.nombre ||
+        'Socio'
+      )}
+      </b>
 
-        ${escapeHtml(
-          String(
-            selectedPartner.capacidad_ton ??
-            '-'
-          )
-        )}
-
-        toneladas
-
-        <br>
-
-        📞 ${escapeHtml(
-          String(
-            selectedPartner.telefono ||
-            '-'
-          )
-        )}
-
-      </p>
+      <span class="pill">
+      Disponible
+      </span>
 
     </div>
 
+    <p>
+
+    🚚 ${escapeHtml(
+      selectedPartner.vehiculo || '-'
+    )}
+
+    <br>
+
+    ⚖️ Capacidad:
+
+    ${escapeHtml(
+      String(
+        selectedPartner.capacidad_ton ?? '-'
+      )
+    )}
+
+    toneladas
+
+    <br>
+
+    📞 ${escapeHtml(
+      String(
+        selectedPartner.telefono || '-'
+      )
+    )}
+
+    </p>
+
+  </div>
+
   `;
+
+
+  document.getElementById(
+    'assignmentError'
+  ).innerHTML = '';
 
 
   show('assignment');
@@ -5112,16 +1612,13 @@ function selectPartner(id){
 
 
 /* =====================================================
-   CREAR DEMANDA
+   CREAR SOLICITUD
 ===================================================== */
 
 async function sendDemand(){
 
-  if(!checkSupabase()){
-
+  if(!checkSupabase())
     return;
-
-  }
 
 
   const origin =
@@ -5162,9 +1659,15 @@ async function sendDemand(){
     ).value;
 
 
-  const errorBox =
+  const requestError =
     document.getElementById(
       'requestError'
+    );
+
+
+  const button =
+    document.getElementById(
+      'sendDemandBtn'
     );
 
 
@@ -5172,18 +1675,17 @@ async function sendDemand(){
     !origin ||
     !dest ||
     !cargo ||
-    !Number.isFinite(quantity) ||
+    !quantity ||
     quantity <= 0
   ){
 
-    errorBox.innerHTML = `
+    requestError.innerHTML = `
 
-      <div class="error">
+    <div class="error">
 
-        ❌ Completa correctamente
-        todos los campos.
+    ❌ Completa correctamente todos los campos.
 
-      </div>
+    </div>
 
     `;
 
@@ -5192,13 +1694,7 @@ async function sendDemand(){
   }
 
 
-  errorBox.innerHTML = '';
-
-
-  const button =
-    document.getElementById(
-      'sendDemandButton'
-    );
+  requestError.innerHTML = '';
 
 
   button.disabled = true;
@@ -5207,131 +1703,316 @@ async function sendDemand(){
     '⏳ Creando solicitud...';
 
 
+  show('matching');
+
+
+  document.getElementById(
+    'matchingList'
+  ).innerHTML = `
+
+  <div class="loading">
+
+  ⏳ Guardando solicitud en Supabase...
+
+  </div>
+
+  `;
+
+
+  /*
+    IMPORTANTE:
+
+    Esta versión utiliza exactamente:
+
+    origen
+    destino
+    mercancia
+    cantidas
+    unidad
+    estado
+    socio_id
+
+    Si tu tabla utiliza "cantidad" en vez de
+    "cantidas", cambia el nombre aquí.
+  */
+
+
+  const insertData = {
+
+    origen: origin,
+
+    destino: dest,
+
+    mercancia: cargo,
+
+    cantidas: quantity,
+
+    unidad: unit,
+
+    estado: 'pendiente',
+
+    socio_id: null
+
+  };
+
+
+  /*
+    Si tienes una columna "cuando", puedes
+    agregarla a la tabla y descomentar:
+
+    cuando: when
+  */
+
+
   try{
 
-    /*
-      IMPORTANTE:
-
-      Aquí se utiliza "cantidas" porque
-      ese es el nombre usado por el
-      código original.
-
-      Si tu columna en Supabase se llama
-      "cantidad", cambia "cantidas"
-      por "cantidad".
-    */
-
-
-    const insertData = {
-
-      origen:origin,
-
-      destino:dest,
-
-      mercancia:cargo,
-
-      cantidas:quantity,
-
-      unidad:unit,
-
-      estado:'pendiente',
-
-      socio_id:null
-
-    };
-
-
-    const result =
+    const {
+      data,
+      error
+    } =
       await supabaseClient
-      .from('solicitudes')
-      .insert([insertData])
-      .select()
-      .single();
+        .from('solicitudes')
+        .insert([insertData])
+        .select()
+        .single();
 
 
-    if(result.error){
+    if(error){
 
-      throw result.error;
-
-    }
-
-
-    currentDemand =
-      result.data;
-
-
-    selectedPartner = null;
-
-
-    document.getElementById(
-      'demandText'
-    ).innerHTML = `
-
-      <b>
-        Solicitud #${escapeHtml(
-          String(
-            currentDemand.id
-          )
-        )}
-      </b>
-
-      <br><br>
-
-      📦 ${escapeHtml(
-        String(quantity)
-      )}
-
-      ${escapeHtml(unit)}
-
-      de
-
-      ${escapeHtml(cargo)}
-
-      <br>
-
-      📍 ${escapeHtml(origin)}
-
-      →
-
-      ${escapeHtml(dest)}
-
-      <br>
-
-      🕐 ${escapeHtml(when)}
-
-    `;
-
-
-    updatePartnerDemand();
-
-    updateAdminDemand();
-
-
-    await loadPartners();
-
-
-    const disponibles =
-      socios.filter(
-        socio =>
-          String(
-            socio.estado || ''
-          ).toLowerCase()
-          === 'disponible'
+      console.error(
+        'ERROR INSERT:',
+        error
       );
 
-
-    if(!disponibles.length){
 
       document.getElementById(
         'matchingList'
       ).innerHTML = `
 
-        <div class="alert">
+      <div class="error">
 
-          ⚠️ No hay socios disponibles
-          en este momento.
+      ❌ No se pudo crear la solicitud.
 
-        </div>
+      <code>${escapeHtml(
+        formatSupabaseError(error)
+      )}</code>
+
+      ${
+        error.code === '42501'
+
+        ?
+
+        `
+
+        <br><br>
+
+        ⚠️ <b>Supabase está bloqueando
+        el INSERT mediante RLS.</b>
+
+        <br><br>
+
+        En Supabase → SQL Editor ejecuta
+        la política INSERT para
+        <b>anon</b>.
+
+        `
+
+        :
+
+        ''
+
+      }
+
+      ${
+        error.code === 'PGRST204'
+
+        ?
+
+        `
+
+        <br><br>
+
+        ⚠️ Una columna no coincide
+        con la estructura de la tabla.
+
+        Revisa especialmente
+        <b>cantidas</b>.
+
+        `
+
+        :
+
+        ''
+
+      }
+
+      </div>
+
+      `;
+
+      return;
+
+    }
+
+
+    currentDemand =
+      data;
+
+
+    /* TEXTO SOLICITUD */
+
+    document.getElementById(
+      'demandText'
+    ).innerHTML = `
+
+    <b>
+    Solicitud #${escapeHtml(
+      String(data.id)
+    )}
+    </b>
+
+    <br><br>
+
+    📦 ${escapeHtml(
+      String(quantity)
+    )}
+
+    ${escapeHtml(unit)}
+
+    de
+
+    ${escapeHtml(cargo)}
+
+    <br>
+
+    📍 ${escapeHtml(origin)}
+
+    →
+
+    ${escapeHtml(dest)}
+
+    <br>
+
+    🕐 ${escapeHtml(when)}
+
+    `;
+
+
+    /* DEMANDA SOCIO */
+
+    document.getElementById(
+      'partnerDemandNumber'
+    ).textContent =
+      'Solicitud #' +
+      String(data.id);
+
+
+    document.getElementById(
+      'partnerDemandText'
+    ).innerHTML = `
+
+    📍 Recoger:
+
+    ${escapeHtml(origin)}
+
+    <br>
+
+    📍 Entregar:
+
+    ${escapeHtml(dest)}
+
+    <br>
+
+    📦 Mercancía:
+
+    ${escapeHtml(cargo)}
+
+    <br>
+
+    ⚖️ Cantidad:
+
+    ${escapeHtml(
+      String(quantity)
+    )}
+
+    ${escapeHtml(unit)}
+
+    `;
+
+
+    /* CENTRAL */
+
+    document.getElementById(
+      'adminDemand'
+    ).innerHTML = `
+
+    <b>
+    Solicitud #${escapeHtml(
+      String(data.id)
+    )}
+    </b>
+
+    <br>
+
+    📦 ${escapeHtml(
+      String(quantity)
+    )}
+
+    ${escapeHtml(unit)}
+
+    de
+
+    ${escapeHtml(cargo)}
+
+    <br>
+
+    📍 ${escapeHtml(origin)}
+
+    →
+
+    ${escapeHtml(dest)}
+
+    <br>
+
+    Estado:
+
+    <b>pendiente</b>
+
+    `;
+
+
+    /*
+      RECARGAR SOCIOS PARA ASEGURAR
+      QUE TENEMOS LA INFORMACIÓN ACTUAL.
+    */
+
+    await loadPartners();
+
+
+    const disponibles =
+      socios.filter(s =>
+
+        String(s.estado || '')
+          .toLowerCase()
+          === 'disponible'
+
+      );
+
+
+    if(disponibles.length === 0){
+
+      document.getElementById(
+        'matchingList'
+      ).innerHTML = `
+
+      <div class="alert">
+
+      ⚠️ La solicitud fue creada correctamente,
+
+      pero no hay socios disponibles
+      en este momento.
+
+      </div>
 
       `;
 
@@ -5341,30 +2022,25 @@ async function sendDemand(){
         'matchingList'
       ).innerHTML = `
 
-        <p>
+      <p>
 
-          Encontramos
+      Encontramos
 
-          <b>
-            ${disponibles.length}
-          </b>
+      <b>
+      ${disponibles.length}
+      </b>
 
-          socio(s) disponible(s).
+      socio(s) disponible(s).
 
-        </p>
+      </p>
 
-        ${disponibles
-          .map(
-            renderMatchingPartner
-          )
-          .join('')}
+      ${disponibles
+        .map(renderMatchingPartner)
+        .join('')}
 
       `;
 
     }
-
-
-    show('matching');
 
 
   }catch(error){
@@ -5376,43 +2052,18 @@ async function sendDemand(){
       'matchingList'
     ).innerHTML = `
 
-      <div class="error">
+    <div class="error">
 
-        ❌ No se pudo crear
-        la solicitud.
+    ❌ Error al crear la solicitud.
 
-        <code>
-          ${escapeHtml(
-            formatSupabaseError(error)
-          )}
-        </code>
+    <code>${escapeHtml(
+      error.message ||
+      String(error)
+    )}</code>
 
-        ${
-          error.code === '42501'
-          ?
-          `
-
-          <br><br>
-
-          ⚠️ Supabase está bloqueando
-          el INSERT mediante RLS.
-
-          <br><br>
-
-          Debes crear una política
-          INSERT para el rol anon.
-
-          `
-          :
-          ''
-        }
-
-      </div>
+    </div>
 
     `;
-
-
-    show('matching');
 
   }finally{
 
@@ -5427,67 +2078,65 @@ async function sendDemand(){
 
 
 /* =====================================================
-   MATCHING
+   SOCIOS PARA MATCHING
 ===================================================== */
 
 function renderMatchingPartner(socio){
 
   return `
 
-    <div class="card">
+  <div class="card">
 
-      <div class="top">
+    <div class="top">
 
-        <b>
+      <b>
 
-          🟢
+      🟢
 
-          ${escapeHtml(
-            socio.nombre ||
-            'Socio'
-          )}
+      ${escapeHtml(
+        socio.nombre ||
+        'Socio'
+      )}
 
-        </b>
+      </b>
 
-        <span class="pill">
-          Disponible
-        </span>
+      <span class="pill">
 
-      </div>
+      Disponible
 
-
-      <p>
-
-        🚚 ${escapeHtml(
-          socio.vehiculo ||
-          '-'
-        )}
-
-        <br>
-
-        ⚖️ Capacidad:
-
-        ${escapeHtml(
-          String(
-            socio.capacidad_ton ??
-            '-'
-          )
-        )}
-
-        toneladas
-
-      </p>
-
-
-      <button
-      class="btn"
-      onclick="selectPartner('${escapeHtml(socio.id)}')">
-
-        🎯 Seleccionar
-
-      </button>
+      </span>
 
     </div>
+
+    <p>
+
+    🚚 ${escapeHtml(
+      socio.vehiculo || '-'
+    )}
+
+    <br>
+
+    ⚖️ Capacidad:
+
+    ${escapeHtml(
+      String(
+        socio.capacidad_ton ?? '-'
+      )
+    )}
+
+    toneladas
+
+    </p>
+
+    <button
+    class="btn"
+    onclick="selectPartner('${escapeAttr(socio.id)}')">
+
+    🎯 Seleccionar
+
+    </button>
+
+  </div>
 
   `;
 
@@ -5495,22 +2144,19 @@ function renderMatchingPartner(socio){
 
 
 /* =====================================================
-   ASIGNAR DESDE CLIENTE
+   ASIGNAR SERVICIO
 ===================================================== */
 
 async function acceptService(){
 
-  if(!checkSupabase()){
-
+  if(!checkSupabase())
     return;
-
-  }
 
 
   if(!currentDemand){
 
     alert(
-      'No existe una solicitud activa.'
+      'No hay una solicitud.'
     );
 
     return;
@@ -5521,7 +2167,7 @@ async function acceptService(){
   if(!selectedPartner){
 
     alert(
-      'Selecciona un socio.'
+      'Selecciona un socio primero.'
     );
 
     return;
@@ -5537,7 +2183,7 @@ async function acceptService(){
 
   const button =
     document.getElementById(
-      'acceptServiceButton'
+      'assignBtn'
     );
 
 
@@ -5549,88 +2195,129 @@ async function acceptService(){
 
   try{
 
+    const {
+      error
+    } =
+      await supabaseClient
+        .from('solicitudes')
+        .update({
+
+          estado:'asignada',
+
+          socio_id:
+            selectedPartner.id
+
+        })
+        .eq(
+          'id',
+          currentDemand.id
+        );
+
+
+    if(error){
+
+      errorBox.innerHTML = `
+
+      <div class="error">
+
+      ❌ No se pudo asignar.
+
+      <code>${escapeHtml(
+        formatSupabaseError(error)
+      )}</code>
+
+      </div>
+
+      `;
+
+      return;
+
+    }
+
+
     /*
-      Solo actualizamos si continúa
-      pendiente.
+      Marcar socio como ocupado.
     */
 
-
-    const result =
+    const {
+      error: partnerError
+    } =
       await supabaseClient
-      .from('solicitudes')
-      .update({
-
-        estado:'asignada',
-
-        socio_id:
+        .from('socios')
+        .update({
+          estado:'ocupado'
+        })
+        .eq(
+          'id',
           selectedPartner.id
-
-      })
-      .eq(
-        'id',
-        currentDemand.id
-      )
-      .eq(
-        'estado',
-        'pendiente'
-      )
-      .select()
-      .maybeSingle();
+        );
 
 
-    if(result.error){
+    if(partnerError){
 
-      throw result.error;
-
-    }
-
-
-    if(!result.data){
-
-      throw new Error(
-        'La solicitud ya fue asignada.'
+      console.error(
+        'Error actualizando socio:',
+        partnerError
       );
 
     }
 
 
-    currentDemand =
-      result.data;
+    document.getElementById(
+      'activePartner'
+    ).textContent =
+      selectedPartner.nombre ||
+      'Socio';
 
 
-    /*
-      Cambiar socio a ocupado.
-    */
+    document.getElementById(
+      'deliveredPartner'
+    ).textContent =
+      selectedPartner.nombre ||
+      'Socio';
 
 
-    const partnerResult =
-      await supabaseClient
-      .from('socios')
-      .update({
+    document.getElementById(
+      'activeServiceText'
+    ).innerHTML = `
 
-        estado:'ocupado'
+    🚚 ${escapeHtml(
+      selectedPartner.vehiculo || '-'
+    )}
 
-      })
-      .eq(
-        'id',
-        selectedPartner.id
+    <br><br>
+
+    📍 ${escapeHtml(
+      currentDemand.origen || ''
+    )}
+
+    →
+
+    ${escapeHtml(
+      currentDemand.destino || ''
+    )}
+
+    <br><br>
+
+    📦 ${escapeHtml(
+      String(
+        currentDemand.mercancia || ''
       )
-      .eq(
-        'estado',
-        'disponible'
-      );
+    )}
 
+    <br>
 
-    if(partnerResult.error){
+    ⚖️ ${escapeHtml(
+      String(
+        currentDemand.cantidas ?? ''
+      )
+    )}
 
-      console.warn(
-        partnerResult.error
-      );
+    ${escapeHtml(
+      currentDemand.unidad || ''
+    )}
 
-    }
-
-
-    renderActiveService();
+    `;
 
 
     show('active');
@@ -5643,17 +2330,16 @@ async function acceptService(){
 
     errorBox.innerHTML = `
 
-      <div class="error">
+    <div class="error">
 
-        ❌ No se pudo asignar.
+    ❌ Error:
 
-        <code>
-          ${escapeHtml(
-            formatSupabaseError(error)
-          )}
-        </code>
+    <code>${escapeHtml(
+      error.message ||
+      String(error)
+    )}</code>
 
-      </div>
+    </div>
 
     `;
 
@@ -5670,142 +2356,80 @@ async function acceptService(){
 
 
 /* =====================================================
-   SERVICIO ACTIVO
-===================================================== */
-
-function renderActiveService(){
-
-  if(
-    !currentDemand ||
-    !selectedPartner
-  ){
-
-    return;
-
-  }
-
-
-  document.getElementById(
-    'activePartner'
-  ).textContent =
-    selectedPartner.nombre ||
-    'Socio';
-
-
-  document.getElementById(
-    'deliveredPartner'
-  ).textContent =
-    selectedPartner.nombre ||
-    'Socio';
-
-
-  document.getElementById(
-    'activeServiceText'
-  ).innerHTML = `
-
-    🚚 ${escapeHtml(
-      selectedPartner.vehiculo ||
-      '-'
-    )}
-
-    <br><br>
-
-    📍 ${escapeHtml(
-      currentDemand.origen ||
-      '-'
-    )}
-
-    →
-
-    ${escapeHtml(
-      currentDemand.destino ||
-      '-'
-    )}
-
-    <br><br>
-
-    📦 ${escapeHtml(
-      String(
-        currentDemand.cantidas ??
-        '-'
-      )
-    )}
-
-    ${escapeHtml(
-      currentDemand.unidad ||
-      ''
-    )}
-
-    de
-
-    ${escapeHtml(
-      currentDemand.mercancia ||
-      ''
-    )}
-
-  `;
-
-}
-
-
-/* =====================================================
-   DEMANDA DEL SOCIO
+   DEMANDA SOCIO
 ===================================================== */
 
 async function openPartnerDemand(){
 
-  if(!checkSupabase()){
-
+  if(!checkSupabase())
     return;
 
-  }
 
+  /*
+    Buscar siempre la solicitud pendiente
+    más reciente.
+  */
 
   try{
 
-    /*
-      Buscar siempre una solicitud
-      pendiente reciente.
-    */
-
-
-    const result =
+    const {
+      data,
+      error
+    } =
       await supabaseClient
-      .from('solicitudes')
-      .select('*')
-      .eq(
-        'estado',
-        'pendiente'
-      )
-      .order(
-        'id',
-        {
-          ascending:false
-        }
-      )
-      .limit(1)
-      .maybeSingle();
+        .from('solicitudes')
+        .select('*')
+        .eq(
+          'estado',
+          'pendiente'
+        )
+        .order(
+          'id',
+          {
+            ascending:false
+          }
+        )
+        .limit(1)
+        .maybeSingle();
 
 
-    if(result.error){
+    if(error){
 
-      throw result.error;
+      document.getElementById(
+        'partnerDemandText'
+      ).innerHTML = `
+
+      <div class="error">
+
+      ❌ No se pudo consultar
+      la demanda.
+
+      <code>${escapeHtml(
+        formatSupabaseError(error)
+      )}</code>
+
+      </div>
+
+      `;
+
+      show('partnerDemand');
+
+      return;
 
     }
 
 
-    currentDemand =
-      result.data ||
-      null;
+    if(data){
 
+      currentDemand =
+        data;
 
-    updatePartnerDemand();
+    }else{
 
+      currentDemand =
+        null;
 
-    await loadPartners();
-
-
-    show('partnerDemand');
+    }
 
 
   }catch(error){
@@ -5814,112 +2438,104 @@ async function openPartnerDemand(){
       'partnerDemandText'
     ).innerHTML = `
 
-      <div class="error">
+    <div class="error">
 
-        ❌ Error consultando
-        solicitudes.
+    ❌ Error:
 
-        <code>
-          ${escapeHtml(
-            formatSupabaseError(error)
-          )}
-        </code>
+    <code>${escapeHtml(
+      error.message ||
+      String(error)
+    )}</code>
 
-      </div>
+    </div>
 
     `;
 
-
     show('partnerDemand');
-
-  }
-
-}
-
-
-/* =====================================================
-   TEXTO DEMANDA
-===================================================== */
-
-function updatePartnerDemand(){
-
-  const number =
-    document.getElementById(
-      'partnerDemandNumber'
-    );
-
-
-  const text =
-    document.getElementById(
-      'partnerDemandText'
-    );
-
-
-  if(!currentDemand){
-
-    number.textContent =
-      'Sin solicitudes';
-
-
-    text.innerHTML =
-      'No hay solicitudes pendientes.';
 
     return;
 
   }
 
 
-  number.textContent =
+  if(!currentDemand){
+
+    document.getElementById(
+      'partnerDemandText'
+    ).innerHTML =
+      'No hay solicitudes pendientes.';
+
+
+    document.getElementById(
+      'partnerAcceptBtn'
+    ).disabled = true;
+
+
+    show('partnerDemand');
+
+    return;
+
+  }
+
+
+  document.getElementById(
+    'partnerAcceptBtn'
+  ).disabled = false;
+
+
+  document.getElementById(
+    'partnerDemandNumber'
+  ).textContent =
     'Solicitud #' +
     String(
       currentDemand.id
     );
 
 
-  text.innerHTML = `
+  document.getElementById(
+    'partnerDemandText'
+  ).innerHTML = `
 
-    📍 Recoger:
+  📍 Recoger:
 
-    ${escapeHtml(
-      currentDemand.origen ||
-      '-'
-    )}
+  ${escapeHtml(
+    currentDemand.origen || '-'
+  )}
 
-    <br>
+  <br>
 
-    📍 Entregar:
+  📍 Entregar:
 
-    ${escapeHtml(
-      currentDemand.destino ||
-      '-'
-    )}
+  ${escapeHtml(
+    currentDemand.destino || '-'
+  )}
 
-    <br>
+  <br>
 
-    📦 Mercancía:
+  📦 Mercancía:
 
-    ${escapeHtml(
-      currentDemand.mercancia ||
-      '-'
-    )}
+  ${escapeHtml(
+    currentDemand.mercancia || '-'
+  )}
 
-    <br>
+  <br>
 
-    ⚖️ Cantidad:
+  ⚖️ Cantidad:
 
-    ${escapeHtml(
-      String(
-        currentDemand.cantidas ??
-        '-'
-      )
-    )}
+  ${escapeHtml(
+    String(
+      currentDemand.cantidas ?? '-'
+    )
+  )}
 
-    ${escapeHtml(
-      currentDemand.unidad ||
-      ''
-    )}
+  ${escapeHtml(
+    currentDemand.unidad || ''
+  )}
 
   `;
+
+
+  show('partnerDemand');
 
 }
 
@@ -5930,78 +2546,15 @@ function updatePartnerDemand(){
 
 async function acceptPartnerDemand(){
 
-  if(!checkSupabase()){
-
+  if(!checkSupabase())
     return;
-
-  }
 
 
   if(!currentDemand){
 
     alert(
-      'No hay solicitud pendiente.'
+      'No hay una solicitud pendiente.'
     );
-
-    return;
-
-  }
-
-
-  const selector =
-    document.getElementById(
-      'partnerSelector'
-    );
-
-
-  const partnerId =
-    selector.value;
-
-
-  if(!partnerId){
-
-    alert(
-      'Selecciona tu vehículo.'
-    );
-
-    return;
-
-  }
-
-
-  const partner =
-    socios.find(
-      socio =>
-        String(socio.id)
-        === String(partnerId)
-    );
-
-
-  if(!partner){
-
-    alert(
-      'No se encontró el socio.'
-    );
-
-    return;
-
-  }
-
-
-  const estado =
-    String(
-      partner.estado ||
-      ''
-    ).toLowerCase();
-
-
-  if(estado !== 'disponible'){
-
-    alert(
-      'Este socio ya no está disponible.'
-    );
-
-    await loadPartners();
 
     return;
 
@@ -6009,174 +2562,127 @@ async function acceptPartnerDemand(){
 
 
   /*
-    Comprobación de capacidad
-    si la carga está expresada
-    en toneladas.
+    Si no se ha seleccionado un socio,
+    usamos el primer socio disponible.
+
+    Para producción será mejor tener
+    un usuario/socio autenticado.
   */
 
+  if(!selectedPartner){
 
-  if(
-    currentDemand.unidad
-    ===
-    'toneladas'
-  ){
+    const disponibles =
+      socios.filter(s =>
 
-    const cantidad =
-      Number(
-        currentDemand.cantidas
+        String(s.estado || '')
+          .toLowerCase()
+          === 'disponible'
+
       );
 
 
-    const capacidad =
-      Number(
-        partner.capacidad_ton
-      );
+    if(disponibles.length > 0){
 
-
-    if(
-      Number.isFinite(cantidad) &&
-      Number.isFinite(capacidad) &&
-      cantidad > capacidad
-    ){
-
-      alert(
-        'La carga supera la capacidad registrada del vehículo.'
-      );
-
-      return;
+      selectedPartner =
+        disponibles[0];
 
     }
 
   }
 
 
+  if(!selectedPartner){
+
+    alert(
+      'No hay un socio disponible.'
+    );
+
+    return;
+
+  }
+
+
   try{
 
-    /*
-      Reservar socio.
-    */
-
-
-    const partnerResult =
+    const {
+      error
+    } =
       await supabaseClient
+        .from('solicitudes')
+        .update({
+
+          estado:'asignada',
+
+          socio_id:
+            selectedPartner.id
+
+        })
+        .eq(
+          'id',
+          currentDemand.id
+        )
+        .eq(
+          'estado',
+          'pendiente'
+        );
+
+
+    if(error){
+
+      alert(
+        'No se pudo aceptar:\n\n' +
+        formatSupabaseError(error)
+      );
+
+      return;
+
+    }
+
+
+    await supabaseClient
       .from('socios')
       .update({
-
         estado:'ocupado'
-
       })
       .eq(
         'id',
-        partner.id
-      )
-      .eq(
-        'estado',
-        'disponible'
-      )
-      .select()
-      .maybeSingle();
-
-
-    if(partnerResult.error){
-
-      throw partnerResult.error;
-
-    }
-
-
-    if(!partnerResult.data){
-
-      throw new Error(
-        'El socio ya no está disponible.'
-      );
-
-    }
-
-
-    /*
-      Asignar solicitud.
-    */
-
-
-    const demandResult =
-      await supabaseClient
-      .from('solicitudes')
-      .update({
-
-        estado:'asignada',
-
-        socio_id:
-          partner.id
-
-      })
-      .eq(
-        'id',
-        currentDemand.id
-      )
-      .eq(
-        'estado',
-        'pendiente'
-      )
-      .select()
-      .maybeSingle();
-
-
-    if(demandResult.error){
-
-      /*
-        Liberar socio si falló
-        la asignación.
-      */
-
-      await supabaseClient
-      .from('socios')
-      .update({
-
-        estado:'disponible'
-
-      })
-      .eq(
-        'id',
-        partner.id
+        selectedPartner.id
       );
 
 
-      throw demandResult.error;
-
-    }
-
-
-    if(!demandResult.data){
-
-      await supabaseClient
-      .from('socios')
-      .update({
-
-        estado:'disponible'
-
-      })
-      .eq(
-        'id',
-        partner.id
-      );
+    document.getElementById(
+      'activePartner'
+    ).textContent =
+      selectedPartner.nombre;
 
 
-      throw new Error(
-        'Otro socio ya aceptó esta solicitud.'
-      );
-
-    }
-
-
-    currentDemand =
-      demandResult.data;
+    document.getElementById(
+      'deliveredPartner'
+    ).textContent =
+      selectedPartner.nombre;
 
 
-    selectedPartner =
-      partner;
+    document.getElementById(
+      'activeServiceText'
+    ).innerHTML = `
 
+    🚚 ${escapeHtml(
+      selectedPartner.vehiculo || '-'
+    )}
 
-    renderActiveService();
+    <br><br>
+
+    📍 ${escapeHtml(
+      currentDemand.origen || ''
+    )}
+
+    →
+
+    ${escapeHtml(
+      currentDemand.destino || ''
+    )}
+
+    `;
 
 
     show('active');
@@ -6188,11 +2694,8 @@ async function acceptPartnerDemand(){
   }catch(error){
 
     alert(
-
-      'No se pudo aceptar el servicio:\n\n' +
-
-      formatSupabaseError(error)
-
+      'Error:\n\n' +
+      error.message
     );
 
   }
@@ -6206,11 +2709,8 @@ async function acceptPartnerDemand(){
 
 async function deliver(){
 
-  if(!checkSupabase()){
-
+  if(!checkSupabase())
     return;
-
-  }
 
 
   if(!currentDemand){
@@ -6222,86 +2722,79 @@ async function deliver(){
   }
 
 
+  const button =
+    document.getElementById(
+      'deliverBtn'
+    );
+
+
+  button.disabled = true;
+
+  button.textContent =
+    '⏳ Registrando entrega...';
+
+
   try{
 
-    const result =
+    const {
+      error
+    } =
       await supabaseClient
-      .from('solicitudes')
-      .update({
-
-        estado:'entregada'
-
-      })
-      .eq(
-        'id',
-        currentDemand.id
-      )
-      .eq(
-        'estado',
-        'asignada'
-      )
-      .select()
-      .maybeSingle();
-
-
-    if(result.error){
-
-      throw result.error;
-
-    }
-
-
-    if(!result.data){
-
-      throw new Error(
-        'La solicitud ya fue cerrada.'
-      );
-
-    }
-
-
-    currentDemand =
-      result.data;
-
-
-    /*
-      Liberar vehículo.
-    */
-
-
-    if(selectedPartner){
-
-      const partnerResult =
-        await supabaseClient
-        .from('socios')
+        .from('solicitudes')
         .update({
 
-          estado:'disponible'
+          estado:'entregada'
 
         })
         .eq(
           'id',
-          selectedPartner.id
+          currentDemand.id
         );
 
 
-      if(partnerResult.error){
+    if(error){
 
-        console.warn(
-          partnerResult.error
+      alert(
+        'No se pudo registrar la entrega:\n\n' +
+        formatSupabaseError(error)
+      );
+
+      return;
+
+    }
+
+
+    /*
+      Liberar socio.
+    */
+
+    if(selectedPartner){
+
+      const {
+        error: partnerError
+      } =
+        await supabaseClient
+          .from('socios')
+          .update({
+
+            estado:'disponible'
+
+          })
+          .eq(
+            'id',
+            selectedPartner.id
+          );
+
+
+      if(partnerError){
+
+        console.error(
+          partnerError
         );
 
       }
 
     }
-
-
-    document.getElementById(
-      'deliveredPartner'
-    ).textContent =
-      selectedPartner
-      ? selectedPartner.nombre
-      : 'Socio';
 
 
     show('delivered');
@@ -6310,272 +2803,19 @@ async function deliver(){
     await loadPartners();
 
 
-    await loadAdminServices();
-
-
   }catch(error){
 
     alert(
-
-      'No se pudo confirmar la entrega:\n\n' +
-
-      formatSupabaseError(error)
-
+      'Error:\n\n' +
+      error.message
     );
 
-  }
+  }finally{
 
-}
+    button.disabled = false;
 
-
-/* =====================================================
-   CENTRAL
-===================================================== */
-
-async function refreshAdmin(){
-
-  await loadPartners();
-
-  await loadAdminServices();
-
-}
-
-
-/* =====================================================
-   ÚLTIMA DEMANDA
-===================================================== */
-
-function updateAdminDemand(){
-
-  const box =
-    document.getElementById(
-      'adminDemand'
-    );
-
-
-  if(
-    !box ||
-    !currentDemand
-  ){
-
-    return;
-
-  }
-
-
-  box.innerHTML = `
-
-    <b>
-      Solicitud #${escapeHtml(
-        String(
-          currentDemand.id
-        )
-      )}
-    </b>
-
-    <br><br>
-
-    📦 ${escapeHtml(
-      String(
-        currentDemand.cantidas ??
-        '-'
-      )
-    )}
-
-    ${escapeHtml(
-      currentDemand.unidad ||
-      ''
-    )}
-
-    de
-
-    ${escapeHtml(
-      currentDemand.mercancia ||
-      ''
-    )}
-
-    <br>
-
-    📍 ${escapeHtml(
-      currentDemand.origen ||
-      '-'
-    )}
-
-    →
-
-    ${escapeHtml(
-      currentDemand.destino ||
-      '-'
-    )}
-
-    <br>
-
-    Estado:
-
-    <b>
-      ${escapeHtml(
-        currentDemand.estado ||
-        '-'
-      )}
-    </b>
-
-  `;
-
-}
-
-
-/* =====================================================
-   SERVICIOS
-===================================================== */
-
-async function loadAdminServices(){
-
-  if(!checkSupabase()){
-
-    return;
-
-  }
-
-
-  const box =
-    document.getElementById(
-      'adminServices'
-    );
-
-
-  if(!box){
-
-    return;
-
-  }
-
-
-  try{
-
-    const result =
-      await supabaseClient
-      .from('solicitudes')
-      .select('*')
-      .order(
-        'id',
-        {
-          ascending:false
-        }
-      );
-
-
-    if(result.error){
-
-      throw result.error;
-
-    }
-
-
-    const solicitudes =
-      result.data || [];
-
-
-    const pendientes =
-      solicitudes.filter(
-        s =>
-          s.estado ===
-          'pendiente'
-      ).length;
-
-
-    const asignadas =
-      solicitudes.filter(
-        s =>
-          s.estado ===
-          'asignada'
-      ).length;
-
-
-    const entregadas =
-      solicitudes.filter(
-        s =>
-          s.estado ===
-          'entregada'
-      ).length;
-
-
-    box.innerHTML = `
-
-      <div class="row">
-
-        <div class="stat">
-
-          <h3>
-            ${pendientes}
-          </h3>
-
-          <span class="small">
-            Pendientes
-          </span>
-
-        </div>
-
-
-        <div class="stat">
-
-          <h3>
-            ${asignadas}
-          </h3>
-
-          <span class="small">
-            En servicio
-          </span>
-
-        </div>
-
-
-        <div class="stat">
-
-          <h3>
-            ${entregadas}
-          </h3>
-
-          <span class="small">
-            Entregadas
-          </span>
-
-        </div>
-
-      </div>
-
-    `;
-
-
-    if(
-      !currentDemand &&
-      solicitudes.length
-    ){
-
-      currentDemand =
-        solicitudes[0];
-
-      updateAdminDemand();
-
-    }
-
-
-  }catch(error){
-
-    box.innerHTML = `
-
-      <div class="error">
-
-        ❌ Error cargando servicios.
-
-        <code>
-          ${escapeHtml(
-            formatSupabaseError(error)
-          )}
-        </code>
-
-      </div>
-
-    `;
+    button.textContent =
+      '📦 Confirmar entrega';
 
   }
 
@@ -6594,94 +2834,39 @@ function resetApp(){
 
 
   document.getElementById(
-    'origin'
-  ).value =
-    'Ferretería - Mocoa';
-
-
-  document.getElementById(
-    'dest'
-  ).value =
-    'Vereda El Rumiyaco';
-
-
-  document.getElementById(
-    'cargo'
-  ).value =
-    'Cemento';
-
-
-  document.getElementById(
-    'quantity'
-  ).value =
-    '100';
-
-
-  document.getElementById(
-    'unit'
-  ).value =
-    'bultos';
-
-
-  document.getElementById(
-    'when'
-  ).value =
-    'Ahora';
+    'selectedPartnerCard'
+  ).innerHTML = '';
 
 
   document.getElementById(
     'requestError'
-  ).innerHTML =
-    '';
-
-
-  document.getElementById(
-    'selectedPartnerCard'
-  ).innerHTML =
-    '';
+  ).innerHTML = '';
 
 
   document.getElementById(
     'assignmentError'
-  ).innerHTML =
-    '';
+  ).innerHTML = '';
 
 
-  show('home');
-
-
-  loadPartners();
+  show('request');
 
 }
 
 
 /* =====================================================
-   INICIO
+   CARGA INICIAL
 ===================================================== */
 
 document.addEventListener(
   'DOMContentLoaded',
-  async function(){
+  () => {
 
-    console.log(
-      'Red Transporte Mocoa iniciando...'
-    );
+    /*
+      Intentamos cargar los socios
+      inmediatamente.
+    */
 
-
-    if(!supabaseClient){
-
-      console.error(
-        supabaseInitError
-      );
-
-      return;
-
-    }
-
-
-    await loadPartners();
-
-    await loadAdminServices();
+    loadPartners();
 
   }
 );
