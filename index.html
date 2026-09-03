@@ -1,2523 +1,404 @@
-<!doctype html>
-<html lang="es">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Red Transporte Mocoa</title>
+:root {
+  --ink: #1A1D1B;
+  --paper: #F5F4EF;
+  --route-green: #1F4B3F;
+  --route-green-dark: #163A31;
+  --amber: #E8A33D;
+  --steel: #6B6F6A;
+  --steel-light: #D8D6CC;
+  --line: #C9C6B9;
+  --danger: #B0432E;
 
-<style>
-*{box-sizing:border-box}
-
-body{
-  margin:0;
-  background:#eef2f5;
-  color:#18232d;
-  font-family:Arial,sans-serif;
+  --font-display: 'Archivo', system-ui, sans-serif;
+  --font-body: 'Inter', system-ui, sans-serif;
 }
 
-.app{
-  max-width:480px;
-  margin:16px auto;
-  background:#fff;
-  min-height:800px;
-  border-radius:24px;
-  overflow:hidden;
-  box-shadow:0 8px 30px #0002;
+* { box-sizing: border-box; }
+
+html, body, #root {
+  height: 100%;
 }
 
-header{
-  background:#173b57;
-  color:#fff;
-  padding:20px;
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
 }
 
-.brand{
-  font-size:21px;
-  font-weight:800;
+h1, h2, h3 {
+  font-family: var(--font-display);
+  margin: 0;
+  color: var(--ink);
+  letter-spacing: -0.01em;
 }
 
-.sub{
-  font-size:12px;
-  opacity:.8;
-  margin-top:5px;
+a { color: inherit; }
+
+button, input, select, textarea {
+  font-family: var(--font-body);
+  font-size: 1rem;
 }
 
-main{
-  padding:20px;
+:focus-visible {
+  outline: 3px solid var(--amber);
+  outline-offset: 2px;
 }
 
-.screen{
-  display:none;
+/* ---------- Layout shell ---------- */
+
+.shell {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
-.screen.active{
-  display:block;
+.topbar {
+  background: var(--route-green);
+  color: var(--paper);
+  padding: 18px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
 }
 
-h1{
-  font-size:25px;
-  margin:8px 0;
+.brand {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
 }
 
-h2{
-  font-size:20px;
-  margin:8px 0;
+.brand-mark {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1.35rem;
 }
 
-h3{
-  margin:8px 0;
+.brand-sub {
+  font-size: 0.85rem;
+  color: var(--steel-light);
 }
 
-p{
-  color:#687681;
-  line-height:1.45;
+.topbar nav {
+  display: flex;
+  gap: 4px;
 }
 
-.card{
-  border:1px solid #dce4e9;
-  border-radius:14px;
-  padding:15px;
-  margin:12px 0;
+.topbar nav a {
+  text-decoration: none;
+  color: var(--paper);
+  padding: 8px 14px;
+  border-radius: 3px;
+  font-size: 0.92rem;
+  font-weight: 500;
+  border: 1px solid transparent;
 }
 
-.dark{
-  background:#f5f7f9;
+.topbar nav a:hover {
+  border-color: rgba(245,244,239,0.35);
 }
 
-.btn{
-  width:100%;
-  border:0;
-  border-radius:11px;
-  padding:14px;
-  margin-top:10px;
-  background:#1670ad;
-  color:#fff;
-  font-weight:700;
-  font-size:15px;
-  cursor:pointer;
+.topbar nav a.active {
+  background: var(--amber);
+  color: var(--ink);
+  font-weight: 600;
 }
 
-.btn:hover{
-  opacity:.9;
+main {
+  flex: 1;
+  width: 100%;
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 32px 24px 64px;
 }
 
-.btn.alt{
-  background:#e8edf1;
-  color:#173b57;
+/* ---------- Hero / búsqueda ---------- */
+
+.hero {
+  border-bottom: 3px solid var(--ink);
+  padding-bottom: 28px;
+  margin-bottom: 28px;
 }
 
-label{
-  display:block;
-  font-size:12px;
-  font-weight:700;
-  margin:11px 0 5px;
+.hero h1 {
+  font-size: clamp(1.9rem, 4vw, 2.6rem);
+  font-weight: 800;
+  max-width: 22ch;
+  line-height: 1.08;
 }
 
-input,select{
-  width:100%;
-  padding:12px;
-  border:1px solid #cdd7de;
-  border-radius:9px;
-  font-size:14px;
+.hero p {
+  max-width: 52ch;
+  color: var(--steel);
+  margin-top: 12px;
+  font-size: 1.02rem;
 }
 
-.row{
-  display:flex;
-  gap:9px;
+.filters {
+  margin-top: 24px;
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
 }
 
-.row>div{
-  flex:1;
+.filters select, .filters input[type="text"] {
+  padding: 11px 14px;
+  border: 1.5px solid var(--ink);
+  border-radius: 3px;
+  background: var(--paper);
+  color: var(--ink);
+  min-width: 180px;
 }
 
-.pill{
-  display:inline-block;
-  padding:5px 8px;
-  border-radius:20px;
-  background:#edf7ef;
-  font-size:12px;
-  color:#28702f;
-  font-weight:700;
+/* ---------- Lista de transportadores (formato manifiesto) ---------- */
+
+.listado {
+  border-top: 1.5px solid var(--ink);
 }
 
-.price{
-  font-size:21px;
-  font-weight:800;
+.fila-transportador {
+  display: grid;
+  grid-template-columns: 64px 1fr auto;
+  gap: 18px;
+  align-items: center;
+  padding: 18px 4px;
+  border-bottom: 1.5px solid var(--line);
 }
 
-.small{
-  font-size:12px;
+.avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 4px;
+  background: var(--route-green);
+  color: var(--paper);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
 }
 
-.top{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:8px;
+.info-transportador h3 {
+  font-size: 1.08rem;
+  font-weight: 700;
 }
 
-.alert{
-  background:#fff5dd;
-  border:1px solid #f1d99b;
-  padding:12px;
-  border-radius:10px;
+.meta-linea {
+  color: var(--steel);
+  font-size: 0.9rem;
+  margin-top: 4px;
 }
 
-.error{
-  background:#ffe9e9;
-  border:1px solid #e0a0a0;
-  padding:12px;
-  border-radius:10px;
-  color:#8a2222;
+.tarifa {
+  font-family: var(--font-display);
+  font-weight: 700;
+  color: var(--route-green-dark);
 }
 
-.error code{
-  display:block;
-  background:#fff;
-  border:1px solid #e0a0a0;
-  border-radius:6px;
-  padding:6px 8px;
-  margin-top:6px;
-  font-size:11px;
-  word-break:break-word;
-  white-space:pre-wrap;
+.acciones-fila {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: flex-end;
 }
 
-.success{
-  background:#e8f7eb;
-  border:1px solid #a8d8ae;
-  padding:12px;
-  border-radius:10px;
-  color:#236b2d;
+.btn {
+  display: inline-block;
+  border: none;
+  border-radius: 3px;
+  padding: 10px 16px;
+  font-weight: 600;
+  font-size: 0.92rem;
+  cursor: pointer;
+  text-decoration: none;
+  text-align: center;
 }
 
-.loading{
-  text-align:center;
-  padding:20px;
-  color:#687681;
+.btn-primary {
+  background: var(--route-green);
+  color: var(--paper);
+}
+.btn-primary:hover { background: var(--route-green-dark); }
+
+.btn-amber {
+  background: var(--amber);
+  color: var(--ink);
+}
+.btn-amber:hover { filter: brightness(0.95); }
+
+.btn-outline {
+  background: transparent;
+  border: 1.5px solid var(--ink);
+  color: var(--ink);
 }
 
-.nav{
-  display:flex;
-  gap:6px;
-  margin-top:20px;
-  flex-wrap:wrap;
+.btn-danger {
+  background: transparent;
+  border: 1.5px solid var(--danger);
+  color: var(--danger);
 }
 
-.nav button{
-  flex:1;
-  min-width:70px;
-  padding:10px 6px;
-  border:0;
-  border-radius:9px;
-  background:#edf1f4;
-  cursor:pointer;
+.estado-vacio {
+  padding: 48px 8px;
+  text-align: center;
+  color: var(--steel);
 }
 
-.map{
-  height:220px;
-  background:linear-gradient(135deg,#e8f0e5,#dce9f2);
-  border-radius:12px;
-  margin-top:12px;
-  position:relative;
-  overflow:hidden;
+/* ---------- Formularios ---------- */
+
+.form-card {
+  background: white;
+  border: 1.5px solid var(--ink);
+  border-radius: 4px;
+  padding: 28px;
+  max-width: 560px;
 }
 
-.marker{
-  position:absolute;
-  font-size:28px;
+.campo {
+  margin-bottom: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 
-.badge{
-  background:#edf1f4;
-  padding:4px 8px;
-  border-radius:8px;
-  font-size:11px;
+.campo label {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--ink);
 }
-</style>
-</head>
 
-<body>
-
-<div class="app">
-
-<header>
-  <div class="brand">🚛 RED TRANSPORTE MOCOA</div>
-  <div class="sub">Red local de transporte de mercancías</div>
-</header>
-
-<main>
-
-<!-- ================= INICIO ================= -->
-
-<section id="home" class="screen active">
-
-<h1>¿Necesitas transporte?</h1>
-
-<p>
-Encuentra un socio transportador disponible en Mocoa.
-</p>
-
-<div class="card">
-<b>📦 Solicita tu transporte</b>
-<p>
-Indica origen, destino, mercancía y cantidad.
-</p>
-</div>
-
-<button class="btn" onclick="show('request')">
-📦 Solicitar transporte
-</button>
-
-<button class="btn alt" onclick="show('partnerHome')">
-🚚 Soy socio transportador
-</button>
-
-<button class="btn alt" onclick="show('admin')">
-🖥️ Central de operaciones
-</button>
-
-</section>
-
-
-<!-- ================= SOLICITUD ================= -->
-
-<section id="request" class="screen">
-
-<h2>📦 Nueva solicitud</h2>
-
-<label>Origen</label>
-<input id="origin" value="Ferretería - Mocoa">
-
-<label>Destino</label>
-<input id="dest" value="Vereda El Rumiyaco">
-
-<label>Mercancía</label>
-<input id="cargo" value="Cemento">
-
-<div class="row">
-
-<div>
-<label>Cantidad</label>
-<input id="quantity" type="number" value="100">
-</div>
-
-<div>
-<label>Unidad</label>
-<select id="unit">
-<option value="bultos">Bultos</option>
-<option value="toneladas">Toneladas</option>
-<option value="kg">Kilogramos</option>
-<option value="unidades">Unidades</option>
-</select>
-</div>
-
-</div>
-
-<label>¿Cuándo necesitas el transporte?</label>
-
-<select id="when">
-<option>Ahora</option>
-<option>Hoy más tarde</option>
-<option>Programado</option>
-</select>
-
-<button class="btn" onclick="sendDemand()">
-🚀 Buscar socio disponible
-</button>
-
-<button class="btn alt" onclick="show('home')">
-Volver
-</button>
-
-<div id="requestError"></div>
-
-</section>
-
-
-<!-- ================= SOCIOS DISPONIBLES ================= -->
-
-<section id="matching" class="screen">
-
-<h2>🔎 Socios disponibles</h2>
-
-<div class="alert">
-
-<b>Solicitud creada</b>
-
-<p id="demandText">
-Buscando socios...
-</p>
-
-</div>
-
-<div id="matchingList">
-
-<div class="loading">
-Buscando socios disponibles...
-</div>
-
-</div>
-
-<button class="btn alt" onclick="show('request')">
-Nueva solicitud
-</button>
-
-</section>
-
-
-<!-- ================= ASIGNACION ================= -->
-
-<section id="assignment" class="screen">
-
-<h2>🎯 Socio seleccionado</h2>
-
-<div id="selectedPartnerCard"></div>
-
-<button class="btn" onclick="acceptService()">
-✅ Asignar servicio
-</button>
-
-<button class="btn alt" onclick="show('matching')">
-Volver
-</button>
-
-<div id="assignmentError"></div>
-
-</section>
-
-
-<!-- ================= SERVICIO ACTIVO ================= -->
-
-<section id="active" class="screen">
-
-<h2>✅ Servicio confirmado</h2>
-
-<div class="success">
-Servicio asignado correctamente.
-</div>
-
-<div class="card">
-
-<b>Socio transportador</b>
-
-<h3 id="activePartner">-</h3>
-
-<p id="activeServiceText">-</p>
-
-<div class="pill">
-🔴 EN SERVICIO
-</div>
-
-</div>
-
-<div class="card">
-
-<b>Estado del servicio</b>
-
-<p>
-🟢 Solicitud asignada<br>
-🚚 Transporte en camino<br>
-📦 Mercancía recogida<br>
-🛣️ En tránsito<br>
-⬜ Entregado
-</p>
-
-</div>
-
-<button class="btn" onclick="deliver()">
-📦 Confirmar entrega
-</button>
-
-</section>
-
-
-<!-- ================= ENTREGA ================= -->
-
-<section id="delivered" class="screen">
-
-<h2>📦 Entrega realizada</h2>
-
-<div class="card">
-
-<div class="pill">
-🟢 SERVICIO FINALIZADO
-</div>
-
-<p>
-El socio <b id="deliveredPartner">-</b>
-ha terminado el servicio.
-</p>
-
-<h3>
-Disponible para nuevas solicitudes
-</h3>
-
-</div>
-
-<button class="btn" onclick="resetApp()">
-Nueva solicitud
-</button>
-
-</section>
-
-
-<!-- ================= PANEL SOCIO ================= -->
-
-<section id="partnerHome" class="screen">
-
-<h2>🚚 Panel del socio</h2>
-
-<div class="card">
-
-<b>Socios registrados</b>
-
-<p>
-Los socios aparecen automáticamente desde Supabase.
-</p>
-
-</div>
-
-<div id="partnerList">
-
-<div class="loading">
-Cargando socios...
-</div>
-
-</div>
-
-<button class="btn" onclick="openPartnerDemand()">
-🔔 Ver demanda disponible
-</button>
-
-<button class="btn alt" onclick="loadPartners()">
-🔄 Actualizar socios
-</button>
-
-<button class="btn alt" onclick="show('home')">
-Volver
-</button>
-
-</section>
-
-
-<!-- ================= DEMANDA SOCIO ================= -->
-
-<section id="partnerDemand" class="screen">
-
-<h2>🔔 Demanda disponible</h2>
-
-<div class="card">
-
-<b id="partnerDemandNumber">
-Solicitud
-</b>
-
-<p id="partnerDemandText">
-No hay solicitud disponible.
-</p>
-
-<div class="alert">
-Revisa la capacidad de tu vehículo antes de aceptar.
-</div>
-
-<button class="btn" onclick="acceptPartnerDemand()">
-✅ Aceptar servicio
-</button>
-
-<button class="btn alt" onclick="show('partnerHome')">
-Volver
-</button>
-
-</div>
-
-</section>
-
-
-<!-- ================= CENTRAL ================= -->
-
-<section id="admin" class="screen">
-
-<h2>🖥️ Central de operaciones</h2>
-
-<div class="card">
-
-<div class="top">
-
-<b>Estado de la red</b>
-
-<button
-class="badge"
-onclick="loadPartners()">
-🔄 Actualizar
-</button>
-
-</div>
-
-<div id="networkStats">
-Cargando...
-</div>
-
-</div>
-
-
-<div class="card">
-
-<b>📍 Mapa operativo</b>
-
-<div class="map">
-
-<div class="marker" style="left:18%;top:30%">
-🟢
-</div>
-
-<div class="marker" style="left:55%;top:18%">
-🟢
-</div>
-
-<div class="marker" style="left:70%;top:55%">
-🔴
-</div>
-
-<div class="marker" style="left:35%;top:68%">
-🟡
-</div>
-
-<div style="
-position:absolute;
-left:8px;
-bottom:12px;
-background:white;
-padding:6px 9px;
-border-radius:8px;
-font-size:11px">
-📍 Mocoa
-</div>
-
-</div>
-
-</div>
-
-
-<div class="card">
-
-<b>🚚 Socios en la red</b>
-
-<div id="adminPartners">
-Cargando socios...
-</div>
-
-</div>
-
-
-<div class="card">
-
-<b>📦 Última solicitud</b>
-
-<p id="adminDemand">
-No hay solicitudes cargadas.
-</p>
-
-</div>
-
-</section>
-
-
-<!-- ================= NAVEGACION ================= -->
-
-<div class="nav">
-
-<button onclick="show('home')">
-Inicio
-</button>
-
-<button onclick="show('request')">
-Solicitar
-</button>
-
-<button onclick="show('partnerHome')">
-Socios
-</button>
-
-<button onclick="show('admin')">
-Central
-</button>
-
-</div>
-
-</main>
-</div>
-
-
-<!-- ================= SUPABASE ================= -->
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-<script>
-
-/* =====================================================
-   CONFIGURACIÓN SUPABASE
-   ===================================================== */
-
-const SUPABASE_URL =
-'https://lmmbbivyhhjepjfengtt.supabase.co';
-
-/*
-   Publishable Key del proyecto.
-*/
-
-const SUPABASE_KEY =
-'sb_publishable_3rK7v9Jhd0ZRv02vU4JTeg_5Q8iXArI';
-
-
-/* =====================================================
-   CONEXIÓN SUPABASE
-   ===================================================== */
-
-let supabaseClient = null;
-let supabaseInitError = null;
-
-try{
-
-  if(typeof window.supabase === 'undefined'){
-
-    throw new Error(
-      'La librería de Supabase (supabase-js) no se cargó. Revisa tu conexión a internet o si algún bloqueador de contenido está impidiendo cargar el script.'
-    );
-
+.campo input, .campo select, .campo textarea {
+  padding: 11px 12px;
+  border: 1.5px solid var(--line);
+  border-radius: 3px;
+  background: var(--paper);
+}
+
+.campo input:focus, .campo select:focus, .campo textarea:focus {
+  border-color: var(--route-green);
+}
+
+.fila-dos {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.mensaje-exito {
+  background: #EAF3EE;
+  border: 1.5px solid var(--route-green);
+  color: var(--route-green-dark);
+  padding: 14px 16px;
+  border-radius: 3px;
+  margin-bottom: 18px;
+  font-size: 0.94rem;
+}
+
+.mensaje-error {
+  background: #FBEAE6;
+  border: 1.5px solid var(--danger);
+  color: var(--danger);
+  padding: 14px 16px;
+  border-radius: 3px;
+  margin-bottom: 18px;
+  font-size: 0.94rem;
+}
+
+/* ---------- Panel admin ---------- */
+
+.tabla-admin {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 16px;
+}
+
+.tabla-admin th {
+  text-align: left;
+  font-family: var(--font-display);
+  font-size: 0.82rem;
+  text-transform: none;
+  color: var(--steel);
+  border-bottom: 2px solid var(--ink);
+  padding: 10px 8px;
+}
+
+.tabla-admin td {
+  padding: 12px 8px;
+  border-bottom: 1px solid var(--line);
+  font-size: 0.92rem;
+  vertical-align: middle;
+}
+
+.badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.badge-pendiente { background: #FCEED4; color: #8A5A15; }
+.badge-aprobado { background: #DFEEE4; color: var(--route-green-dark); }
+.badge-rechazado { background: #FBEAE6; color: var(--danger); }
+
+.acciones-admin {
+  display: flex;
+  gap: 6px;
+}
+
+.acciones-admin .btn {
+  padding: 6px 12px;
+  font-size: 0.82rem;
+}
+
+/* ---------- Modal ---------- */
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(26,29,27,0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  z-index: 50;
+}
+
+.modal {
+  background: var(--paper);
+  border-radius: 4px;
+  max-width: 460px;
+  width: 100%;
+  padding: 28px;
+  border: 1.5px solid var(--ink);
+}
+
+.modal-cerrar {
+  background: none;
+  border: none;
+  font-size: 1.4rem;
+  cursor: pointer;
+  float: right;
+  line-height: 1;
+  color: var(--steel);
+}
+
+@media (max-width: 640px) {
+  .fila-transportador {
+    grid-template-columns: 48px 1fr;
   }
-
-  if(!SUPABASE_URL || !SUPABASE_KEY){
-
-    throw new Error(
-      'Falta SUPABASE_URL o SUPABASE_KEY.'
-    );
-
+  .acciones-fila {
+    grid-column: 1 / -1;
+    flex-direction: row;
+    justify-content: flex-start;
+    margin-top: 8px;
   }
-
-  supabaseClient =
-  window.supabase.createClient(
-    SUPABASE_URL,
-    SUPABASE_KEY
-  );
-
-}catch(error){
-
-  supabaseInitError = error;
-
-  console.error(
-    'Error iniciando Supabase:',
-    error
-  );
-
+  .fila-dos { grid-template-columns: 1fr; }
 }
-
-
-/* =====================================================
-   VARIABLES
-   ===================================================== */
-
-let socios = [];
-
-let currentDemand = null;
-
-let selectedPartner = null;
-
-
-/* =====================================================
-   CAMBIAR PANTALLA
-   ===================================================== */
-
-function show(id){
-
-  document
-  .querySelectorAll('.screen')
-  .forEach(screen => {
-
-    screen.classList.remove('active');
-
-  });
-
-  const target =
-  document.getElementById(id);
-
-  if(target){
-
-    target.classList.add('active');
-
-  }
-
-}
-
-
-/* =====================================================
-   FORMATEAR ERROR DE SUPABASE (para diagnóstico visible)
-   ===================================================== */
-
-function formatSupabaseError(error){
-
-  if(!error) return '';
-
-  const parts = [];
-
-  if(error.message) parts.push('Mensaje: ' + error.message);
-  if(error.code) parts.push('Código: ' + error.code);
-  if(error.details) parts.push('Detalles: ' + error.details);
-  if(error.hint) parts.push('Sugerencia: ' + error.hint);
-
-  return parts.join('\n');
-
-}
-
-
-/* =====================================================
-   VERIFICAR SUPABASE
-   ===================================================== */
-
-function checkSupabase(){
-
-  if(!supabaseClient){
-
-    const detail =
-    supabaseInitError
-    ? escapeHtml(formatSupabaseError(supabaseInitError) || supabaseInitError.message || String(supabaseInitError))
-    : 'No se pudo crear el cliente de Supabase.';
-
-    const message = `
-
-    <div class="error">
-
-    ❌ No se pudo iniciar Supabase.
-
-    <code>${detail}</code>
-
-    <br><br>
-
-    Revisa la Publishable Key y la URL del proyecto en Settings → API de Supabase.
-
-    </div>
-
-    `;
-
-    const partnerList =
-    document.getElementById('partnerList');
-
-    const adminPartners =
-    document.getElementById('adminPartners');
-
-    if(partnerList){
-
-      partnerList.innerHTML =
-      message;
-
-    }
-
-    if(adminPartners){
-
-      adminPartners.innerHTML =
-      message;
-
-    }
-
-    return false;
-
-  }
-
-  return true;
-
-}
-
-
-/* =====================================================
-   CARGAR SOCIOS
-   ===================================================== */
-
-async function loadPartners(){
-
-  if(!checkSupabase())
-    return;
-
-
-  const partnerList =
-  document.getElementById('partnerList');
-
-  const adminPartners =
-  document.getElementById('adminPartners');
-
-  const networkStats =
-  document.getElementById('networkStats');
-
-
-  if(partnerList){
-
-    partnerList.innerHTML =
-    '<div class="loading">Cargando socios...</div>';
-
-  }
-
-
-  try{
-
-    const result =
-    await supabaseClient
-    .from('socios')
-    .select('*')
-    .order('id');
-
-
-    const data =
-    result.data;
-
-    const error =
-    result.error;
-
-
-    if(error){
-
-      console.error(error);
-
-
-      const message = `
-
-      <div class="error">
-
-      ❌ No se pudieron cargar los socios.
-
-      <code>${escapeHtml(formatSupabaseError(error))}</code>
-
-      ${
-        error.code === '42501' || (error.message && error.message.toLowerCase().includes('row-level security'))
-        ? '<br><br>⚠️ Esto suele significar que la tabla <b>socios</b> tiene RLS activado sin una política que permita SELECT con la clave pública. Revisa la sección "Solución RLS" que te compartí.'
-        : ''
-      }
-
-      </div>
-
-      `;
-
-
-      if(partnerList){
-
-        partnerList.innerHTML =
-        message;
-
-      }
-
-
-      if(adminPartners){
-
-        adminPartners.innerHTML =
-        message;
-
-      }
-
-
-      return;
-
-    }
-
-
-    socios =
-    data || [];
-
-
-    /* PANEL SOCIOS */
-
-    if(partnerList){
-
-      if(socios.length === 0){
-
-        partnerList.innerHTML = `
-
-        <div class="card">
-
-        No hay socios registrados.
-
-        </div>
-
-        `;
-
-      }else{
-
-        partnerList.innerHTML =
-        socios
-        .map(renderPartnerCard)
-        .join('');
-
-      }
-
-    }
-
-
-    /* CENTRAL */
-
-    if(adminPartners){
-
-      if(socios.length === 0){
-
-        adminPartners.innerHTML =
-        '<p>No hay socios registrados.</p>';
-
-      }else{
-
-        adminPartners.innerHTML =
-        socios
-        .map(renderAdminPartner)
-        .join('');
-
-      }
-
-    }
-
-
-    /* ESTADISTICAS */
-
-    const disponibles =
-    socios.filter(s =>
-
-      String(s.estado || '')
-      .toLowerCase()
-      === 'disponible'
-
-    ).length;
-
-
-    const ocupados =
-    socios.length - disponibles;
-
-
-    if(networkStats){
-
-      networkStats.innerHTML = `
-
-      <div class="row">
-
-        <div>
-
-          <h3>
-          🟢 ${disponibles}
-          </h3>
-
-          <span class="small">
-          Disponibles
-          </span>
-
-        </div>
-
-        <div>
-
-          <h3>
-          🔴 ${ocupados}
-          </h3>
-
-          <span class="small">
-          Ocupados
-          </span>
-
-        </div>
-
-      </div>
-
-      <p>
-
-      <b>${socios.length}</b>
-      socios registrados.
-
-      </p>
-
-      `;
-
-    }
-
-
-  }catch(error){
-
-    console.error(error);
-
-
-    const message = `
-
-    <div class="error">
-
-    ❌ Error de conexión.
-
-    <code>${escapeHtml(error.message || String(error))}</code>
-
-    </div>
-
-    `;
-
-
-    if(partnerList){
-
-      partnerList.innerHTML =
-      message;
-
-    }
-
-
-    if(adminPartners){
-
-      adminPartners.innerHTML =
-      message;
-
-    }
-
-  }
-
-}
-
-
-/* =====================================================
-   TARJETA SOCIO
-   ===================================================== */
-
-function renderPartnerCard(socio){
-
-  const nombre =
-  socio.nombre || 'Sin nombre';
-
-
-  const telefono =
-  socio.telefono || 'No registrado';
-
-
-  const vehiculo =
-  socio.vehiculo ||
-  'Vehículo no registrado';
-
-
-  const capacidad =
-  socio.capacidad_ton ?? '-';
-
-
-  const estado =
-  socio.estado ||
-  'sin estado';
-
-
-  const disponible =
-  String(estado)
-  .toLowerCase()
-  === 'disponible';
-
-
-  return `
-
-  <div class="card">
-
-    <div class="top">
-
-      <b>
-
-      ${disponible ? '🟢' : '🔴'}
-
-      ${escapeHtml(nombre)}
-
-      </b>
-
-      <span class="pill">
-
-      ${escapeHtml(estado)}
-
-      </span>
-
-    </div>
-
-
-    <p>
-
-    🚚 ${escapeHtml(vehiculo)}
-
-    <br>
-
-    ⚖️ Capacidad:
-    ${escapeHtml(
-      String(capacidad)
-    )}
-    t
-
-    <br>
-
-    📞 ${escapeHtml(
-      String(telefono)
-    )}
-
-    </p>
-
-
-    ${
-      disponible
-      ?
-      `
-
-      <button
-      class="btn"
-      onclick="selectPartner('${escapeAttr(socio.id)}')">
-
-      🎯 Seleccionar socio
-
-      </button>
-
-      `
-      :
-      ''
-    }
-
-  </div>
-
-  `;
-
-}
-
-
-/* =====================================================
-   SOCIO EN CENTRAL
-   ===================================================== */
-
-function renderAdminPartner(socio){
-
-  const nombre =
-  socio.nombre || 'Sin nombre';
-
-
-  const vehiculo =
-  socio.vehiculo || '-';
-
-
-  const capacidad =
-  socio.capacidad_ton ?? '-';
-
-
-  const estado =
-  socio.estado || '-';
-
-
-  const disponible =
-  String(estado)
-  .toLowerCase()
-  === 'disponible';
-
-
-  return `
-
-  <div class="card dark">
-
-    <div class="top">
-
-      <b>
-
-      ${disponible ? '🟢' : '🔴'}
-
-      ${escapeHtml(nombre)}
-
-      </b>
-
-      <span class="small">
-
-      ${escapeHtml(estado)}
-
-      </span>
-
-    </div>
-
-
-    <p>
-
-    🚚 ${escapeHtml(vehiculo)}
-
-    ·
-
-    ${escapeHtml(
-      String(capacidad)
-    )}
-
-    t
-
-    </p>
-
-  </div>
-
-  `;
-
-}
-
-
-/* =====================================================
-   PRECIO ESTIMADO
-   (Cálculo simple de referencia. Ajusta las tarifas
-   base y por unidad según tus costos reales.)
-   ===================================================== */
-
-function estimatePrice(demand){
-
-  const BASE = 40000;
-
-  const PRECIO_POR_UNIDAD = {
-    bultos: 350,
-    kg: 120,
-    toneladas: 45000,
-    unidades: 300
-  };
-
-
-  if(!demand){
-    return BASE;
-  }
-
-
-  const cantidad =
-  Number(demand.cantidas) || 0;
-
-
-  const unidad =
-  (demand.unidad || '').toLowerCase();
-
-
-  const tarifa =
-  PRECIO_POR_UNIDAD[unidad] ?? 200;
-
-
-  const total =
-  BASE + (cantidad * tarifa);
-
-
-  return Math.round(total / 1000) * 1000;
-
-}
-
-
-function formatPrice(value){
-
-  return '$' + Number(value)
-  .toLocaleString('es-CO');
-
-}
-
-
-/* =====================================================
-   SELECCIONAR SOCIO
-   ===================================================== */
-
-function selectPartner(id){
-
-  selectedPartner =
-  socios.find(
-    socio =>
-    String(socio.id)
-    === String(id)
-  );
-
-
-  if(!selectedPartner){
-
-    alert(
-      'No se encontró el socio.'
-    );
-
-    return;
-
-  }
-
-
-  document.getElementById(
-    'selectedPartnerCard'
-  ).innerHTML = `
-
-  <div class="card">
-
-    <div class="top">
-
-      <b>
-
-      🟢
-
-      ${escapeHtml(
-        selectedPartner.nombre ||
-        'Socio'
-      )}
-
-      </b>
-
-      <span class="pill">
-      Disponible
-      </span>
-
-    </div>
-
-
-    <p>
-
-    🚚 ${escapeHtml(
-      selectedPartner.vehiculo || '-'
-    )}
-
-    <br>
-
-    ⚖️ Capacidad:
-
-    ${escapeHtml(
-      String(
-        selectedPartner.capacidad_ton ?? '-'
-      )
-    )}
-
-    toneladas
-
-    <br>
-
-    📞 ${escapeHtml(
-      String(
-        selectedPartner.telefono || '-'
-      )
-    )}
-
-    </p>
-
-
-    <p class="price">
-    💰 ${escapeHtml(
-      formatPrice(
-        estimatePrice(currentDemand)
-      )
-    )}
-    </p>
-
-    <p class="small">
-    Precio estimado, sujeto a confirmación del socio.
-    </p>
-
-  </div>
-
-  `;
-
-
-  show('assignment');
-
-}
-
-
-/* =====================================================
-   CREAR SOLICITUD
-   ===================================================== */
-
-async function sendDemand(){
-
-  if(!checkSupabase())
-    return;
-
-
-  const submitBtn =
-  document.querySelector(
-    '#request .btn:not(.alt)'
-  );
-
-  if(submitBtn && submitBtn.disabled)
-    return;
-
-
-  const origin =
-  document.getElementById(
-    'origin'
-  ).value.trim();
-
-
-  const dest =
-  document.getElementById(
-    'dest'
-  ).value.trim();
-
-
-  const cargo =
-  document.getElementById(
-    'cargo'
-  ).value.trim();
-
-
-  const quantity =
-  Number(
-    document.getElementById(
-      'quantity'
-    ).value
-  );
-
-
-  const unit =
-  document.getElementById(
-    'unit'
-  ).value;
-
-
-  const requestError =
-  document.getElementById(
-    'requestError'
-  );
-
-
-  if(
-    !origin ||
-    !dest ||
-    !cargo ||
-    !quantity
-  ){
-
-    requestError.innerHTML = `
-
-    <div class="error">
-
-    ❌ Completa todos los campos.
-
-    </div>
-
-    `;
-
-    return;
-
-  }
-
-
-  if(quantity <= 0){
-
-    requestError.innerHTML = `
-
-    <div class="error">
-
-    ❌ La cantidad debe ser mayor a cero.
-
-    </div>
-
-    `;
-
-    return;
-
-  }
-
-
-  requestError.innerHTML = '';
-
-
-  if(submitBtn){
-
-    submitBtn.disabled = true;
-
-    submitBtn.textContent =
-    '⏳ Enviando...';
-
-  }
-
-
-  const matchingList =
-  document.getElementById(
-    'matchingList'
-  );
-
-
-  matchingList.innerHTML = `
-
-  <div class="loading">
-
-  ⏳ Guardando solicitud...
-
-  </div>
-
-  `;
-
-
-  show('matching');
-
-
-  /*
-    Columnas de la tabla solicitudes:
-
-    origen
-    destino
-    mercancia
-    cantidas
-    unidad
-    estado
-    socio_id
-  */
-
-
-  const insertData = {
-
-    origen:origin,
-
-    destino:dest,
-
-    mercancia:cargo,
-
-    cantidas:quantity,
-
-    unidad:unit,
-
-    estado:'pendiente',
-
-    socio_id:null
-
-  };
-
-
-  try{
-
-    const result =
-    await supabaseClient
-    .from('solicitudes')
-    .insert([
-      insertData
-    ])
-    .select()
-    .single();
-
-
-    const data =
-    result.data;
-
-
-    const error =
-    result.error;
-
-
-    if(error){
-
-      console.error(error);
-
-
-      matchingList.innerHTML = `
-
-      <div class="error">
-
-      ❌ No se pudo crear la solicitud.
-
-      <code>${escapeHtml(formatSupabaseError(error))}</code>
-
-      ${
-        error.code === '42501' || (error.message && error.message.toLowerCase().includes('row-level security'))
-        ? '<br><br>⚠️ La tabla <b>solicitudes</b> probablemente tiene RLS activado sin política de INSERT.'
-        : ''
-      }
-      ${
-        error.code === 'PGRST204' || error.code === '42703'
-        ? '<br><br>⚠️ Es posible que el nombre de alguna columna no coincida (por ejemplo "cantidas" vs "cantidad"). Revisa los nombres exactos de columnas en tu tabla.'
-        : ''
-      }
-
-      </div>
-
-      `;
-
-      return;
-
-    }
-
-
-    currentDemand =
-    data;
-
-
-    document.getElementById(
-      'demandText'
-    ).innerHTML = `
-
-    <b>
-
-    Solicitud #${escapeHtml(
-      String(data.id)
-    )}
-
-    </b>
-
-    <br><br>
-
-    📦 ${escapeHtml(
-      String(quantity)
-    )}
-
-    ${escapeHtml(unit)}
-
-    de
-
-    ${escapeHtml(cargo)}
-
-    <br>
-
-    📍 ${escapeHtml(origin)}
-
-    →
-
-    ${escapeHtml(dest)}
-
-    `;
-
-
-    document.getElementById(
-      'partnerDemandNumber'
-    ).textContent =
-    'Solicitud #' +
-    String(data.id);
-
-
-    document.getElementById(
-      'partnerDemandText'
-    ).innerHTML = `
-
-    📍 Recoger:
-
-    ${escapeHtml(origin)}
-
-    <br>
-
-    📍 Entregar:
-
-    ${escapeHtml(dest)}
-
-    <br>
-
-    📦 Mercancía:
-
-    ${escapeHtml(cargo)}
-
-    <br>
-
-    ⚖️ Cantidad:
-
-    ${escapeHtml(
-      String(quantity)
-    )}
-
-    ${escapeHtml(unit)}
-
-    `;
-
-
-    document.getElementById(
-      'adminDemand'
-    ).innerHTML = `
-
-    <b>
-
-    Solicitud #${escapeHtml(
-      String(data.id)
-    )}
-
-    </b>
-
-    <br>
-
-    📦 ${escapeHtml(
-      String(quantity)
-    )}
-
-    ${escapeHtml(unit)}
-
-    de
-
-    ${escapeHtml(cargo)}
-
-    <br>
-
-    📍 ${escapeHtml(origin)}
-
-    →
-
-    ${escapeHtml(dest)}
-
-    <br>
-
-    Estado:
-
-    <b>pendiente</b>
-
-    `;
-
-
-    /* SOCIOS DISPONIBLES */
-    /* Se recarga la lista de socios desde Supabase
-       antes de filtrar, para no usar datos viejos
-       que puedan estar en memoria. */
-
-    await loadPartners();
-
-
-    const disponibles =
-    socios.filter(s =>
-
-      String(s.estado || '')
-      .toLowerCase()
-      === 'disponible'
-
-    );
-
-
-    if(disponibles.length === 0){
-
-      matchingList.innerHTML = `
-
-      <div class="alert">
-
-      ⚠️ No hay socios disponibles
-      en este momento.
-
-      </div>
-
-      `;
-
-      return;
-
-    }
-
-
-    matchingList.innerHTML = `
-
-    <p>
-
-    Encontramos
-
-    <b>
-    ${disponibles.length}
-    </b>
-
-    socio(s) disponible(s).
-
-    </p>
-
-
-    ${disponibles
-      .map(renderMatchingPartner)
-      .join('')}
-
-    `;
-
-
-  }catch(error){
-
-    console.error(error);
-
-
-    matchingList.innerHTML = `
-
-    <div class="error">
-
-    ❌ Error al crear la solicitud.
-
-    <code>${escapeHtml(error.message || String(error))}</code>
-
-    </div>
-
-    `;
-
-  }finally{
-
-    if(submitBtn){
-
-      submitBtn.disabled = false;
-
-      submitBtn.textContent =
-      '🚀 Buscar socio disponible';
-
-    }
-
-  }
-
-}
-
-
-/* =====================================================
-   SOCIOS PARA SOLICITUD
-   ===================================================== */
-
-function renderMatchingPartner(socio){
-
-  return `
-
-  <div class="card">
-
-    <div class="top">
-
-      <b>
-
-      🟢
-
-      ${escapeHtml(
-        socio.nombre ||
-        'Socio'
-      )}
-
-      </b>
-
-      <span class="pill">
-
-      Disponible
-
-      </span>
-
-    </div>
-
-
-    <p>
-
-    🚚 ${escapeHtml(
-      socio.vehiculo || '-'
-    )}
-
-    <br>
-
-    ⚖️ Capacidad:
-
-    ${escapeHtml(
-      String(
-        socio.capacidad_ton ?? '-'
-      )
-    )}
-
-    toneladas
-
-    </p>
-
-
-    <button
-    class="btn"
-    onclick="selectPartner('${escapeAttr(socio.id)}')">
-
-    🎯 Seleccionar
-
-    </button>
-
-  </div>
-
-  `;
-
-}
-
-
-/* =====================================================
-   ASIGNAR SERVICIO
-   ===================================================== */
-
-async function acceptService(){
-
-  if(!checkSupabase())
-    return;
-
-
-  if(!currentDemand){
-
-    alert(
-      'No hay una solicitud.'
-    );
-
-    return;
-
-  }
-
-
-  if(!selectedPartner){
-
-    alert(
-      'Selecciona un socio primero.'
-    );
-
-    return;
-
-  }
-
-
-  const errorBox =
-  document.getElementById(
-    'assignmentError'
-  );
-
-
-  try{
-
-    const result =
-    await supabaseClient
-    .from('solicitudes')
-    .update({
-
-      estado:'asignada',
-
-      socio_id:
-      selectedPartner.id
-
-    })
-    .eq(
-      'id',
-      currentDemand.id
-    );
-
-
-    if(result.error){
-
-      errorBox.innerHTML = `
-
-      <div class="error">
-
-      ❌ No se pudo asignar.
-
-      <code>${escapeHtml(formatSupabaseError(result.error))}</code>
-
-      </div>
-
-      `;
-
-      return;
-
-    }
-
-
-    document.getElementById(
-      'activePartner'
-    ).textContent =
-    selectedPartner.nombre;
-
-
-    document.getElementById(
-      'deliveredPartner'
-    ).textContent =
-    selectedPartner.nombre;
-
-
-    document.getElementById(
-      'activeServiceText'
-    ).innerHTML = `
-
-    🚚 ${escapeHtml(
-      selectedPartner.vehiculo || '-'
-    )}
-
-    <br><br>
-
-    📍 ${escapeHtml(
-      currentDemand.origen || ''
-    )}
-
-    →
-
-    ${escapeHtml(
-      currentDemand.destino || ''
-    )}
-
-    `;
-
-
-    /* MARCAR SOCIO COMO OCUPADO */
-
-    await supabaseClient
-    .from('socios')
-    .update({
-      estado:'ocupado'
-    })
-    .eq(
-      'id',
-      selectedPartner.id
-    );
-
-
-    show('active');
-
-
-    loadPartners();
-
-
-  }catch(error){
-
-    errorBox.innerHTML = `
-
-    <div class="error">
-
-    ❌ Error:
-
-    <code>${escapeHtml(error.message || String(error))}</code>
-
-    </div>
-
-    `;
-
-  }
-
-}
-
-
-/* =====================================================
-   DEMANDA DEL SOCIO
-   ===================================================== */
-
-async function openPartnerDemand(){
-
-  if(!currentDemand){
-
-    if(!checkSupabase())
-      return;
-
-
-    try{
-
-      const result =
-      await supabaseClient
-      .from('solicitudes')
-      .select('*')
-      .eq(
-        'estado',
-        'pendiente'
-      )
-      .order(
-        'id',
-        {
-          ascending:false
-        }
-      )
-      .limit(1)
-      .maybeSingle();
-
-
-      if(result.error){
-
-        alert(
-          formatSupabaseError(result.error)
-        );
-
-        return;
-
-      }
-
-
-      if(result.data){
-
-        currentDemand =
-        result.data;
-
-      }
-
-
-    }catch(error){
-
-      alert(
-        error.message
-      );
-
-      return;
-
-    }
-
-  }
-
-
-  if(!currentDemand){
-
-    document.getElementById(
-      'partnerDemandText'
-    ).innerHTML =
-    'No hay solicitudes pendientes.';
-
-    show('partnerDemand');
-
-    return;
-
-  }
-
-
-  document.getElementById(
-    'partnerDemandNumber'
-  ).textContent =
-  'Solicitud #' +
-  String(
-    currentDemand.id
-  );
-
-
-  document.getElementById(
-    'partnerDemandText'
-  ).innerHTML = `
-
-  📍 Recoger:
-
-  ${escapeHtml(
-    currentDemand.origen || '-'
-  )}
-
-  <br>
-
-  📍 Entregar:
-
-  ${escapeHtml(
-    currentDemand.destino || '-'
-  )}
-
-  <br>
-
-  📦 Mercancía:
-
-  ${escapeHtml(
-    currentDemand.mercancia || '-'
-  )}
-
-  <br>
-
-  ⚖️ Cantidad:
-
-  ${escapeHtml(
-    String(
-      currentDemand.cantidas ?? '-'
-    )
-  )}
-
-  ${escapeHtml(
-    currentDemand.unidad || ''
-  )}
-
-  `;
-
-
-  show('partnerDemand');
-
-}
-
-
-/* =====================================================
-   ACEPTAR COMO SOCIO
-   ===================================================== */
-
-async function acceptPartnerDemand(){
-
-  if(!checkSupabase())
-    return;
-
-
-  if(!currentDemand){
-
-    alert(
-      'No hay una solicitud pendiente.'
-    );
-
-    return;
-
-  }
-
-
-  if(!selectedPartner){
-
-    const disponibles =
-    socios.filter(s =>
-
-      String(s.estado || '')
-      .toLowerCase()
-      === 'disponible'
-
-    );
-
-
-    if(disponibles.length > 0){
-
-      selectedPartner =
-      disponibles[0];
-
-    }
-
-  }
-
-
-  if(!selectedPartner){
-
-    alert(
-      'No hay un socio disponible.'
-    );
-
-    return;
-
-  }
-
-
-  try{
-
-    const result =
-    await supabaseClient
-    .from('solicitudes')
-    .update({
-
-      estado:'asignada',
-
-      socio_id:
-      selectedPartner.id
-
-    })
-    .eq(
-      'id',
-      currentDemand.id
-    );
-
-
-    if(result.error){
-
-      alert(
-        'No se pudo aceptar: ' +
-        formatSupabaseError(result.error)
-      );
-
-      return;
-
-    }
-
-
-    await supabaseClient
-    .from('socios')
-    .update({
-
-      estado:'ocupado'
-
-    })
-    .eq(
-      'id',
-      selectedPartner.id
-    );
-
-
-    document.getElementById(
-      'activePartner'
-    ).textContent =
-    selectedPartner.nombre;
-
-
-    document.getElementById(
-      'deliveredPartner'
-    ).textContent =
-    selectedPartner.nombre;
-
-
-    show('active');
-
-
-    loadPartners();
-
-
-  }catch(error){
-
-    alert(
-      'Error: ' +
-      error.message
-    );
-
-  }
-
-}
-
-
-/* =====================================================
-   ENTREGAR
-   ===================================================== */
-
-async function deliver(){
-
-  if(!checkSupabase())
-    return;
-
-
-  if(!currentDemand){
-
-    show('home');
-
-    return;
-
-  }
-
-
-  try{
-
-    const result =
-    await supabaseClient
-    .from('solicitudes')
-    .update({
-
-      estado:'entregada'
-
-    })
-    .eq(
-      'id',
-      currentDemand.id
-    );
-
-
-    if(result.error){
-
-      alert(
-        'No se pudo finalizar: ' +
-        formatSupabaseError(result.error)
-      );
-
-      return;
-
-    }
-
-
-    /* VOLVER A PONER SOCIO DISPONIBLE */
-
-    if(selectedPartner){
-
-      await supabaseClient
-      .from('socios')
-      .update({
-
-        estado:'disponible'
-
-      })
-      .eq(
-        'id',
-        selectedPartner.id
-      );
-
-    }
-
-
-    show('delivered');
-
-
-    loadPartners();
-
-
-  }catch(error){
-
-    alert(
-      error.message
-    );
-
-  }
-
-}
-
-
-/* =====================================================
-   REINICIAR
-   ===================================================== */
-
-function resetApp(){
-
-  currentDemand = null;
-
-  selectedPartner = null;
-
-
-  document.getElementById(
-    'origin'
-  ).value =
-  'Ferretería - Mocoa';
-
-
-  document.getElementById(
-    'dest'
-  ).value =
-  'Vereda El Rumiyaco';
-
-
-  document.getElementById(
-    'cargo'
-  ).value =
-  'Cemento';
-
-
-  document.getElementById(
-    'quantity'
-  ).value =
-  '100';
-
-
-  document.getElementById(
-    'unit'
-  ).value =
-  'bultos';
-
-
-  document.getElementById(
-    'when'
-  ).value =
-  'Ahora';
-
-
-  const requestErrorBox =
-  document.getElementById('requestError');
-
-  if(requestErrorBox)
-    requestErrorBox.innerHTML = '';
-
-
-  const assignmentErrorBox =
-  document.getElementById('assignmentError');
-
-  if(assignmentErrorBox)
-    assignmentErrorBox.innerHTML = '';
-
-
-  show('home');
-
-}
-
-
-/* =====================================================
-   SEGURIDAD
-   ===================================================== */
-
-function escapeHtml(value){
-
-  return String(value)
-
-  .replaceAll(
-    '&',
-    '&amp;'
-  )
-
-  .replaceAll(
-    '<',
-    '&lt;'
-  )
-
-  .replaceAll(
-    '>',
-    '&gt;'
-  )
-
-  .replaceAll(
-    '"',
-    '&quot;'
-  )
-
-  .replaceAll(
-    "'",
-    '&#039;'
-  );
-
-}
-
-
-function escapeAttr(value){
-
-  return String(value)
-
-  .replaceAll(
-    '\\',
-    '\\\\'
-  )
-
-  .replaceAll(
-    "'",
-    "\\'"
-  );
-
-}
-
-
-/* =====================================================
-   INICIO
-   ===================================================== */
-
-document.addEventListener(
-  'DOMContentLoaded',
-  function(){
-
-    loadPartners();
-
-  }
-);
-
-</script>
-
-</body>
-</html>
