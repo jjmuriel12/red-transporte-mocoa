@@ -18,6 +18,10 @@
   box-sizing:border-box;
 }
 
+html{
+  scroll-behavior:auto;
+}
+
 body{
   margin:0;
   background:#eef2f5;
@@ -317,6 +321,35 @@ hr{
   font-size:11px;
   margin-top:10px;
   text-align:center;
+}
+
+/*
+=====================================================
+CORRECCIÓN CONTRA SALTOS
+=====================================================
+*/
+
+.screen{
+  min-height:0;
+}
+
+.screen.active{
+  animation:none !important;
+  transition:none !important;
+}
+
+button,
+input,
+select{
+  -webkit-tap-highlight-color:transparent;
+}
+
+/*
+Evita que el navegador intente conservar
+posiciones extrañas durante cambios internos.
+*/
+body{
+  overflow-anchor:none;
 }
 
 </style>
@@ -747,7 +780,7 @@ Cargando socios...
 
 <button
   class="btn alt"
-  onclick="loadPartners()"
+  onclick="loadPartners(true)"
 >
 🔄 Actualizar socios
 </button>
@@ -1096,20 +1129,18 @@ let selectedPartner = null;
 
 let actualizandoSocios = false;
 
-/*
-   NUEVO:
-   Guarda una "huella" de los socios.
-   Si la información no cambió, NO se vuelve a
-   construir el HTML.
-*/
 let sociosHash = '';
 
-/*
-   NUEVO:
-   Evita que loadPartners y la actualización
-   automática se pisen entre sí.
-*/
 let cargandoSocios = false;
+
+
+/*
+  NUEVO:
+  Controla la pantalla actualmente visible.
+  Evita operaciones visuales innecesarias.
+*/
+
+let pantallaActual = 'home';
 
 
 /* =====================================================
@@ -1161,10 +1192,6 @@ function formatSupabaseError(error){
 }
 
 
-/*
-   NUEVO:
-   Genera una huella estable de los datos.
-*/
 function crearHashSocios(lista){
 
   return JSON.stringify(
@@ -1212,38 +1239,75 @@ function checkSupabase(){
 
 /* =====================================================
    NAVEGACIÓN
+   CORREGIDA
 ===================================================== */
 
 function show(id){
+
+  const target =
+    document.getElementById(id);
+
+  if(!target){
+
+    console.warn(
+      'Pantalla no encontrada:',
+      id
+    );
+
+    return;
+
+  }
+
+
+  /*
+    Si ya estamos en esa pantalla,
+    no hacemos absolutamente nada.
+
+    Esto evita saltos innecesarios.
+  */
+
+  if(
+    pantallaActual === id &&
+    target.classList.contains('active')
+  ){
+
+    return;
+
+  }
+
+
+  /*
+    Guardamos la posición actual.
+    No utilizamos scrollTo smooth.
+  */
+
+  pantallaActual = id;
+
 
   document
     .querySelectorAll('.screen')
     .forEach(screen => {
 
-      screen.classList.remove('active');
+      if(screen === target){
+
+        screen.classList.add('active');
+
+      }else{
+
+        screen.classList.remove('active');
+
+      }
 
     });
 
 
-  const target =
-    document.getElementById(id);
-
-
-  if(target){
-
-    target.classList.add('active');
-
-    /*
-       No usamos animaciones ni reconstruimos
-       la página al cambiar de pantalla.
-    */
-
-    window.scrollTo({
-      top:0,
-      behavior:'smooth'
-    });
-
-  }
+  /*
+    IMPORTANTE:
+    NO hacemos window.scrollTo().
+    
+    El navegador conserva la posición actual.
+    Esto elimina el efecto de "salto".
+  */
 
 }
 
@@ -1251,6 +1315,10 @@ function show(id){
 function openPartnerHome(){
 
   show('partnerHome');
+
+  /*
+    Solo carga socios si es necesario.
+  */
 
   loadPartners();
 
@@ -1423,9 +1491,9 @@ async function loginAdmin(){
     } =
       await supabaseClient.auth.signInWithPassword({
 
-        email: email,
+        email:email,
 
-        password: password
+        password:password
 
       });
 
@@ -1566,10 +1634,10 @@ async function loadPartners(forzar = false){
 
 
   /*
-     Si ya hay una consulta ejecutándose,
-     no iniciamos otra simultáneamente.
+    Nunca permitimos consultas duplicadas.
   */
-  if(cargandoSocios && !forzar)
+
+  if(cargandoSocios)
     return;
 
 
@@ -1592,10 +1660,7 @@ async function loadPartners(forzar = false){
 
 
   /*
-     IMPORTANTE:
-     Solo mostramos "Cargando..." cuando realmente
-     no tenemos datos. Durante las actualizaciones
-     automáticas NO tocamos el HTML.
+    Solo mostramos cargando la primera vez.
   */
 
   if(
@@ -1696,16 +1761,15 @@ async function loadPartners(forzar = false){
 
 
     /*
-       SI NO CAMBIÓ NADA:
-       no hacemos render.
-       Esta es la corrección principal
-       del parpadeo.
+      CORRECCIÓN:
+
+      Si no hubo cambios, NO se vuelve
+      a construir el HTML.
+
+      Incluso si forzar=true.
     */
 
-    if(
-      !forzar &&
-      nuevoHash === sociosHash
-    ){
+    if(nuevoHash === sociosHash){
 
       return;
 
@@ -2352,19 +2416,19 @@ async function sendDemand(){
 
   const insertData = {
 
-    origen: origin,
+    origen:origin,
 
-    destino: dest,
+    destino:dest,
 
-    mercancia: cargo,
+    mercancia:cargo,
 
-    cantidas: quantity,
+    cantidas:quantity,
 
-    unidad: unit,
+    unidad:unit,
 
-    estado: 'pendiente',
+    estado:'pendiente',
 
-    socio_id: null
+    socio_id:null
 
   };
 
@@ -2526,10 +2590,10 @@ async function sendDemand(){
 
 
     /*
-       Actualización manual:
-       aquí sí queremos refrescar inmediatamente
-       porque acabamos de crear una solicitud.
+      Refresco manual.
+      Solo actualiza si realmente hubo cambios.
     */
+
     await loadPartners(true);
 
 
@@ -2751,8 +2815,8 @@ async function acceptService(){
   try{
 
     const {
-      data: socioActualizado,
-      error: socioError
+      data:socioActualizado,
+      error:socioError
     } =
       await supabaseClient
         .from('socios')
@@ -2821,8 +2885,8 @@ async function acceptService(){
 
 
     const {
-      data: solicitudActualizada,
-      error: solicitudError
+      data:solicitudActualizada,
+      error:solicitudError
     } =
       await supabaseClient
         .from('solicitudes')
@@ -3284,8 +3348,8 @@ async function acceptPartnerDemand(){
   try{
 
     const {
-      data: socioActualizado,
-      error: socioError
+      data:socioActualizado,
+      error:socioError
     } =
       await supabaseClient
         .from('socios')
@@ -3336,8 +3400,8 @@ async function acceptPartnerDemand(){
 
 
     const {
-      data: solicitudActualizada,
-      error: solicitudError
+      data:solicitudActualizada,
+      error:solicitudError
     } =
       await supabaseClient
         .from('solicitudes')
@@ -3541,8 +3605,8 @@ async function deliver(){
   try{
 
     const {
-      data: solicitud,
-      error: consultaError
+      data:solicitud,
+      error:consultaError
     } =
       await supabaseClient
         .from('solicitudes')
@@ -3590,8 +3654,8 @@ async function deliver(){
 
 
     const {
-      data: solicitudEntregada,
-      error: entregaError
+      data:solicitudEntregada,
+      error:entregaError
     } =
       await supabaseClient
         .from('solicitudes')
@@ -3625,8 +3689,8 @@ async function deliver(){
     if(!solicitudEntregada){
 
       const {
-        data: verificacionSolicitud,
-        error: verificacionError
+        data:verificacionSolicitud,
+        error:verificacionError
       } =
         await supabaseClient
           .from('solicitudes')
@@ -3663,8 +3727,8 @@ async function deliver(){
 
 
     const {
-      data: socioLiberado,
-      error: socioError
+      data:socioLiberado,
+      error:socioError
     } =
       await supabaseClient
         .from('socios')
@@ -3696,8 +3760,8 @@ async function deliver(){
 
 
     const {
-      data: socioVerificado,
-      error: verificarSocioError
+      data:socioVerificado,
+      error:verificarSocioError
     } =
       await supabaseClient
         .from('socios')
@@ -3872,13 +3936,20 @@ function resetApp(){
   }
 
 
+  /*
+    Importante:
+    Solo cambiamos de pantalla.
+    No recargamos la página.
+  */
+
   show('request');
 
 }
 
 
 /* =====================================================
-   ACTUALIZACIÓN AUTOMÁTICA SIN PARPADEO
+   ACTUALIZACIÓN AUTOMÁTICA
+   SIN SALTOS
 ===================================================== */
 
 async function actualizarSociosAutomaticamente(){
@@ -3887,14 +3958,18 @@ async function actualizarSociosAutomaticamente(){
     return;
 
 
-  if(actualizandoSocios)
+  /*
+    No actualizamos si la pestaña está
+    en segundo plano.
+  */
+
+  if(document.hidden)
     return;
 
 
-  /*
-     No usamos loadPartners(true).
-     Solo comprobamos si hubo cambios.
-  */
+  if(actualizandoSocios)
+    return;
+
 
   actualizandoSocios = true;
 
@@ -3934,11 +4009,11 @@ async function actualizarSociosAutomaticamente(){
 
 
     /*
-       CLAVE:
-       Si los datos son iguales, salimos.
-       NO se toca el DOM.
-       NO se reconstruyen tarjetas.
-       NO hay parpadeo.
+      ESTA ES UNA DE LAS CORRECCIONES
+      MÁS IMPORTANTES.
+
+      Si no cambió Supabase:
+      NO hacemos nada.
     */
 
     if(nuevoHash === sociosHash){
@@ -3955,14 +4030,18 @@ async function actualizarSociosAutomaticamente(){
       nuevoHash;
 
 
+    /*
+      Solo ahora se reconstruyen
+      las tarjetas.
+    */
+
     renderPartners();
 
     updateNetworkStats();
 
 
     /*
-       Verificamos si el socio seleccionado
-       cambió de estado.
+      Comprobar socio seleccionado.
     */
 
     if(selectedPartner){
@@ -3984,10 +4063,15 @@ async function actualizarSociosAutomaticamente(){
         !== 'disponible'
       ){
 
+        const assignment =
+          document.getElementById(
+            'assignment'
+          );
+
+
         if(
-          document
-            .getElementById('assignment')
-            ?.classList.contains('active')
+          assignment &&
+          assignment.classList.contains('active')
         ){
 
           selectedPartner = null;
@@ -4005,8 +4089,8 @@ async function actualizarSociosAutomaticamente(){
 
               <div class="error">
 
-                🔴 El socio seleccionado acaba
-                de ser ocupado por otro usuario.
+                🔴 El socio seleccionado
+                ya no está disponible.
 
                 <br><br>
 
@@ -4042,13 +4126,42 @@ async function actualizarSociosAutomaticamente(){
 
 
 /*
-   Cada 5 segundos sigue comprobando Supabase,
-   pero ya NO reconstruye la pantalla si nada cambió.
+=====================================================
+ACTUALIZACIÓN CADA 10 SEGUNDOS
+=====================================================
+
+Antes:
+5 segundos
+
+Ahora:
+10 segundos
+
+Y si no cambia Supabase,
+NO se toca la pantalla.
 */
 
-setInterval(
-  actualizarSociosAutomaticamente,
-  5000
+const intervaloSocios =
+  setInterval(
+    actualizarSociosAutomaticamente,
+    10000
+  );
+
+
+/* =====================================================
+   CUANDO LA PESTAÑA VUELVE A ESTAR ACTIVA
+===================================================== */
+
+document.addEventListener(
+  'visibilitychange',
+  () => {
+
+    if(!document.hidden){
+
+      actualizarSociosAutomaticamente();
+
+    }
+
+  }
 );
 
 
@@ -4060,7 +4173,15 @@ document.addEventListener(
   'DOMContentLoaded',
   async () => {
 
+    /*
+      Carga inicial.
+    */
+
     await loadPartners();
+
+    /*
+      Comprobación inicial.
+    */
 
     await actualizarSociosAutomaticamente();
 
