@@ -18,10 +18,6 @@
   box-sizing:border-box;
 }
 
-html{
-  scroll-behavior:auto;
-}
-
 body{
   margin:0;
   background:#eef2f5;
@@ -323,33 +319,66 @@ hr{
   text-align:center;
 }
 
-/*
-=====================================================
-CORRECCIÓN CONTRA SALTOS
-=====================================================
-*/
+/* =====================================================
+   HISTORIAL
+===================================================== */
 
-.screen{
-  min-height:0;
+.history-card{
+  border:1px solid #dce4e9;
+  border-radius:14px;
+  padding:14px;
+  margin:12px 0;
+  background:#fff;
 }
 
-.screen.active{
-  animation:none !important;
-  transition:none !important;
+.history-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:8px;
+  margin-bottom:8px;
 }
 
-button,
-input,
-select{
-  -webkit-tap-highlight-color:transparent;
+.history-number{
+  font-weight:800;
+  color:#173b57;
 }
 
-/*
-Evita que el navegador intente conservar
-posiciones extrañas durante cambios internos.
-*/
-body{
-  overflow-anchor:none;
+.history-date{
+  font-size:11px;
+  color:#687681;
+  margin:4px 0 10px;
+}
+
+.history-line{
+  padding:5px 0;
+  font-size:13px;
+}
+
+.history-line b{
+  color:#18232d;
+}
+
+.history-delivered{
+  color:#28702f;
+  font-weight:700;
+}
+
+.history-assigned{
+  color:#1670ad;
+  font-weight:700;
+}
+
+.history-pending{
+  color:#9a6b00;
+  font-weight:700;
+}
+
+.history-title{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:8px;
 }
 
 </style>
@@ -780,7 +809,7 @@ Cargando socios...
 
 <button
   class="btn alt"
-  onclick="loadPartners(true)"
+  onclick="loadPartners()"
 >
 🔄 Actualizar socios
 </button>
@@ -1028,6 +1057,43 @@ No hay solicitudes cargadas.
 
 </div>
 
+
+<!-- =================================================
+     HISTORIAL
+================================================= -->
+
+<div class="card">
+
+<div class="history-title">
+
+<b>
+📋 Historial de servicios
+</b>
+
+<button
+  class="badge"
+  id="refreshHistoryBtn"
+  onclick="loadHistory(true)"
+>
+🔄 Actualizar
+</button>
+
+</div>
+
+<p class="small">
+Consulta todos los servicios registrados en Supabase.
+</p>
+
+<div id="historyList">
+
+<div class="loading">
+Cargando historial...
+</div>
+
+</div>
+
+</div>
+
 </section>
 
 
@@ -1133,14 +1199,11 @@ let sociosHash = '';
 
 let cargandoSocios = false;
 
+let historial = [];
 
-/*
-  NUEVO:
-  Controla la pantalla actualmente visible.
-  Evita operaciones visuales innecesarias.
-*/
+let historialHash = '';
 
-let pantallaActual = 'home';
+let cargandoHistorial = false;
 
 
 /* =====================================================
@@ -1192,6 +1255,69 @@ function formatSupabaseError(error){
 }
 
 
+/* =====================================================
+   FECHAS
+===================================================== */
+
+function formatFecha(fecha){
+
+  if(!fecha)
+    return 'No registrada';
+
+  const date =
+    new Date(fecha);
+
+  if(Number.isNaN(date.getTime()))
+    return 'Fecha no válida';
+
+  return new Intl.DateTimeFormat(
+    'es-CO',
+    {
+      dateStyle:'short',
+      timeStyle:'short'
+    }
+  ).format(date);
+
+}
+
+
+/*
+   Obtiene la mejor fecha de creación disponible.
+*/
+
+function obtenerFechaCreacion(solicitud){
+
+  return (
+    solicitud.created_at ||
+    solicitud.fecha_creacion ||
+    solicitud.createdAt ||
+    null
+  );
+
+}
+
+
+/*
+   Obtiene la fecha de entrega si la tabla
+   tiene una columna para ella.
+*/
+
+function obtenerFechaEntrega(solicitud){
+
+  return (
+    solicitud.fecha_entrega ||
+    solicitud.delivered_at ||
+    solicitud.fechaEntrega ||
+    null
+  );
+
+}
+
+
+/* =====================================================
+   HASH SOCIOS
+===================================================== */
+
 function crearHashSocios(lista){
 
   return JSON.stringify(
@@ -1214,6 +1340,49 @@ function crearHashSocios(lista){
 
 }
 
+
+/* =====================================================
+   HASH HISTORIAL
+===================================================== */
+
+function crearHashHistorial(lista){
+
+  return JSON.stringify(
+    (lista || []).map(s => ({
+
+      id:s.id,
+
+      origen:s.origen,
+
+      destino:s.destino,
+
+      mercancia:s.mercancia,
+
+      cantidas:s.cantidas,
+
+      unidad:s.unidad,
+
+      estado:s.estado,
+
+      socio_id:s.socio_id,
+
+      created_at:s.created_at,
+
+      fecha_creacion:s.fecha_creacion,
+
+      fecha_entrega:s.fecha_entrega,
+
+      delivered_at:s.delivered_at
+
+    }))
+  );
+
+}
+
+
+/* =====================================================
+   SUPABASE
+===================================================== */
 
 function checkSupabase(){
 
@@ -1239,75 +1408,39 @@ function checkSupabase(){
 
 /* =====================================================
    NAVEGACIÓN
-   CORREGIDA
 ===================================================== */
 
 function show(id){
-
-  const target =
-    document.getElementById(id);
-
-  if(!target){
-
-    console.warn(
-      'Pantalla no encontrada:',
-      id
-    );
-
-    return;
-
-  }
-
-
-  /*
-    Si ya estamos en esa pantalla,
-    no hacemos absolutamente nada.
-
-    Esto evita saltos innecesarios.
-  */
-
-  if(
-    pantallaActual === id &&
-    target.classList.contains('active')
-  ){
-
-    return;
-
-  }
-
-
-  /*
-    Guardamos la posición actual.
-    No utilizamos scrollTo smooth.
-  */
-
-  pantallaActual = id;
-
 
   document
     .querySelectorAll('.screen')
     .forEach(screen => {
 
-      if(screen === target){
-
-        screen.classList.add('active');
-
-      }else{
-
-        screen.classList.remove('active');
-
-      }
+      screen.classList.remove('active');
 
     });
 
 
-  /*
-    IMPORTANTE:
-    NO hacemos window.scrollTo().
-    
-    El navegador conserva la posición actual.
-    Esto elimina el efecto de "salto".
-  */
+  const target =
+    document.getElementById(id);
+
+
+  if(target){
+
+    target.classList.add('active');
+
+    /*
+       IMPORTANTE:
+       scroll instantáneo.
+       Evita que la pantalla parezca saltar.
+    */
+
+    window.scrollTo({
+      top:0,
+      behavior:'auto'
+    });
+
+  }
 
 }
 
@@ -1316,17 +1449,13 @@ function openPartnerHome(){
 
   show('partnerHome');
 
-  /*
-    Solo carga socios si es necesario.
-  */
-
   loadPartners();
 
 }
 
 
 /* =====================================================
-   ABRIR CENTRAL
+   CENTRAL
 ===================================================== */
 
 async function openAdmin(){
@@ -1408,6 +1537,8 @@ async function openAdmin(){
 
     await loadPartners();
 
+    await loadHistory();
+
 
   }catch(error){
 
@@ -1424,7 +1555,7 @@ async function openAdmin(){
 
 
 /* =====================================================
-   LOGIN ADMINISTRADOR
+   LOGIN ADMIN
 ===================================================== */
 
 async function loginAdmin(){
@@ -1563,6 +1694,8 @@ async function loginAdmin(){
 
     await loadPartners();
 
+    await loadHistory();
+
 
   }catch(error){
 
@@ -1597,7 +1730,7 @@ async function loginAdmin(){
 
 
 /* =====================================================
-   CERRAR SESIÓN
+   LOGOUT
 ===================================================== */
 
 async function logoutAdmin(){
@@ -1633,11 +1766,7 @@ async function loadPartners(forzar = false){
     return;
 
 
-  /*
-    Nunca permitimos consultas duplicadas.
-  */
-
-  if(cargandoSocios)
+  if(cargandoSocios && !forzar)
     return;
 
 
@@ -1658,10 +1787,6 @@ async function loadPartners(forzar = false){
       'networkStats'
     );
 
-
-  /*
-    Solo mostramos cargando la primera vez.
-  */
 
   if(
     socios.length === 0 &&
@@ -1760,16 +1885,10 @@ async function loadPartners(forzar = false){
       );
 
 
-    /*
-      CORRECCIÓN:
-
-      Si no hubo cambios, NO se vuelve
-      a construir el HTML.
-
-      Incluso si forzar=true.
-    */
-
-    if(nuevoHash === sociosHash){
+    if(
+      !forzar &&
+      nuevoHash === sociosHash
+    ){
 
       return;
 
@@ -1975,9 +2094,7 @@ function renderPartnerCard(socio){
 
       ${
         disponible
-
         ?
-
         `
 
           <button
@@ -1990,9 +2107,7 @@ function renderPartnerCard(socio){
           </button>
 
         `
-
         :
-
         `
 
           <div class="alert">
@@ -2002,7 +2117,6 @@ function renderPartnerCard(socio){
           </div>
 
         `
-
       }
 
     </div>
@@ -2560,6 +2674,15 @@ async function sendDemand(){
 
       <br>
 
+      📅 Creada:
+      ${escapeHtml(
+        formatFecha(
+          obtenerFechaCreacion(data)
+        )
+      )}
+
+      <br>
+
       📦 ${escapeHtml(
         String(quantity)
       )}
@@ -2589,12 +2712,17 @@ async function sendDemand(){
     `;
 
 
+    await loadPartners(true);
+
+
     /*
-      Refresco manual.
-      Solo actualiza si realmente hubo cambios.
+       Actualizamos historial.
+       Si todavía no existe la tabla/configuración
+       de fechas, mostramos el error correspondiente
+       sin romper la solicitud.
     */
 
-    await loadPartners(true);
+    await loadHistory();
 
 
     const disponibles =
@@ -3047,6 +3175,8 @@ async function acceptService(){
 
 
     await loadPartners(true);
+
+    await loadHistory();
 
     show('active');
 
@@ -3543,6 +3673,8 @@ async function acceptPartnerDemand(){
 
     await loadPartners(true);
 
+    await loadHistory();
+
     show('active');
 
 
@@ -3653,27 +3785,96 @@ async function deliver(){
     }
 
 
-    const {
-      data:solicitudEntregada,
-      error:entregaError
-    } =
-      await supabaseClient
-        .from('solicitudes')
-        .update({
+    /*
+       Primero intentamos registrar la entrega.
+       Si existe fecha_entrega en Supabase,
+       la guardamos automáticamente.
+    */
 
-          estado:'entregada'
+    let solicitudEntregada = null;
 
-        })
-        .eq(
-          'id',
-          solicitud.id
-        )
-        .eq(
-          'estado',
-          'asignada'
-        )
-        .select()
-        .maybeSingle();
+    let entregaError = null;
+
+
+    try{
+
+      const resultadoEntrega =
+        await supabaseClient
+          .from('solicitudes')
+          .update({
+
+            estado:'entregada',
+
+            fecha_entrega:
+              new Date().toISOString()
+
+          })
+          .eq(
+            'id',
+            solicitud.id
+          )
+          .eq(
+            'estado',
+            'asignada'
+          )
+          .select()
+          .maybeSingle();
+
+
+      solicitudEntregada =
+        resultadoEntrega.data;
+
+      entregaError =
+        resultadoEntrega.error;
+
+    }catch(error){
+
+      entregaError = error;
+
+    }
+
+
+    /*
+       Si fecha_entrega no existe en la tabla,
+       hacemos el cambio de estado sin esa columna.
+    */
+
+    if(entregaError){
+
+      console.warn(
+        'No fue posible guardar fecha_entrega. ' +
+        'Se intenta actualizar solamente el estado.',
+        entregaError
+      );
+
+
+      const resultadoSimple =
+        await supabaseClient
+          .from('solicitudes')
+          .update({
+
+            estado:'entregada'
+
+          })
+          .eq(
+            'id',
+            solicitud.id
+          )
+          .eq(
+            'estado',
+            'asignada'
+          )
+          .select()
+          .maybeSingle();
+
+
+      solicitudEntregada =
+        resultadoSimple.data;
+
+      entregaError =
+        resultadoSimple.error;
+
+    }
 
 
     if(entregaError){
@@ -3694,7 +3895,7 @@ async function deliver(){
       } =
         await supabaseClient
           .from('solicitudes')
-          .select('estado,socio_id')
+          .select('*')
           .eq(
             'id',
             solicitud.id
@@ -3723,8 +3924,16 @@ async function deliver(){
 
       }
 
+
+      solicitudEntregada =
+        verificacionSolicitud;
+
     }
 
+
+    /*
+       Liberar socio.
+    */
 
     const {
       data:socioLiberado,
@@ -3842,6 +4051,14 @@ async function deliver(){
     await loadPartners(true);
 
 
+    /*
+       CLAVE:
+       Actualizamos el historial después de entregar.
+    */
+
+    await loadHistory(true);
+
+
     const socioActual =
       socios.find(
         s =>
@@ -3898,6 +4115,522 @@ async function deliver(){
 
 
 /* =====================================================
+   HISTORIAL
+===================================================== */
+
+async function loadHistory(forzar = false){
+
+  if(!checkSupabase())
+    return;
+
+
+  if(cargandoHistorial && !forzar)
+    return;
+
+
+  const historyList =
+    document.getElementById(
+      'historyList'
+    );
+
+
+  if(!historyList)
+    return;
+
+
+  if(historial.length === 0){
+
+    historyList.innerHTML = `
+
+      <div class="loading">
+
+        Cargando historial...
+
+      </div>
+
+    `;
+
+  }
+
+
+  cargandoHistorial = true;
+
+
+  try{
+
+    /*
+       Primero intentamos obtener las solicitudes
+       con fecha_entrega.
+    */
+
+    let resultado =
+      await supabaseClient
+        .from('solicitudes')
+        .select('*')
+        .order(
+          'id',
+          {
+            ascending:false
+          }
+        );
+
+
+    /*
+       Si la consulta falla específicamente porque
+       fecha_entrega no existe, esta consulta realmente
+       no depende de fecha_entrega, por lo que podemos
+       seguir usando created_at.
+    */
+
+    const {
+      data,
+      error
+    } = resultado;
+
+
+    if(error){
+
+      console.error(
+        'Error cargando historial:',
+        error
+      );
+
+
+      historyList.innerHTML = `
+
+        <div class="error">
+
+          ❌ No se pudo cargar el historial.
+
+          <code>${escapeHtml(
+            formatSupabaseError(error)
+          )}</code>
+
+        </div>
+
+      `;
+
+      return;
+
+    }
+
+
+    const nuevasSolicitudes =
+      data || [];
+
+
+    /*
+       Intentamos traer los nombres de los socios
+       por separado para no depender de una relación
+       configurada en Supabase.
+    */
+
+    let sociosHistorial =
+      [];
+
+
+    try{
+
+      const {
+        data:sociosData
+      } =
+        await supabaseClient
+          .from('socios')
+          .select('id,nombre,vehiculo');
+
+
+      sociosHistorial =
+        sociosData || [];
+
+    }catch(error){
+
+      console.warn(
+        'No se pudieron cargar nombres de socios:',
+        error
+      );
+
+    }
+
+
+    const mapaSocios =
+      new Map(
+        sociosHistorial.map(
+          socio => [
+            String(socio.id),
+            socio
+          ]
+        )
+      );
+
+
+    const hashDatos =
+      JSON.stringify({
+
+        solicitudes:
+          nuevasSolicitudes,
+
+        socios:
+          sociosHistorial
+
+      });
+
+
+    if(
+      !forzar &&
+      hashDatos === historialHash
+    ){
+
+      return;
+
+    }
+
+
+    historial =
+      nuevasSolicitudes;
+
+
+    historialHash =
+      hashDatos;
+
+
+    renderHistory(
+      mapaSocios
+    );
+
+
+  }catch(error){
+
+    console.error(
+      'Error historial:',
+      error
+    );
+
+
+    historyList.innerHTML = `
+
+      <div class="error">
+
+        ❌ Error cargando historial.
+
+        <code>${escapeHtml(
+          error.message ||
+          String(error)
+        )}</code>
+
+      </div>
+
+    `;
+
+  }finally{
+
+    cargandoHistorial = false;
+
+  }
+
+}
+
+
+/* =====================================================
+   RENDER HISTORIAL
+===================================================== */
+
+function renderHistory(mapaSocios){
+
+  const historyList =
+    document.getElementById(
+      'historyList'
+    );
+
+
+  if(!historyList)
+    return;
+
+
+  if(!historial.length){
+
+    historyList.innerHTML = `
+
+      <div class="empty">
+
+        📋 No hay servicios registrados todavía.
+
+      </div>
+
+    `;
+
+    return;
+
+  }
+
+
+  historyList.innerHTML =
+    historial
+      .map(
+        solicitud =>
+          renderHistoryCard(
+            solicitud,
+            mapaSocios
+          )
+      )
+      .join('');
+
+}
+
+
+/* =====================================================
+   TARJETA HISTORIAL
+===================================================== */
+
+function renderHistoryCard(
+  solicitud,
+  mapaSocios
+){
+
+  const socio =
+    solicitud.socio_id
+    ? mapaSocios.get(
+        String(
+          solicitud.socio_id
+        )
+      )
+    : null;
+
+
+  const socioNombre =
+    socio?.nombre ||
+    solicitud.socio_nombre ||
+    'Sin socio asignado';
+
+
+  const estado =
+    String(
+      solicitud.estado ||
+      'sin estado'
+    )
+    .toLowerCase()
+    .trim();
+
+
+  let estadoClase =
+    'history-pending';
+
+
+  let estadoTexto =
+    estado;
+
+
+  if(estado === 'entregada'){
+
+    estadoClase =
+      'history-delivered';
+
+    estadoTexto =
+      '🟢 ENTREGADA';
+
+  }else if(estado === 'asignada'){
+
+    estadoClase =
+      'history-assigned';
+
+    estadoTexto =
+      '🔵 ASIGNADA';
+
+  }else if(estado === 'pendiente'){
+
+    estadoClase =
+      'history-pending';
+
+    estadoTexto =
+      '🟡 PENDIENTE';
+
+  }
+
+
+  const fechaCreacion =
+    obtenerFechaCreacion(
+      solicitud
+    );
+
+
+  const fechaEntrega =
+    obtenerFechaEntrega(
+      solicitud
+    );
+
+
+  return `
+
+    <div class="history-card">
+
+      <div class="history-header">
+
+        <div class="history-number">
+
+          📦 Solicitud #${escapeHtml(
+            String(solicitud.id)
+          )}
+
+        </div>
+
+        <span class="pill">
+
+          ${escapeHtml(
+            estadoTexto
+          )}
+
+        </span>
+
+      </div>
+
+
+      <div class="history-date">
+
+        📅 Creada:
+
+        ${escapeHtml(
+          formatFecha(
+            fechaCreacion
+          )
+        )}
+
+      </div>
+
+
+      ${
+        fechaEntrega
+        ?
+        `
+
+          <div class="history-date history-delivered">
+
+            📅 Entregada:
+
+            ${escapeHtml(
+              formatFecha(
+                fechaEntrega
+              )
+            )}
+
+          </div>
+
+        `
+        :
+        ''
+      }
+
+
+      <hr>
+
+
+      <div class="history-line">
+
+        📍 <b>Origen:</b>
+
+        ${escapeHtml(
+          solicitud.origen ||
+          '-'
+        )}
+
+      </div>
+
+
+      <div class="history-line">
+
+        📍 <b>Destino:</b>
+
+        ${escapeHtml(
+          solicitud.destino ||
+          '-'
+        )}
+
+      </div>
+
+
+      <div class="history-line">
+
+        📦 <b>Mercancía:</b>
+
+        ${escapeHtml(
+          solicitud.mercancia ||
+          '-'
+        )}
+
+      </div>
+
+
+      <div class="history-line">
+
+        ⚖️ <b>Cantidad:</b>
+
+        ${escapeHtml(
+          String(
+            solicitud.cantidas ??
+            '-'
+          )
+        )}
+
+        ${escapeHtml(
+          solicitud.unidad ||
+          ''
+        )}
+
+      </div>
+
+
+      <div class="history-line">
+
+        🚚 <b>Socio:</b>
+
+        ${escapeHtml(
+          socioNombre
+        )}
+
+      </div>
+
+
+      <div class="history-line">
+
+        📊 <b>Estado:</b>
+
+        <span class="${estadoClase}">
+
+          ${escapeHtml(
+            estadoTexto
+          )}
+
+        </span>
+
+      </div>
+
+
+      ${
+        socio?.vehiculo
+        ?
+        `
+
+          <div class="history-line">
+
+            🚛 <b>Vehículo:</b>
+
+            ${escapeHtml(
+              socio.vehiculo
+            )}
+
+          </div>
+
+        `
+        :
+        ''
+      }
+
+    </div>
+
+  `;
+
+}
+
+
+/* =====================================================
    REINICIAR
 ===================================================== */
 
@@ -3937,9 +4670,9 @@ function resetApp(){
 
 
   /*
-    Importante:
-    Solo cambiamos de pantalla.
-    No recargamos la página.
+     IMPORTANTE:
+     resetApp NO elimina historial.
+     Solo prepara una nueva solicitud.
   */
 
   show('request');
@@ -3948,22 +4681,12 @@ function resetApp(){
 
 
 /* =====================================================
-   ACTUALIZACIÓN AUTOMÁTICA
-   SIN SALTOS
+   ACTUALIZACIÓN AUTOMÁTICA SOCIOS
 ===================================================== */
 
 async function actualizarSociosAutomaticamente(){
 
   if(!supabaseClient)
-    return;
-
-
-  /*
-    No actualizamos si la pestaña está
-    en segundo plano.
-  */
-
-  if(document.hidden)
     return;
 
 
@@ -4008,14 +4731,6 @@ async function actualizarSociosAutomaticamente(){
       );
 
 
-    /*
-      ESTA ES UNA DE LAS CORRECCIONES
-      MÁS IMPORTANTES.
-
-      Si no cambió Supabase:
-      NO hacemos nada.
-    */
-
     if(nuevoHash === sociosHash){
 
       return;
@@ -4030,19 +4745,10 @@ async function actualizarSociosAutomaticamente(){
       nuevoHash;
 
 
-    /*
-      Solo ahora se reconstruyen
-      las tarjetas.
-    */
-
     renderPartners();
 
     updateNetworkStats();
 
-
-    /*
-      Comprobar socio seleccionado.
-    */
 
     if(selectedPartner){
 
@@ -4063,15 +4769,10 @@ async function actualizarSociosAutomaticamente(){
         !== 'disponible'
       ){
 
-        const assignment =
-          document.getElementById(
-            'assignment'
-          );
-
-
         if(
-          assignment &&
-          assignment.classList.contains('active')
+          document
+            .getElementById('assignment')
+            ?.classList.contains('active')
         ){
 
           selectedPartner = null;
@@ -4089,8 +4790,8 @@ async function actualizarSociosAutomaticamente(){
 
               <div class="error">
 
-                🔴 El socio seleccionado
-                ya no está disponible.
+                🔴 El socio seleccionado acaba
+                de ser ocupado por otro usuario.
 
                 <br><br>
 
@@ -4125,43 +4826,63 @@ async function actualizarSociosAutomaticamente(){
 }
 
 
-/*
-=====================================================
-ACTUALIZACIÓN CADA 10 SEGUNDOS
-=====================================================
+/* =====================================================
+   ACTUALIZACIÓN AUTOMÁTICA HISTORIAL
+===================================================== */
 
-Antes:
-5 segundos
+async function actualizarHistorialAutomaticamente(){
 
-Ahora:
-10 segundos
+  if(!supabaseClient)
+    return;
 
-Y si no cambia Supabase,
-NO se toca la pantalla.
-*/
 
-const intervaloSocios =
-  setInterval(
-    actualizarSociosAutomaticamente,
-    10000
-  );
+  /*
+     Solo actualizamos si la Central está visible.
+     Esto evita consultas innecesarias.
+  */
+
+  const admin =
+    document.getElementById(
+      'admin'
+    );
+
+
+  if(
+    !admin ||
+    !admin.classList.contains('active')
+  ){
+
+    return;
+
+  }
+
+
+  await loadHistory();
+
+}
 
 
 /* =====================================================
-   CUANDO LA PESTAÑA VUELVE A ESTAR ACTIVA
+   INTERVALOS
 ===================================================== */
 
-document.addEventListener(
-  'visibilitychange',
-  () => {
+setInterval(
+  actualizarSociosAutomaticamente,
+  5000
+);
 
-    if(!document.hidden){
 
-      actualizarSociosAutomaticamente();
+/*
+   Historial cada 10 segundos.
 
-    }
+   IMPORTANTE:
+   Si nada cambió, loadHistory() NO reconstruye
+   el HTML.
+*/
 
-  }
+setInterval(
+  actualizarHistorialAutomaticamente,
+  10000
 );
 
 
@@ -4173,17 +4894,7 @@ document.addEventListener(
   'DOMContentLoaded',
   async () => {
 
-    /*
-      Carga inicial.
-    */
-
     await loadPartners();
-
-    /*
-      Comprobación inicial.
-    */
-
-    await actualizarSociosAutomaticamente();
 
   }
 );
