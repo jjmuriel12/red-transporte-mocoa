@@ -329,7 +329,7 @@ hr{
   text-align:center;
 }
 
-/* NUEVO: botones de control de estado */
+/* CONTROL ESTADO */
 
 .admin-status-btn{
   width:100%;
@@ -361,6 +361,45 @@ hr{
 
 .admin-control{
   margin-top:10px;
+}
+
+/* HISTORIAL */
+
+.history-card{
+  border:1px solid #dce4e9;
+  border-radius:14px;
+  padding:14px;
+  margin:12px 0;
+  background:#fff;
+}
+
+.history-date{
+  background:#eef5fa;
+  color:#173b57;
+  border-radius:9px;
+  padding:8px 10px;
+  font-size:12px;
+  font-weight:700;
+  margin-bottom:10px;
+}
+
+.history-id{
+  font-size:17px;
+  font-weight:800;
+  color:#173b57;
+}
+
+.history-status{
+  margin-top:10px;
+}
+
+.history-filter{
+  margin-bottom:12px;
+}
+
+.date-label{
+  font-size:11px;
+  color:#687681;
 }
 
 </style>
@@ -1040,6 +1079,68 @@ No hay solicitudes cargadas.
 
 </div>
 
+
+<!-- HISTORIAL -->
+
+<div class="card">
+
+<div class="top">
+
+<b>
+📜 Historial de solicitudes
+</b>
+
+<button
+  class="badge"
+  onclick="loadHistory()"
+>
+🔄 Actualizar
+</button>
+
+</div>
+
+<p class="small">
+Consulta las solicitudes anteriores con fecha,
+hora, socio y estado.
+</p>
+
+<div class="history-filter">
+
+<select
+  id="historyFilter"
+  onchange="loadHistory()"
+>
+
+<option value="todas">
+Todas las solicitudes
+</option>
+
+<option value="pendiente">
+Pendientes
+</option>
+
+<option value="asignada">
+Asignadas
+</option>
+
+<option value="entregada">
+Entregadas
+</option>
+
+</select>
+
+</div>
+
+<div id="historyList">
+
+<div class="loading">
+Cargando historial...
+</div>
+
+</div>
+
+</div>
+
 </section>
 
 
@@ -1195,6 +1296,40 @@ function formatSupabaseError(error){
 }
 
 
+/* =====================================================
+   FECHAS DEL HISTORIAL
+===================================================== */
+
+function formatFecha(fecha){
+
+  if(!fecha){
+
+    return 'Fecha no disponible';
+
+  }
+
+  const d =
+    new Date(fecha);
+
+  if(isNaN(d.getTime())){
+
+    return escapeHtml(
+      String(fecha)
+    );
+
+  }
+
+  return d.toLocaleString(
+    'es-CO',
+    {
+      dateStyle:'medium',
+      timeStyle:'short'
+    }
+  );
+
+}
+
+
 function crearHashSocios(lista){
 
   return JSON.stringify(
@@ -1282,10 +1417,6 @@ function openPartnerHome(){
 }
 
 
-/* =====================================================
-   ABRIR CENTRAL
-===================================================== */
-
 async function openAdmin(){
 
   if(!checkSupabase())
@@ -1364,6 +1495,8 @@ async function openAdmin(){
     show('admin');
 
     await loadPartners();
+
+    await loadHistory();
 
 
   }catch(error){
@@ -1519,6 +1652,8 @@ async function loginAdmin(){
     show('admin');
 
     await loadPartners();
+
+    await loadHistory();
 
 
   }catch(error){
@@ -1946,7 +2081,6 @@ function renderPartnerCard(socio){
 
 /* =====================================================
    SOCIO CENTRAL
-   AHORA INCLUYE CONTROL MANUAL
 ===================================================== */
 
 function renderAdminPartner(socio){
@@ -2057,8 +2191,7 @@ function renderAdminPartner(socio){
 
 
 /* =====================================================
-   NUEVO:
-   CAMBIAR ESTADO MANUAL DESDE CENTRAL
+   CAMBIAR ESTADO DESDE CENTRAL
 ===================================================== */
 
 async function cambiarEstadoSocio(id,nuevoEstado){
@@ -2066,11 +2199,6 @@ async function cambiarEstadoSocio(id,nuevoEstado){
   if(!checkSupabase())
     return;
 
-
-  /*
-     Solo permitimos los dos estados válidos
-     desde este control.
-  */
 
   if(
     nuevoEstado !== 'disponible' &&
@@ -2124,11 +2252,6 @@ async function cambiarEstadoSocio(id,nuevoEstado){
     return;
 
 
-  /*
-     Buscamos el botón para evitar
-     doble clic mientras se guarda.
-  */
-
   const boton =
     document.getElementById(
       'statusBtn-' + id
@@ -2154,9 +2277,7 @@ async function cambiarEstadoSocio(id,nuevoEstado){
       await supabaseClient
         .from('socios')
         .update({
-
           estado:nuevoEstado
-
         })
         .eq(
           'id',
@@ -2167,12 +2288,6 @@ async function cambiarEstadoSocio(id,nuevoEstado){
 
 
     if(error){
-
-      console.error(
-        'Error cambiando estado:',
-        error
-      );
-
 
       alert(
         '❌ No se pudo cambiar el estado.\n\n' +
@@ -2188,18 +2303,13 @@ async function cambiarEstadoSocio(id,nuevoEstado){
 
       alert(
         '⚠️ No se actualizó ningún socio.\n\n' +
-        'Verifica que el socio exista y que la política UPDATE de Supabase permita este cambio.'
+        'Verifica las políticas UPDATE de Supabase.'
       );
 
       return;
 
     }
 
-
-    /*
-       Actualizamos el socio localmente.
-       Así no necesitamos recargar toda la página.
-    */
 
     const index =
       socios.findIndex(
@@ -2222,66 +2332,27 @@ async function cambiarEstadoSocio(id,nuevoEstado){
     }
 
 
-    /*
-       Actualizamos la huella.
-    */
-
     sociosHash =
       crearHashSocios(
         socios
       );
 
 
-    /*
-       Renderizamos solamente las tarjetas
-       necesarias de la Central.
-    */
-
     renderPartners();
 
     updateNetworkStats();
 
 
-    /*
-       Si el socio que estaba seleccionado
-       cambió de estado, actualizamos la referencia.
-    */
-
-    if(
-      selectedPartner &&
-      String(selectedPartner.id) ===
-      String(id)
-    ){
-
-      selectedPartner = {
-        ...selectedPartner,
-        ...data
-      };
-
-    }
-
-
-    /*
-       Confirmación visual.
-    */
-
-    const mensaje =
+    alert(
       nuevoEstado === 'disponible'
-
       ? `🟢 ${nombre} ahora está DISPONIBLE.`
-
-      : `🔴 ${nombre} ahora está OCUPADO.`;
-
-    console.log(mensaje);
+      : `🔴 ${nombre} ahora está OCUPADO.`
+    );
 
 
   }catch(error){
 
-    console.error(
-      'Error cambiando estado:',
-      error
-    );
-
+    console.error(error);
 
     alert(
       '❌ Error cambiando el estado:\n\n' +
@@ -2292,11 +2363,6 @@ async function cambiarEstadoSocio(id,nuevoEstado){
     );
 
   }finally{
-
-    /*
-       Si todavía existe la tarjeta,
-       restauramos el botón.
-    */
 
     const botonActual =
       document.getElementById(
@@ -2652,19 +2718,19 @@ async function sendDemand(){
 
   const insertData = {
 
-    origen: origin,
+    origen:origin,
 
-    destino: dest,
+    destino:dest,
 
-    mercancia: cargo,
+    mercancia:cargo,
 
-    cantidas: quantity,
+    cantidas:quantity,
 
-    unidad: unit,
+    unidad:unit,
 
-    estado: 'pendiente',
+    estado:'pendiente',
 
-    socio_id: null
+    socio_id:null
 
   };
 
@@ -2821,6 +2887,17 @@ async function sendDemand(){
       <b>
         pendiente
       </b>
+
+      <br><br>
+
+      <span class="date-label">
+        📅 Creada:
+        ${escapeHtml(
+          formatFecha(
+            data.created_at
+          )
+        )}
+      </span>
 
     `;
 
@@ -3274,10 +3351,21 @@ async function acceptService(){
         currentDemand.unidad || ''
       )}
 
+      <br><br>
+
+      📅 Solicitud:
+      ${escapeHtml(
+        formatFecha(
+          currentDemand.created_at
+        )
+      )}
+
     `;
 
 
     await loadPartners(true);
+
+    await loadHistory();
 
     show('active');
 
@@ -3475,6 +3563,16 @@ async function openPartnerDemand(){
 
     ${escapeHtml(
       currentDemand.unidad || ''
+    )}
+
+    <br><br>
+
+    📅 Creada:
+
+    ${escapeHtml(
+      formatFecha(
+        currentDemand.created_at
+      )
     )}
 
   `;
@@ -3769,10 +3867,21 @@ async function acceptPartnerDemand(){
         currentDemand.unidad || ''
       )}
 
+      <br><br>
+
+      📅 Solicitud:
+      ${escapeHtml(
+        formatFecha(
+          currentDemand.created_at
+        )
+      )}
+
     `;
 
 
     await loadPartners(true);
+
+    await loadHistory();
 
     show('active');
 
@@ -3877,22 +3986,32 @@ async function deliver(){
     if(!socioId){
 
       throw new Error(
-        'La solicitud no tiene socio_id. ' +
-        'No se puede liberar el socio automáticamente.'
+        'La solicitud no tiene socio_id.'
       );
 
     }
 
 
-    const {
-      data: solicitudEntregada,
-      error: entregaError
-    } =
+    /*
+      Intentamos guardar la fecha de entrega.
+      Si la tabla no tiene delivered_at,
+      hacemos la actualización normal.
+    */
+
+    let solicitudEntregada = null;
+
+    let entregaError = null;
+
+
+    const resultadoConFecha =
       await supabaseClient
         .from('solicitudes')
         .update({
 
-          estado:'entregada'
+          estado:'entregada',
+
+          delivered_at:
+            new Date().toISOString()
 
         })
         .eq(
@@ -3905,6 +4024,64 @@ async function deliver(){
         )
         .select()
         .maybeSingle();
+
+
+    solicitudEntregada =
+      resultadoConFecha.data;
+
+    entregaError =
+      resultadoConFecha.error;
+
+
+    /*
+      Si delivered_at no existe, intentamos
+      actualizar solamente estado.
+    */
+
+    if(
+      entregaError &&
+      (
+        String(
+          entregaError.message || ''
+        )
+        .toLowerCase()
+        .includes('delivered_at')
+        ||
+        String(
+          entregaError.message || ''
+        )
+        .toLowerCase()
+        .includes('column')
+      )
+    ){
+
+      const resultadoSimple =
+        await supabaseClient
+          .from('solicitudes')
+          .update({
+
+            estado:'entregada'
+
+          })
+          .eq(
+            'id',
+            solicitud.id
+          )
+          .eq(
+            'estado',
+            'asignada'
+          )
+          .select()
+          .maybeSingle();
+
+
+      solicitudEntregada =
+        resultadoSimple.data;
+
+      entregaError =
+        resultadoSimple.error;
+
+    }
 
 
     if(entregaError){
@@ -3925,7 +4102,7 @@ async function deliver(){
       } =
         await supabaseClient
           .from('solicitudes')
-          .select('estado,socio_id')
+          .select('*')
           .eq(
             'id',
             solicitud.id
@@ -3936,7 +4113,7 @@ async function deliver(){
       if(verificacionError){
 
         throw new Error(
-          'No se pudo verificar el estado de la solicitud:\n' +
+          'No se pudo verificar el estado:\n' +
           formatSupabaseError(verificacionError)
         );
 
@@ -3945,8 +4122,14 @@ async function deliver(){
 
       if(
         verificacionSolicitud &&
-        verificacionSolicitud.estado !== 'entregada'
+        verificacionSolicitud.estado ===
+        'entregada'
       ){
+
+        solicitudEntregada =
+          verificacionSolicitud;
+
+      }else{
 
         throw new Error(
           'La solicitud no pudo cambiar a entregada.'
@@ -4007,7 +4190,7 @@ async function deliver(){
     if(verificarSocioError){
 
       throw new Error(
-        'No se pudo verificar el nuevo estado del socio:\n' +
+        'No se pudo verificar el nuevo estado:\n' +
         formatSupabaseError(verificarSocioError)
       );
 
@@ -4017,7 +4200,7 @@ async function deliver(){
     if(!socioVerificado){
 
       throw new Error(
-        'El socio no fue encontrado después de finalizar el servicio.'
+        'El socio no fue encontrado.'
       );
 
     }
@@ -4033,7 +4216,7 @@ async function deliver(){
     ){
 
       throw new Error(
-        'El servicio terminó, pero el socio todavía aparece como "' +
+        'El socio todavía aparece como "' +
         socioVerificado.estado +
         '".'
       );
@@ -4072,6 +4255,8 @@ async function deliver(){
 
     await loadPartners(true);
 
+    await loadHistory();
+
 
     const socioActual =
       socios.find(
@@ -4104,7 +4289,10 @@ async function deliver(){
 
       <div class="error">
 
-        ❌ <b>No se pudo finalizar completamente el servicio.</b>
+        ❌ <b>
+        No se pudo finalizar completamente
+        el servicio.
+        </b>
 
         <code>${escapeHtml(
           error.message ||
@@ -4124,6 +4312,455 @@ async function deliver(){
       '📦 Confirmar entrega';
 
   }
+
+}
+
+
+/* =====================================================
+   HISTORIAL
+===================================================== */
+
+async function loadHistory(){
+
+  if(!checkSupabase())
+    return;
+
+
+  const historyList =
+    document.getElementById(
+      'historyList'
+    );
+
+
+  if(!historyList)
+    return;
+
+
+  historyList.innerHTML = `
+
+    <div class="loading">
+      ⏳ Cargando historial...
+    </div>
+
+  `;
+
+
+  const filtro =
+    document.getElementById(
+      'historyFilter'
+    )?.value ||
+    'todas';
+
+
+  try{
+
+    /*
+      Primero obtenemos las solicitudes.
+      No dependemos de una relación FK con socios,
+      por lo que funciona aunque la relación no
+      esté configurada para joins.
+    */
+
+    let query =
+      supabaseClient
+        .from('solicitudes')
+        .select('*')
+        .order(
+          'id',
+          {
+            ascending:false
+          }
+        );
+
+
+    if(filtro !== 'todas'){
+
+      query =
+        query.eq(
+          'estado',
+          filtro
+        );
+
+    }
+
+
+    const {
+      data,
+      error
+    } =
+      await query;
+
+
+    if(error){
+
+      console.error(
+        'Error historial:',
+        error
+      );
+
+
+      historyList.innerHTML = `
+
+        <div class="error">
+
+          ❌ No se pudo cargar el historial.
+
+          <code>${escapeHtml(
+            formatSupabaseError(error)
+          )}</code>
+
+        </div>
+
+      `;
+
+      return;
+
+    }
+
+
+    const solicitudes =
+      data || [];
+
+
+    if(solicitudes.length === 0){
+
+      historyList.innerHTML = `
+
+        <div class="empty">
+
+          📜 No hay solicitudes en el historial.
+
+        </div>
+
+      `;
+
+      return;
+
+    }
+
+
+    /*
+      Obtenemos los socios relacionados.
+    */
+
+    const idsSocios =
+      [
+        ...new Set(
+          solicitudes
+            .map(s => s.socio_id)
+            .filter(Boolean)
+            .map(id => String(id))
+        )
+      ];
+
+
+    let sociosHistorial = [];
+
+
+    if(idsSocios.length > 0){
+
+      const {
+        data: sociosData,
+        error: sociosError
+      } =
+        await supabaseClient
+          .from('socios')
+          .select(
+            'id,nombre,vehiculo'
+          )
+          .in(
+            'id',
+            idsSocios
+          );
+
+
+      if(!sociosError){
+
+        sociosHistorial =
+          sociosData || [];
+
+      }
+
+    }
+
+
+    historyList.innerHTML =
+      solicitudes
+        .map(solicitud => {
+
+          const socio =
+            sociosHistorial.find(
+              s =>
+                String(s.id) ===
+                String(solicitud.socio_id)
+            );
+
+
+          return renderHistoryCard(
+            solicitud,
+            socio
+          );
+
+        })
+        .join('');
+
+
+  }catch(error){
+
+    console.error(error);
+
+
+    historyList.innerHTML = `
+
+      <div class="error">
+
+        ❌ Error cargando historial.
+
+        <code>${escapeHtml(
+          error.message ||
+          String(error)
+        )}</code>
+
+      </div>
+
+    `;
+
+  }
+
+}
+
+
+/* =====================================================
+   TARJETA HISTORIAL
+===================================================== */
+
+function renderHistoryCard(
+  solicitud,
+  socio
+){
+
+  const estado =
+    String(
+      solicitud.estado || 'desconocido'
+    )
+    .toLowerCase()
+    .trim();
+
+
+  let estadoHtml = '';
+
+
+  if(estado === 'entregada'){
+
+    estadoHtml = `
+
+      <span class="pill">
+        🟢 ENTREGADA
+      </span>
+
+    `;
+
+  }else if(estado === 'asignada'){
+
+    estadoHtml = `
+
+      <span class="pill red">
+        🔴 EN SERVICIO
+      </span>
+
+    `;
+
+  }else if(estado === 'pendiente'){
+
+    estadoHtml = `
+
+      <span class="pill">
+        🟡 PENDIENTE
+      </span>
+
+    `;
+
+  }else{
+
+    estadoHtml = `
+
+      <span class="pill red">
+        ${escapeHtml(estado)}
+      </span>
+
+    `;
+
+  }
+
+
+  const fechaCreacion =
+    formatFecha(
+      solicitud.created_at
+    );
+
+
+  const fechaEntrega =
+    solicitud.delivered_at
+    ? formatFecha(
+        solicitud.delivered_at
+      )
+    : null;
+
+
+  return `
+
+    <div class="history-card">
+
+      <div class="history-date">
+
+        📅 Creada:
+        ${escapeHtml(
+          fechaCreacion
+        )}
+
+      </div>
+
+
+      <div class="history-id">
+
+        📦 Solicitud #
+        ${escapeHtml(
+          String(
+            solicitud.id
+          )
+        )}
+
+      </div>
+
+
+      <div class="history-status">
+
+        ${estadoHtml}
+
+      </div>
+
+
+      <p>
+
+        📍 <b>Origen:</b>
+
+        ${escapeHtml(
+          solicitud.origen || '-'
+        )}
+
+        <br>
+
+        📍 <b>Destino:</b>
+
+        ${escapeHtml(
+          solicitud.destino || '-'
+        )}
+
+        <br>
+
+        📦 <b>Mercancía:</b>
+
+        ${escapeHtml(
+          solicitud.mercancia || '-'
+        )}
+
+        <br>
+
+        ⚖️ <b>Cantidad:</b>
+
+        ${escapeHtml(
+          String(
+            solicitud.cantidas ?? '-'
+          )
+        )}
+
+        ${escapeHtml(
+          solicitud.unidad || ''
+        )}
+
+      </p>
+
+
+      <div class="card dark">
+
+        🚚 <b>Socio:</b>
+
+        ${
+          socio
+
+          ?
+
+          escapeHtml(
+            socio.nombre ||
+            'Socio'
+          )
+
+          :
+
+          solicitud.socio_id
+
+          ?
+
+          'Socio #' +
+          escapeHtml(
+            String(
+              solicitud.socio_id
+            )
+          )
+
+          :
+
+          'Sin socio asignado'
+
+        }
+
+        ${
+          socio?.vehiculo
+
+          ?
+
+          `<br>
+           🚛 ${escapeHtml(
+             socio.vehiculo
+           )}`
+
+          :
+
+          ''
+
+        }
+
+      </div>
+
+
+      ${
+        fechaEntrega
+
+        ?
+
+        `
+
+          <div class="success">
+
+            ✅ Entregada:
+
+            ${escapeHtml(
+              fechaEntrega
+            )}
+
+          </div>
+
+        `
+
+        :
+
+        ''
+
+      }
+
+    </div>
+
+  `;
 
 }
 
@@ -4173,7 +4810,7 @@ function resetApp(){
 
 
 /* =====================================================
-   ACTUALIZACIÓN AUTOMÁTICA SIN PARPADEO
+   ACTUALIZACIÓN AUTOMÁTICA
 ===================================================== */
 
 async function actualizarSociosAutomaticamente(){
@@ -4321,6 +4958,31 @@ async function actualizarSociosAutomaticamente(){
 setInterval(
   actualizarSociosAutomaticamente,
   5000
+);
+
+
+/* =====================================================
+   ACTUALIZACIÓN AUTOMÁTICA DEL HISTORIAL
+===================================================== */
+
+setInterval(
+  async () => {
+
+    const adminScreen =
+      document.getElementById('admin');
+
+
+    if(
+      adminScreen &&
+      adminScreen.classList.contains('active')
+    ){
+
+      await loadHistory();
+
+    }
+
+  },
+  10000
 );
 
 
