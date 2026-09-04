@@ -5006,3 +5006,39 @@ document.addEventListener(
 </body>
 
 </html>
+
+const insertData = {
+
+  origen: origin,
+
+  destino: dest,
+
+  mercancia: cargo,
+
+  cantidas: quantity,
+
+  unidad: unit,
+
+  estado: 'pendiente',
+
+  socio_id: null,
+
+  usuario_id:
+    usuarioActual.id,
+
+  usuario_nombre:
+    perfilUsuario?.nombre ||
+    usuarioActual.email,
+
+  usuario_telefono:
+    perfilUsuario?.telefono ||
+    '',
+
+  usuario_correo:
+    perfilUsuario?.correo ||
+    usuarioActual.email,
+
+  created_at:
+    new Date().toISOString()
+
+};
