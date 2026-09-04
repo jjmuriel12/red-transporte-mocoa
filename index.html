@@ -173,6 +173,11 @@ select:focus{
   color:#9b2222;
 }
 
+.pill.yellow{
+  background:#fff5dd;
+  color:#8a6500;
+}
+
 .price{
   font-size:21px;
   font-weight:800;
@@ -319,6 +324,81 @@ hr{
   text-align:center;
 }
 
+/* =====================================================
+   HISTORIAL
+===================================================== */
+
+.history-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:8px;
+}
+
+.history-card{
+  border:1px solid #dce4e9;
+  border-radius:14px;
+  padding:14px;
+  margin:12px 0;
+  background:#fff;
+}
+
+.history-card .history-title{
+  font-weight:800;
+  font-size:15px;
+}
+
+.history-card .history-date{
+  font-size:11px;
+  color:#7a8790;
+  margin-top:4px;
+}
+
+.history-info{
+  margin-top:10px;
+  font-size:13px;
+  line-height:1.65;
+}
+
+.history-status{
+  margin-top:10px;
+}
+
+.status-pendiente{
+  background:#fff5dd;
+  color:#8a6500;
+}
+
+.status-asignada{
+  background:#eaf3ff;
+  color:#165b91;
+}
+
+.status-entregada{
+  background:#edf7ef;
+  color:#28702f;
+}
+
+.status-cancelada{
+  background:#ffeaea;
+  color:#9b2222;
+}
+
+.history-filter{
+  margin:12px 0;
+}
+
+.refresh-mini{
+  width:auto;
+  margin:0;
+  padding:8px 10px;
+  font-size:12px;
+}
+
+/* =====================================================
+   FIN HISTORIAL
+===================================================== */
+
 </style>
 
 </head>
@@ -382,6 +462,13 @@ La central buscará los socios disponibles.
   onclick="openPartnerHome()"
 >
 🚚 Soy socio transportador
+</button>
+
+<button
+  class="btn alt"
+  onclick="openHistory()"
+>
+📜 Historial de solicitudes
 </button>
 
 <button
@@ -548,6 +635,13 @@ Buscando socios disponibles...
 </div>
 
 <button
+  class="btn"
+  onclick="openHistory()"
+>
+📜 Ver historial
+</button>
+
+<button
   class="btn alt"
   onclick="show('request')"
 >
@@ -655,6 +749,13 @@ Estado del servicio
 📦 Confirmar entrega
 </button>
 
+<button
+  class="btn alt"
+  onclick="openHistory()"
+>
+📜 Ver historial
+</button>
+
 <div id="deliveryError"></div>
 
 </section>
@@ -698,6 +799,13 @@ El socio fue liberado correctamente y ya aparece como disponible.
 
 <button
   class="btn"
+  onclick="openHistory()"
+>
+📜 Ver historial
+</button>
+
+<button
+  class="btn alt"
   onclick="resetApp()"
 >
 Nueva solicitud
@@ -800,6 +908,85 @@ Volver
 </button>
 
 </div>
+
+</section>
+
+
+<!-- =====================================================
+     HISTORIAL
+===================================================== -->
+
+<section id="history" class="screen">
+
+<div class="history-header">
+
+  <h2>
+    📜 Historial
+  </h2>
+
+  <button
+    class="badge refresh-mini"
+    onclick="loadHistory()"
+  >
+    🔄 Actualizar
+  </button>
+
+</div>
+
+<p>
+Aquí puedes consultar las solicitudes registradas
+en la plataforma.
+</p>
+
+<div class="history-filter">
+
+<label>
+Filtrar por estado
+</label>
+
+<select
+  id="historyStatusFilter"
+  onchange="loadHistory()"
+>
+
+<option value="todos">
+Todos
+</option>
+
+<option value="pendiente">
+Pendientes
+</option>
+
+<option value="asignada">
+Asignadas
+</option>
+
+<option value="entregada">
+Entregadas
+</option>
+
+<option value="cancelada">
+Canceladas
+</option>
+
+</select>
+
+</div>
+
+<div id="historyList">
+
+<div class="loading">
+Cargando historial...
+</div>
+
+</div>
+
+<button
+  class="btn alt"
+  onclick="show('home')"
+>
+Volver
+</button>
 
 </section>
 
@@ -985,6 +1172,30 @@ Cargando socios...
 
 <div class="card">
 
+<div class="top">
+
+<b>
+📜 Historial de solicitudes
+</b>
+
+<button
+  class="badge"
+  onclick="loadAdminHistory()"
+>
+🔄
+</button>
+
+</div>
+
+<div id="adminHistory">
+Cargando historial...
+</div>
+
+</div>
+
+
+<div class="card">
+
 <b>
 📦 Última solicitud
 </b>
@@ -1008,6 +1219,10 @@ Inicio
 
 <button onclick="show('request')">
 Solicitar
+</button>
+
+<button onclick="openHistory()">
+📜 Historial
 </button>
 
 <button onclick="openPartnerHome()">
@@ -1168,6 +1383,77 @@ function checkSupabase(){
 }
 
 
+function formatHistoryDate(value){
+
+  if(!value)
+    return 'Fecha no disponible';
+
+  try{
+
+    const date = new Date(value);
+
+    if(Number.isNaN(date.getTime()))
+      return String(value);
+
+    return date.toLocaleString(
+      'es-CO',
+      {
+        dateStyle:'short',
+        timeStyle:'short'
+      }
+    );
+
+  }catch(error){
+
+    return String(value);
+
+  }
+
+}
+
+
+function getStatusClass(status){
+
+  const estado =
+    String(status || '')
+      .toLowerCase()
+      .trim();
+
+  if(estado === 'entregada')
+    return 'status-entregada';
+
+  if(estado === 'asignada')
+    return 'status-asignada';
+
+  if(estado === 'cancelada')
+    return 'status-cancelada';
+
+  return 'status-pendiente';
+
+}
+
+
+function getStatusIcon(status){
+
+  const estado =
+    String(status || '')
+      .toLowerCase()
+      .trim();
+
+  if(estado === 'entregada')
+    return '🟢';
+
+  if(estado === 'asignada')
+    return '🔵';
+
+  if(estado === 'cancelada')
+    return '🔴';
+
+  return '🟡';
+
+}
+
+
 /* =====================================================
    NAVEGACIÓN
 ===================================================== */
@@ -1206,6 +1492,15 @@ function openPartnerHome(){
   show('partnerHome');
 
   loadPartners();
+
+}
+
+
+function openHistory(){
+
+  show('history');
+
+  loadHistory();
 
 }
 
@@ -1292,6 +1587,8 @@ async function openAdmin(){
     show('admin');
 
     await loadPartners();
+
+    await loadAdminHistory();
 
 
   }catch(error){
@@ -1447,6 +1744,8 @@ async function loginAdmin(){
     show('admin');
 
     await loadPartners();
+
+    await loadAdminHistory();
 
 
   }catch(error){
@@ -2416,6 +2715,13 @@ async function sendDemand(){
     `;
 
 
+    /* NUEVO: actualizar historial */
+
+    await loadHistory();
+
+    await loadAdminHistory();
+
+
     await loadPartners();
 
 
@@ -2869,6 +3175,10 @@ async function acceptService(){
 
 
     await loadPartners();
+
+    await loadHistory();
+
+    await loadAdminHistory();
 
     show('active');
 
@@ -3365,6 +3675,10 @@ async function acceptPartnerDemand(){
 
     await loadPartners();
 
+    await loadHistory();
+
+    await loadAdminHistory();
+
     show('active');
 
 
@@ -3663,6 +3977,10 @@ async function deliver(){
 
     await loadPartners();
 
+    await loadHistory();
+
+    await loadAdminHistory();
+
 
     const socioActual =
       socios.find(
@@ -3713,6 +4031,410 @@ async function deliver(){
 
     button.textContent =
       '📦 Confirmar entrega';
+
+  }
+
+}
+
+
+/* =====================================================
+   HISTORIAL - CARGAR
+===================================================== */
+
+async function loadHistory(){
+
+  if(!checkSupabase())
+    return;
+
+
+  const historyList =
+    document.getElementById(
+      'historyList'
+    );
+
+
+  if(!historyList)
+    return;
+
+
+  historyList.innerHTML = `
+
+    <div class="loading">
+      ⏳ Cargando historial...
+    </div>
+
+  `;
+
+
+  const filter =
+    document.getElementById(
+      'historyStatusFilter'
+    )?.value ||
+    'todos';
+
+
+  try{
+
+    let query =
+      supabaseClient
+        .from('solicitudes')
+        .select('*')
+        .order(
+          'id',
+          {
+            ascending:false
+          }
+        )
+        .limit(100);
+
+
+    if(filter !== 'todos'){
+
+      query =
+        query.eq(
+          'estado',
+          filter
+        );
+
+    }
+
+
+    const {
+      data,
+      error
+    } =
+      await query;
+
+
+    if(error){
+
+      console.error(
+        'ERROR HISTORIAL:',
+        error
+      );
+
+
+      historyList.innerHTML = `
+
+        <div class="error">
+
+          ❌ No se pudo cargar el historial.
+
+          <code>${escapeHtml(
+            formatSupabaseError(error)
+          )}</code>
+
+        </div>
+
+      `;
+
+      return;
+
+    }
+
+
+    const solicitudes =
+      data || [];
+
+
+    if(solicitudes.length === 0){
+
+      historyList.innerHTML = `
+
+        <div class="empty">
+
+          📭 No hay solicitudes
+          en el historial.
+
+        </div>
+
+      `;
+
+      return;
+
+    }
+
+
+    historyList.innerHTML =
+      solicitudes
+        .map(renderHistoryCard)
+        .join('');
+
+
+  }catch(error){
+
+    console.error(error);
+
+
+    historyList.innerHTML = `
+
+      <div class="error">
+
+        ❌ Error cargando historial.
+
+        <code>${escapeHtml(
+          error.message ||
+          String(error)
+        )}</code>
+
+      </div>
+
+    `;
+
+  }
+
+}
+
+
+/* =====================================================
+   HISTORIAL - TARJETA
+===================================================== */
+
+function renderHistoryCard(solicitud){
+
+  const estado =
+    String(
+      solicitud.estado || 'pendiente'
+    )
+    .toLowerCase()
+    .trim();
+
+
+  const statusClass =
+    getStatusClass(estado);
+
+
+  const icon =
+    getStatusIcon(estado);
+
+
+  const socio =
+    solicitud.socio_nombre ||
+    solicitud.nombre_socio ||
+    solicitud.socio ||
+    null;
+
+
+  return `
+
+    <div class="history-card">
+
+      <div class="top">
+
+        <div>
+
+          <div class="history-title">
+
+            📦 Solicitud #${escapeHtml(
+              String(solicitud.id)
+            )}
+
+          </div>
+
+          <div class="history-date">
+
+            ${escapeHtml(
+              formatHistoryDate(
+                solicitud.created_at ||
+                solicitud.fecha ||
+                solicitud.created
+              )
+            )}
+
+          </div>
+
+        </div>
+
+
+        <span class="pill ${statusClass}">
+
+          ${icon}
+
+          ${escapeHtml(
+            estado
+          )}
+
+        </span>
+
+      </div>
+
+
+      <div class="history-info">
+
+        <b>📍 Ruta</b>
+
+        <br>
+
+        ${escapeHtml(
+          solicitud.origen || '-'
+        )}
+
+        →
+
+        ${escapeHtml(
+          solicitud.destino || '-'
+        )}
+
+        <br><br>
+
+        <b>📦 Mercancía:</b>
+
+        ${escapeHtml(
+          solicitud.mercancia || '-'
+        )}
+
+        <br>
+
+        <b>⚖️ Cantidad:</b>
+
+        ${escapeHtml(
+          String(
+            solicitud.cantidas ??
+            solicitud.cantidad ??
+            '-'
+          )
+        )}
+
+        ${escapeHtml(
+          solicitud.unidad || ''
+        )}
+
+        ${
+          socio
+          ?
+          `
+            <br>
+
+            <b>🚚 Socio:</b>
+
+            ${escapeHtml(
+              socio
+            )}
+          `
+          :
+          ''
+        }
+
+      </div>
+
+    </div>
+
+  `;
+
+}
+
+
+/* =====================================================
+   HISTORIAL CENTRAL
+===================================================== */
+
+async function loadAdminHistory(){
+
+  if(!checkSupabase())
+    return;
+
+
+  const container =
+    document.getElementById(
+      'adminHistory'
+    );
+
+
+  if(!container)
+    return;
+
+
+  container.innerHTML = `
+
+    <div class="loading">
+      ⏳ Cargando historial...
+    </div>
+
+  `;
+
+
+  try{
+
+    const {
+      data,
+      error
+    } =
+      await supabaseClient
+        .from('solicitudes')
+        .select('*')
+        .order(
+          'id',
+          {
+            ascending:false
+          }
+        )
+        .limit(20);
+
+
+    if(error){
+
+      container.innerHTML = `
+
+        <div class="error">
+
+          ❌ No se pudo cargar el historial.
+
+          <code>${escapeHtml(
+            formatSupabaseError(error)
+          )}</code>
+
+        </div>
+
+      `;
+
+      return;
+
+    }
+
+
+    const solicitudes =
+      data || [];
+
+
+    if(solicitudes.length === 0){
+
+      container.innerHTML = `
+
+        <div class="empty">
+
+          📭 No hay solicitudes registradas.
+
+        </div>
+
+      `;
+
+      return;
+
+    }
+
+
+    container.innerHTML =
+      solicitudes
+        .map(renderHistoryCard)
+        .join('');
+
+
+  }catch(error){
+
+    container.innerHTML = `
+
+      <div class="error">
+
+        ❌ Error cargando historial.
+
+        <code>${escapeHtml(
+          error.message ||
+          String(error)
+        )}</code>
+
+      </div>
+
+    `;
 
   }
 
@@ -3890,8 +4612,87 @@ async function actualizarSociosAutomaticamente(){
 }
 
 
+/* =====================================================
+   ACTUALIZACIÓN AUTOMÁTICA DEL HISTORIAL
+===================================================== */
+
+let actualizandoHistorial = false;
+
+async function actualizarHistorialAutomaticamente(){
+
+  if(!supabaseClient)
+    return;
+
+
+  if(actualizandoHistorial)
+    return;
+
+
+  const historyScreen =
+    document.getElementById(
+      'history'
+    );
+
+
+  const adminScreen =
+    document.getElementById(
+      'admin'
+    );
+
+
+  const historialVisible =
+    historyScreen?.classList.contains('active');
+
+
+  const adminVisible =
+    adminScreen?.classList.contains('active');
+
+
+  if(!historialVisible && !adminVisible)
+    return;
+
+
+  actualizandoHistorial = true;
+
+
+  try{
+
+    if(historialVisible)
+      await loadHistory();
+
+
+    if(adminVisible)
+      await loadAdminHistory();
+
+
+  }catch(error){
+
+    console.error(
+      'Actualización automática del historial:',
+      error
+    );
+
+  }finally{
+
+    actualizandoHistorial = false;
+
+  }
+
+}
+
+
+/* =====================================================
+   INTERVALOS
+===================================================== */
+
 setInterval(
   actualizarSociosAutomaticamente,
+  5000
+);
+
+
+setInterval(
+  actualizarHistorialAutomaticamente,
   5000
 );
 
