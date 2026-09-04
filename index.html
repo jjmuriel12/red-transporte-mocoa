@@ -341,10 +341,7 @@ hr{
 
 <main>
 
-
-<!-- =====================================================
-     INICIO
-===================================================== -->
+<!-- INICIO -->
 
 <section id="home" class="screen active">
 
@@ -397,9 +394,7 @@ La central buscará los socios disponibles.
 </section>
 
 
-<!-- =====================================================
-     SOLICITUD
-===================================================== -->
+<!-- SOLICITUD -->
 
 <section id="request" class="screen">
 
@@ -524,9 +519,7 @@ Volver
 </section>
 
 
-<!-- =====================================================
-     MATCHING
-===================================================== -->
+<!-- MATCHING -->
 
 <section id="matching" class="screen">
 
@@ -564,9 +557,7 @@ Nueva solicitud
 </section>
 
 
-<!-- =====================================================
-     ASIGNACIÓN
-===================================================== -->
+<!-- ASIGNACIÓN -->
 
 <section id="assignment" class="screen">
 
@@ -596,9 +587,7 @@ Volver
 </section>
 
 
-<!-- =====================================================
-     SERVICIO ACTIVO
-===================================================== -->
+<!-- SERVICIO ACTIVO -->
 
 <section id="active" class="screen">
 
@@ -671,9 +660,7 @@ Estado del servicio
 </section>
 
 
-<!-- =====================================================
-     ENTREGA
-===================================================== -->
+<!-- ENTREGA -->
 
 <section id="delivered" class="screen">
 
@@ -719,9 +706,7 @@ Nueva solicitud
 </section>
 
 
-<!-- =====================================================
-     PANEL SOCIO
-===================================================== -->
+<!-- PANEL SOCIO -->
 
 <section id="partnerHome" class="screen">
 
@@ -777,9 +762,7 @@ Volver
 </section>
 
 
-<!-- =====================================================
-     DEMANDA SOCIO
-===================================================== -->
+<!-- DEMANDA SOCIO -->
 
 <section id="partnerDemand" class="screen">
 
@@ -821,9 +804,7 @@ Volver
 </section>
 
 
-<!-- =====================================================
-     LOGIN ADMIN
-===================================================== -->
+<!-- LOGIN ADMIN -->
 
 <section id="adminLogin" class="screen">
 
@@ -886,9 +867,7 @@ Volver
 </section>
 
 
-<!-- =====================================================
-     CENTRAL
-===================================================== -->
+<!-- CENTRAL -->
 
 <section id="admin" class="screen">
 
@@ -1019,9 +998,7 @@ No hay solicitudes cargadas.
 </section>
 
 
-<!-- =====================================================
-     NAVEGACIÓN
-===================================================== -->
+<!-- NAVEGACIÓN -->
 
 <div class="nav">
 
@@ -1048,9 +1025,7 @@ Central
 </div>
 
 
-<!-- =====================================================
-     SUPABASE
-===================================================== -->
+<!-- SUPABASE -->
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -3410,7 +3385,7 @@ async function acceptPartnerDemand(){
 
 /* =====================================================
    ENTREGAR SERVICIO
-   ===================================================== */
+===================================================== */
 
 async function deliver(){
 
@@ -3451,14 +3426,6 @@ async function deliver(){
 
   try{
 
-    /*
-      =================================================
-      PASO 1
-      Buscamos nuevamente la solicitud en Supabase.
-      NO usamos únicamente selectedPartner.
-      =================================================
-    */
-
     const {
       data: solicitud,
       error: consultaError
@@ -3492,13 +3459,6 @@ async function deliver(){
     }
 
 
-    /*
-      =================================================
-      PASO 2
-      Obtenemos el ID REAL DEL SOCIO.
-      =================================================
-    */
-
     const socioId =
       solicitud.socio_id ||
       selectedPartner?.id ||
@@ -3514,13 +3474,6 @@ async function deliver(){
 
     }
 
-
-    /*
-      =================================================
-      PASO 3
-      Marcamos la solicitud como ENTREGADA.
-      =================================================
-    */
 
     const {
       data: solicitudEntregada,
@@ -3554,10 +3507,6 @@ async function deliver(){
 
     }
 
-
-    /*
-      Si no se actualizó, verificamos si ya estaba entregada.
-    */
 
     if(!solicitudEntregada){
 
@@ -3599,21 +3548,6 @@ async function deliver(){
     }
 
 
-    /*
-      =================================================
-      PASO 4
-      AQUÍ ESTÁ LA MODIFICACIÓN IMPORTANTE.
-      
-      Liberamos el SOCIO REAL relacionado con
-      la solicitud.
-      
-      Solo cambia:
-      
-          ocupado -> disponible
-      
-      =================================================
-    */
-
     const {
       data: socioLiberado,
       error: socioError
@@ -3646,14 +3580,6 @@ async function deliver(){
 
     }
 
-
-    /*
-      =================================================
-      PASO 5
-      Verificamos directamente en Supabase que quedó
-      disponible.
-      =================================================
-    */
 
     const {
       data: socioVerificado,
@@ -3706,13 +3632,6 @@ async function deliver(){
     }
 
 
-    /*
-      =================================================
-      PASO 6
-      Actualizamos las variables locales.
-      =================================================
-    */
-
     currentDemand =
       solicitudEntregada ||
       solicitud;
@@ -3742,19 +3661,8 @@ async function deliver(){
       'Socio';
 
 
-    /*
-      =================================================
-      PASO 7
-      Recargamos todos los socios desde Supabase.
-      =================================================
-    */
-
     await loadPartners();
 
-
-    /*
-      Limpiamos el servicio activo.
-    */
 
     const socioActual =
       socios.find(
@@ -3924,12 +3832,6 @@ async function actualizarSociosAutomaticamente(){
         .trim()
         !== 'disponible'
       ){
-
-        /*
-          No borramos el socio si estamos en
-          servicio activo. Solo evitamos usarlo
-          como selección disponible.
-        */
 
         if(
           document
