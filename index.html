@@ -308,8 +308,6 @@ hr{
   margin:18px 0;
 }
 
-/* NUEVO: aviso de actualización */
-
 .live-status{
   background:#e8f7eb;
   border:1px solid #b8dfbd;
@@ -626,7 +624,7 @@ Socio transportador
 -
 </p>
 
-<div class="pill">
+<div class="pill red">
 🔴 EN SERVICIO
 </div>
 
@@ -668,6 +666,8 @@ Estado del servicio
 📦 Confirmar entrega
 </button>
 
+<div id="deliveryError"></div>
+
 </section>
 
 
@@ -700,8 +700,12 @@ ha terminado el servicio.
 </p>
 
 <h3>
-Disponible para nuevas solicitudes
+🟢 Disponible para nuevas solicitudes
 </h3>
+
+<div class="success">
+El socio fue liberado correctamente y ya aparece como disponible.
+</div>
 
 </div>
 
@@ -2010,15 +2014,6 @@ async function selectPartner(id){
     return;
 
 
-  /*
-    MUY IMPORTANTE:
-    Antes de mostrar la pantalla de asignación,
-    consultamos nuevamente Supabase.
-
-    Así evitamos seleccionar un socio que
-    otra aplicación acaba de ocupar.
-  */
-
   try{
 
     const {
@@ -2614,7 +2609,6 @@ function renderMatchingPartner(socio){
 
 /* =====================================================
    ASIGNAR SERVICIO
-   NUEVA LÓGICA ANTI-DOBLE ASIGNACIÓN
 ===================================================== */
 
 async function acceptService(){
@@ -2667,15 +2661,6 @@ async function acceptService(){
 
   try{
 
-    /*
-      PASO 1
-      Intentamos cambiar el socio de
-      disponible -> ocupado.
-
-      La condición .eq('estado','disponible')
-      es fundamental.
-    */
-
     const {
       data: socioActualizado,
       error: socioError
@@ -2699,18 +2684,11 @@ async function acceptService(){
 
     if(socioError){
 
-      console.error(
-        'Error ocupando socio:',
-        socioError
-      );
-
-
       errorBox.innerHTML = `
 
         <div class="error">
 
-          ❌ No se pudo verificar
-          la disponibilidad.
+          ❌ No se pudo ocupar el socio.
 
           <code>${escapeHtml(
             formatSupabaseError(socioError)
@@ -2725,12 +2703,6 @@ async function acceptService(){
     }
 
 
-    /*
-      Si no regresó ningún socio,
-      significa que otra aplicación
-      ya lo ocupó.
-    */
-
     if(!socioActualizado){
 
       errorBox.innerHTML = `
@@ -2743,10 +2715,6 @@ async function acceptService(){
           )}</b>
 
           ya no está disponible.
-
-          <br><br>
-
-          Otro usuario acaba de asignarlo.
 
         </div>
 
@@ -2762,11 +2730,6 @@ async function acceptService(){
 
     }
 
-
-    /*
-      PASO 2
-      Ahora asignamos la solicitud.
-    */
 
     const {
       data: solicitudActualizada,
@@ -2795,11 +2758,6 @@ async function acceptService(){
 
 
     if(solicitudError){
-
-      /*
-        Si falló la solicitud,
-        liberamos nuevamente al socio.
-      */
 
       await supabaseClient
         .from('socios')
@@ -2834,11 +2792,6 @@ async function acceptService(){
 
     }
 
-
-    /*
-      Si no hubo solicitud actualizada,
-      otra app ya tomó la solicitud.
-    */
 
     if(!solicitudActualizada){
 
@@ -2882,10 +2835,6 @@ async function acceptService(){
     currentDemand =
       solicitudActualizada;
 
-
-    /*
-      Mostrar servicio activo.
-    */
 
     document.getElementById(
       'activePartner'
@@ -2944,13 +2893,7 @@ async function acceptService(){
     `;
 
 
-    /*
-      Actualizar inmediatamente
-      la lista de socios.
-    */
-
     await loadPartners();
-
 
     show('active');
 
@@ -3046,15 +2989,8 @@ async function openPartnerDemand(){
     }
 
 
-    if(data){
-
-      currentDemand = data;
-
-    }else{
-
-      currentDemand = null;
-
-    }
+    currentDemand =
+      data || null;
 
 
   }catch(error){
@@ -3186,18 +3122,8 @@ async function acceptPartnerDemand(){
   }
 
 
-  /*
-    Recargamos los socios antes de aceptar.
-    Esto evita trabajar con información vieja.
-  */
-
   await loadPartners();
 
-
-  /*
-    Si hay un socio seleccionado, lo volvemos
-    a consultar directamente.
-  */
 
   if(selectedPartner){
 
@@ -3231,11 +3157,6 @@ async function acceptPartnerDemand(){
 
   }
 
-
-  /*
-    Si no hay socio seleccionado,
-    usamos uno disponible.
-  */
 
   if(!selectedPartner){
 
@@ -3272,11 +3193,6 @@ async function acceptPartnerDemand(){
 
 
   try{
-
-    /*
-      Ocupamos el socio solamente si
-      sigue disponible.
-    */
 
     const {
       data: socioActualizado,
@@ -3329,10 +3245,6 @@ async function acceptPartnerDemand(){
 
     }
 
-
-    /*
-      Asignamos la solicitud.
-    */
 
     const {
       data: solicitudActualizada,
@@ -3497,8 +3409,8 @@ async function acceptPartnerDemand(){
 
 
 /* =====================================================
-   ENTREGAR
-===================================================== */
+   ENTREGAR SERVICIO
+   ===================================================== */
 
 async function deliver(){
 
@@ -3508,7 +3420,9 @@ async function deliver(){
 
   if(!currentDemand){
 
-    show('home');
+    alert(
+      'No hay un servicio activo.'
+    );
 
     return;
 
@@ -3521,16 +3435,96 @@ async function deliver(){
     );
 
 
+  const errorBox =
+    document.getElementById(
+      'deliveryError'
+    );
+
+
   button.disabled = true;
 
   button.textContent =
-    '⏳ Registrando entrega...';
+    '⏳ Finalizando servicio...';
+
+  errorBox.innerHTML = '';
 
 
   try{
 
+    /*
+      =================================================
+      PASO 1
+      Buscamos nuevamente la solicitud en Supabase.
+      NO usamos únicamente selectedPartner.
+      =================================================
+    */
+
     const {
-      error
+      data: solicitud,
+      error: consultaError
+    } =
+      await supabaseClient
+        .from('solicitudes')
+        .select('*')
+        .eq(
+          'id',
+          currentDemand.id
+        )
+        .maybeSingle();
+
+
+    if(consultaError){
+
+      throw new Error(
+        'No se pudo consultar la solicitud:\n' +
+        formatSupabaseError(consultaError)
+      );
+
+    }
+
+
+    if(!solicitud){
+
+      throw new Error(
+        'La solicitud ya no existe en Supabase.'
+      );
+
+    }
+
+
+    /*
+      =================================================
+      PASO 2
+      Obtenemos el ID REAL DEL SOCIO.
+      =================================================
+    */
+
+    const socioId =
+      solicitud.socio_id ||
+      selectedPartner?.id ||
+      null;
+
+
+    if(!socioId){
+
+      throw new Error(
+        'La solicitud no tiene socio_id. ' +
+        'No se puede liberar el socio automáticamente.'
+      );
+
+    }
+
+
+    /*
+      =================================================
+      PASO 3
+      Marcamos la solicitud como ENTREGADA.
+      =================================================
+    */
+
+    const {
+      data: solicitudEntregada,
+      error: entregaError
     } =
       await supabaseClient
         .from('solicitudes')
@@ -3541,45 +3535,63 @@ async function deliver(){
         })
         .eq(
           'id',
-          currentDemand.id
-        );
+          solicitud.id
+        )
+        .eq(
+          'estado',
+          'asignada'
+        )
+        .select()
+        .maybeSingle();
 
 
-    if(error){
+    if(entregaError){
 
-      alert(
-        'No se pudo registrar la entrega:\n\n' +
-        formatSupabaseError(error)
+      throw new Error(
+        'No se pudo registrar la entrega:\n' +
+        formatSupabaseError(entregaError)
       );
-
-      return;
 
     }
 
 
-    if(selectedPartner){
+    /*
+      Si no se actualizó, verificamos si ya estaba entregada.
+    */
+
+    if(!solicitudEntregada){
 
       const {
-        error: partnerError
+        data: verificacionSolicitud,
+        error: verificacionError
       } =
         await supabaseClient
-          .from('socios')
-          .update({
-
-            estado:'disponible'
-
-          })
+          .from('solicitudes')
+          .select('estado,socio_id')
           .eq(
             'id',
-            selectedPartner.id
-          );
+            solicitud.id
+          )
+          .maybeSingle();
 
 
-      if(partnerError){
+      if(verificacionError){
 
-        console.error(
-          'Error liberando socio:',
-          partnerError
+        throw new Error(
+          'No se pudo verificar el estado de la solicitud:\n' +
+          formatSupabaseError(verificacionError)
+        );
+
+      }
+
+
+      if(
+        verificacionSolicitud &&
+        verificacionSolicitud.estado !== 'entregada'
+      ){
+
+        throw new Error(
+          'La solicitud no pudo cambiar a entregada.'
         );
 
       }
@@ -3587,17 +3599,205 @@ async function deliver(){
     }
 
 
-    show('delivered');
+    /*
+      =================================================
+      PASO 4
+      AQUÍ ESTÁ LA MODIFICACIÓN IMPORTANTE.
+      
+      Liberamos el SOCIO REAL relacionado con
+      la solicitud.
+      
+      Solo cambia:
+      
+          ocupado -> disponible
+      
+      =================================================
+    */
+
+    const {
+      data: socioLiberado,
+      error: socioError
+    } =
+      await supabaseClient
+        .from('socios')
+        .update({
+
+          estado:'disponible'
+
+        })
+        .eq(
+          'id',
+          socioId
+        )
+        .eq(
+          'estado',
+          'ocupado'
+        )
+        .select()
+        .maybeSingle();
+
+
+    if(socioError){
+
+      throw new Error(
+        'La entrega se registró, pero NO se pudo liberar el socio:\n' +
+        formatSupabaseError(socioError)
+      );
+
+    }
+
+
+    /*
+      =================================================
+      PASO 5
+      Verificamos directamente en Supabase que quedó
+      disponible.
+      =================================================
+    */
+
+    const {
+      data: socioVerificado,
+      error: verificarSocioError
+    } =
+      await supabaseClient
+        .from('socios')
+        .select('id,nombre,estado')
+        .eq(
+          'id',
+          socioId
+        )
+        .maybeSingle();
+
+
+    if(verificarSocioError){
+
+      throw new Error(
+        'No se pudo verificar el nuevo estado del socio:\n' +
+        formatSupabaseError(verificarSocioError)
+      );
+
+    }
+
+
+    if(!socioVerificado){
+
+      throw new Error(
+        'El socio no fue encontrado después de finalizar el servicio.'
+      );
+
+    }
+
+
+    if(
+      String(
+        socioVerificado.estado || ''
+      )
+      .toLowerCase()
+      .trim()
+      !== 'disponible'
+    ){
+
+      throw new Error(
+        'El servicio terminó, pero el socio todavía aparece como "' +
+        socioVerificado.estado +
+        '".'
+      );
+
+    }
+
+
+    /*
+      =================================================
+      PASO 6
+      Actualizamos las variables locales.
+      =================================================
+    */
+
+    currentDemand =
+      solicitudEntregada ||
+      solicitud;
+
+
+    selectedPartner = {
+
+      ...(selectedPartner || {}),
+
+      id:socioVerificado.id,
+
+      nombre:
+        socioVerificado.nombre ||
+        selectedPartner?.nombre ||
+        'Socio',
+
+      estado:'disponible'
+
+    };
+
+
+    document.getElementById(
+      'deliveredPartner'
+    ).textContent =
+      socioVerificado.nombre ||
+      selectedPartner.nombre ||
+      'Socio';
+
+
+    /*
+      =================================================
+      PASO 7
+      Recargamos todos los socios desde Supabase.
+      =================================================
+    */
 
     await loadPartners();
 
 
+    /*
+      Limpiamos el servicio activo.
+    */
+
+    const socioActual =
+      socios.find(
+        s =>
+          String(s.id) ===
+          String(socioId)
+      );
+
+
+    if(socioActual){
+
+      selectedPartner =
+        socioActual;
+
+    }
+
+
+    show('delivered');
+
+
   }catch(error){
 
-    alert(
-      'Error:\n\n' +
-      error.message
+    console.error(
+      'ERROR FINALIZANDO SERVICIO:',
+      error
     );
+
+
+    errorBox.innerHTML = `
+
+      <div class="error">
+
+        ❌ <b>No se pudo finalizar completamente el servicio.</b>
+
+        <code>${escapeHtml(
+          error.message ||
+          String(error)
+        )}</code>
+
+      </div>
+
+    `;
+
 
   }finally{
 
@@ -3637,6 +3837,19 @@ function resetApp(){
   ).innerHTML = '';
 
 
+  const deliveryError =
+    document.getElementById(
+      'deliveryError'
+    );
+
+
+  if(deliveryError){
+
+    deliveryError.innerHTML = '';
+
+  }
+
+
   show('request');
 
 }
@@ -3646,13 +3859,6 @@ function resetApp(){
    ACTUALIZACIÓN AUTOMÁTICA
 ===================================================== */
 
-/*
-  Cada 5 segundos consultamos nuevamente Supabase.
-
-  Esto hace que si APP 1 ocupa a Gabriel,
-  APP 2 actualice su lista y lo muestre como ocupado.
-*/
-
 let actualizandoSocios = false;
 
 async function actualizarSociosAutomaticamente(){
@@ -3660,14 +3866,13 @@ async function actualizarSociosAutomaticamente(){
   if(!supabaseClient)
     return;
 
-  /*
-    Evita dos consultas simultáneas.
-  */
 
   if(actualizandoSocios)
     return;
 
+
   actualizandoSocios = true;
+
 
   try{
 
@@ -3696,22 +3901,10 @@ async function actualizarSociosAutomaticamente(){
     socios = data || [];
 
 
-    /*
-      Redibujar las listas.
-    */
-
     renderPartners();
 
     updateNetworkStats();
 
-
-    /*
-      Si tenemos un socio seleccionado,
-      comprobamos si sigue disponible.
-
-      Esto evita que una selección vieja
-      permanezca abierta si otra app lo ocupó.
-    */
 
     if(selectedPartner){
 
@@ -3732,31 +3925,45 @@ async function actualizarSociosAutomaticamente(){
         !== 'disponible'
       ){
 
-        selectedPartner = null;
+        /*
+          No borramos el socio si estamos en
+          servicio activo. Solo evitamos usarlo
+          como selección disponible.
+        */
+
+        if(
+          document
+            .getElementById('assignment')
+            ?.classList.contains('active')
+        ){
+
+          selectedPartner = null;
 
 
-        const errorBox =
-          document.getElementById(
-            'assignmentError'
-          );
+          const errorBox =
+            document.getElementById(
+              'assignmentError'
+            );
 
 
-        if(errorBox){
+          if(errorBox){
 
-          errorBox.innerHTML = `
+            errorBox.innerHTML = `
 
-            <div class="error">
+              <div class="error">
 
-              🔴 El socio seleccionado acaba
-              de ser ocupado por otro usuario.
+                🔴 El socio seleccionado acaba
+                de ser ocupado por otro usuario.
 
-              <br><br>
+                <br><br>
 
-              Selecciona otro socio disponible.
+                Selecciona otro socio disponible.
 
-            </div>
+              </div>
 
-          `;
+            `;
+
+          }
 
         }
 
@@ -3781,10 +3988,6 @@ async function actualizarSociosAutomaticamente(){
 }
 
 
-/*
-  Actualización cada 5 segundos.
-*/
-
 setInterval(
   actualizarSociosAutomaticamente,
   5000
@@ -3800,10 +4003,6 @@ document.addEventListener(
   async () => {
 
     await loadPartners();
-
-    /*
-      Primera actualización inmediata.
-    */
 
     await actualizarSociosAutomaticamente();
 
