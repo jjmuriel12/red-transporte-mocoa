@@ -173,11 +173,6 @@ select:focus{
   color:#9b2222;
 }
 
-.pill.yellow{
-  background:#fff5dd;
-  color:#8a6500;
-}
-
 .price{
   font-size:21px;
   font-weight:800;
@@ -324,81 +319,6 @@ hr{
   text-align:center;
 }
 
-/* =====================================================
-   HISTORIAL
-===================================================== */
-
-.history-header{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:8px;
-}
-
-.history-card{
-  border:1px solid #dce4e9;
-  border-radius:14px;
-  padding:14px;
-  margin:12px 0;
-  background:#fff;
-}
-
-.history-card .history-title{
-  font-weight:800;
-  font-size:15px;
-}
-
-.history-card .history-date{
-  font-size:11px;
-  color:#7a8790;
-  margin-top:4px;
-}
-
-.history-info{
-  margin-top:10px;
-  font-size:13px;
-  line-height:1.65;
-}
-
-.history-status{
-  margin-top:10px;
-}
-
-.status-pendiente{
-  background:#fff5dd;
-  color:#8a6500;
-}
-
-.status-asignada{
-  background:#eaf3ff;
-  color:#165b91;
-}
-
-.status-entregada{
-  background:#edf7ef;
-  color:#28702f;
-}
-
-.status-cancelada{
-  background:#ffeaea;
-  color:#9b2222;
-}
-
-.history-filter{
-  margin:12px 0;
-}
-
-.refresh-mini{
-  width:auto;
-  margin:0;
-  padding:8px 10px;
-  font-size:12px;
-}
-
-/* =====================================================
-   FIN HISTORIAL
-===================================================== */
-
 </style>
 
 </head>
@@ -462,13 +382,6 @@ La central buscará los socios disponibles.
   onclick="openPartnerHome()"
 >
 🚚 Soy socio transportador
-</button>
-
-<button
-  class="btn alt"
-  onclick="openHistory()"
->
-📜 Historial de solicitudes
 </button>
 
 <button
@@ -635,13 +548,6 @@ Buscando socios disponibles...
 </div>
 
 <button
-  class="btn"
-  onclick="openHistory()"
->
-📜 Ver historial
-</button>
-
-<button
   class="btn alt"
   onclick="show('request')"
 >
@@ -749,13 +655,6 @@ Estado del servicio
 📦 Confirmar entrega
 </button>
 
-<button
-  class="btn alt"
-  onclick="openHistory()"
->
-📜 Ver historial
-</button>
-
 <div id="deliveryError"></div>
 
 </section>
@@ -799,13 +698,6 @@ El socio fue liberado correctamente y ya aparece como disponible.
 
 <button
   class="btn"
-  onclick="openHistory()"
->
-📜 Ver historial
-</button>
-
-<button
-  class="btn alt"
   onclick="resetApp()"
 >
 Nueva solicitud
@@ -912,85 +804,6 @@ Volver
 </section>
 
 
-<!-- =====================================================
-     HISTORIAL
-===================================================== -->
-
-<section id="history" class="screen">
-
-<div class="history-header">
-
-  <h2>
-    📜 Historial
-  </h2>
-
-  <button
-    class="badge refresh-mini"
-    onclick="loadHistory()"
-  >
-    🔄 Actualizar
-  </button>
-
-</div>
-
-<p>
-Aquí puedes consultar las solicitudes registradas
-en la plataforma.
-</p>
-
-<div class="history-filter">
-
-<label>
-Filtrar por estado
-</label>
-
-<select
-  id="historyStatusFilter"
-  onchange="loadHistory()"
->
-
-<option value="todos">
-Todos
-</option>
-
-<option value="pendiente">
-Pendientes
-</option>
-
-<option value="asignada">
-Asignadas
-</option>
-
-<option value="entregada">
-Entregadas
-</option>
-
-<option value="cancelada">
-Canceladas
-</option>
-
-</select>
-
-</div>
-
-<div id="historyList">
-
-<div class="loading">
-Cargando historial...
-</div>
-
-</div>
-
-<button
-  class="btn alt"
-  onclick="show('home')"
->
-Volver
-</button>
-
-</section>
-
-
 <!-- LOGIN ADMIN -->
 
 <section id="adminLogin" class="screen">
@@ -1089,7 +902,7 @@ Estado de la red
 
 <button
   class="badge"
-  onclick="loadPartners()"
+  onclick="loadPartners(true)"
 >
 🔄 Actualizar
 </button>
@@ -1172,30 +985,6 @@ Cargando socios...
 
 <div class="card">
 
-<div class="top">
-
-<b>
-📜 Historial de solicitudes
-</b>
-
-<button
-  class="badge"
-  onclick="loadAdminHistory()"
->
-🔄
-</button>
-
-</div>
-
-<div id="adminHistory">
-Cargando historial...
-</div>
-
-</div>
-
-
-<div class="card">
-
 <b>
 📦 Última solicitud
 </b>
@@ -1221,10 +1010,6 @@ Inicio
 Solicitar
 </button>
 
-<button onclick="openHistory()">
-📜 Historial
-</button>
-
 <button onclick="openPartnerHome()">
 Socios
 </button>
@@ -1239,8 +1024,6 @@ Central
 
 </div>
 
-
-<!-- SUPABASE -->
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -1311,6 +1094,23 @@ let currentDemand = null;
 
 let selectedPartner = null;
 
+let actualizandoSocios = false;
+
+/*
+   NUEVO:
+   Guarda una "huella" de los socios.
+   Si la información no cambió, NO se vuelve a
+   construir el HTML.
+*/
+let sociosHash = '';
+
+/*
+   NUEVO:
+   Evita que loadPartners y la actualización
+   automática se pisen entre sí.
+*/
+let cargandoSocios = false;
+
 
 /* =====================================================
    UTILIDADES
@@ -1361,6 +1161,33 @@ function formatSupabaseError(error){
 }
 
 
+/*
+   NUEVO:
+   Genera una huella estable de los datos.
+*/
+function crearHashSocios(lista){
+
+  return JSON.stringify(
+    (lista || []).map(s => ({
+
+      id:s.id,
+
+      nombre:s.nombre,
+
+      telefono:s.telefono,
+
+      vehiculo:s.vehiculo,
+
+      capacidad_ton:s.capacidad_ton,
+
+      estado:s.estado
+
+    }))
+  );
+
+}
+
+
 function checkSupabase(){
 
   if(!supabaseClient){
@@ -1379,77 +1206,6 @@ function checkSupabase(){
   }
 
   return true;
-
-}
-
-
-function formatHistoryDate(value){
-
-  if(!value)
-    return 'Fecha no disponible';
-
-  try{
-
-    const date = new Date(value);
-
-    if(Number.isNaN(date.getTime()))
-      return String(value);
-
-    return date.toLocaleString(
-      'es-CO',
-      {
-        dateStyle:'short',
-        timeStyle:'short'
-      }
-    );
-
-  }catch(error){
-
-    return String(value);
-
-  }
-
-}
-
-
-function getStatusClass(status){
-
-  const estado =
-    String(status || '')
-      .toLowerCase()
-      .trim();
-
-  if(estado === 'entregada')
-    return 'status-entregada';
-
-  if(estado === 'asignada')
-    return 'status-asignada';
-
-  if(estado === 'cancelada')
-    return 'status-cancelada';
-
-  return 'status-pendiente';
-
-}
-
-
-function getStatusIcon(status){
-
-  const estado =
-    String(status || '')
-      .toLowerCase()
-      .trim();
-
-  if(estado === 'entregada')
-    return '🟢';
-
-  if(estado === 'asignada')
-    return '🔵';
-
-  if(estado === 'cancelada')
-    return '🔴';
-
-  return '🟡';
 
 }
 
@@ -1477,6 +1233,11 @@ function show(id){
 
     target.classList.add('active');
 
+    /*
+       No usamos animaciones ni reconstruimos
+       la página al cambiar de pantalla.
+    */
+
     window.scrollTo({
       top:0,
       behavior:'smooth'
@@ -1492,15 +1253,6 @@ function openPartnerHome(){
   show('partnerHome');
 
   loadPartners();
-
-}
-
-
-function openHistory(){
-
-  show('history');
-
-  loadHistory();
 
 }
 
@@ -1587,8 +1339,6 @@ async function openAdmin(){
     show('admin');
 
     await loadPartners();
-
-    await loadAdminHistory();
 
 
   }catch(error){
@@ -1745,8 +1495,6 @@ async function loginAdmin(){
 
     await loadPartners();
 
-    await loadAdminHistory();
-
 
   }catch(error){
 
@@ -1811,9 +1559,17 @@ async function logoutAdmin(){
    CARGAR SOCIOS
 ===================================================== */
 
-async function loadPartners(){
+async function loadPartners(forzar = false){
 
   if(!checkSupabase())
+    return;
+
+
+  /*
+     Si ya hay una consulta ejecutándose,
+     no iniciamos otra simultáneamente.
+  */
+  if(cargandoSocios && !forzar)
     return;
 
 
@@ -1835,7 +1591,17 @@ async function loadPartners(){
     );
 
 
-  if(partnerList){
+  /*
+     IMPORTANTE:
+     Solo mostramos "Cargando..." cuando realmente
+     no tenemos datos. Durante las actualizaciones
+     automáticas NO tocamos el HTML.
+  */
+
+  if(
+    socios.length === 0 &&
+    partnerList
+  ){
 
     partnerList.innerHTML =
       '<div class="loading">Cargando socios...</div>';
@@ -1843,7 +1609,10 @@ async function loadPartners(){
   }
 
 
-  if(adminPartners){
+  if(
+    socios.length === 0 &&
+    adminPartners
+  ){
 
     adminPartners.innerHTML =
       '<div class="loading">Cargando socios...</div>';
@@ -1851,12 +1620,18 @@ async function loadPartners(){
   }
 
 
-  if(networkStats){
+  if(
+    socios.length === 0 &&
+    networkStats
+  ){
 
     networkStats.innerHTML =
       'Cargando...';
 
   }
+
+
+  cargandoSocios = true;
 
 
   try{
@@ -1910,7 +1685,38 @@ async function loadPartners(){
     }
 
 
-    socios = data || [];
+    const nuevosSocios =
+      data || [];
+
+
+    const nuevoHash =
+      crearHashSocios(
+        nuevosSocios
+      );
+
+
+    /*
+       SI NO CAMBIÓ NADA:
+       no hacemos render.
+       Esta es la corrección principal
+       del parpadeo.
+    */
+
+    if(
+      !forzar &&
+      nuevoHash === sociosHash
+    ){
+
+      return;
+
+    }
+
+
+    socios =
+      nuevosSocios;
+
+    sociosHash =
+      nuevoHash;
 
 
     renderPartners();
@@ -1944,6 +1750,10 @@ async function loadPartners(){
 
     if(adminPartners)
       adminPartners.innerHTML = message;
+
+  }finally{
+
+    cargandoSocios = false;
 
   }
 
@@ -2715,14 +2525,12 @@ async function sendDemand(){
     `;
 
 
-    /* NUEVO: actualizar historial */
-
-    await loadHistory();
-
-    await loadAdminHistory();
-
-
-    await loadPartners();
+    /*
+       Actualización manual:
+       aquí sí queremos refrescar inmediatamente
+       porque acabamos de crear una solicitud.
+    */
+    await loadPartners(true);
 
 
     const disponibles =
@@ -3003,7 +2811,7 @@ async function acceptService(){
 
       selectedPartner = null;
 
-      await loadPartners();
+      await loadPartners(true);
 
       show('matching');
 
@@ -3104,7 +2912,7 @@ async function acceptService(){
 
       selectedPartner = null;
 
-      await loadPartners();
+      await loadPartners(true);
 
       show('matching');
 
@@ -3174,11 +2982,7 @@ async function acceptService(){
     `;
 
 
-    await loadPartners();
-
-    await loadHistory();
-
-    await loadAdminHistory();
+    await loadPartners(true);
 
     show('active');
 
@@ -3522,7 +3326,7 @@ async function acceptPartnerDemand(){
 
       selectedPartner = null;
 
-      await loadPartners();
+      await loadPartners(true);
 
       show('partnerHome');
 
@@ -3607,7 +3411,7 @@ async function acceptPartnerDemand(){
 
       selectedPartner = null;
 
-      await loadPartners();
+      await loadPartners(true);
 
       show('partnerHome');
 
@@ -3673,11 +3477,7 @@ async function acceptPartnerDemand(){
     `;
 
 
-    await loadPartners();
-
-    await loadHistory();
-
-    await loadAdminHistory();
+    await loadPartners(true);
 
     show('active');
 
@@ -3975,11 +3775,7 @@ async function deliver(){
       'Socio';
 
 
-    await loadPartners();
-
-    await loadHistory();
-
-    await loadAdminHistory();
+    await loadPartners(true);
 
 
     const socioActual =
@@ -4038,410 +3834,6 @@ async function deliver(){
 
 
 /* =====================================================
-   HISTORIAL - CARGAR
-===================================================== */
-
-async function loadHistory(){
-
-  if(!checkSupabase())
-    return;
-
-
-  const historyList =
-    document.getElementById(
-      'historyList'
-    );
-
-
-  if(!historyList)
-    return;
-
-
-  historyList.innerHTML = `
-
-    <div class="loading">
-      ⏳ Cargando historial...
-    </div>
-
-  `;
-
-
-  const filter =
-    document.getElementById(
-      'historyStatusFilter'
-    )?.value ||
-    'todos';
-
-
-  try{
-
-    let query =
-      supabaseClient
-        .from('solicitudes')
-        .select('*')
-        .order(
-          'id',
-          {
-            ascending:false
-          }
-        )
-        .limit(100);
-
-
-    if(filter !== 'todos'){
-
-      query =
-        query.eq(
-          'estado',
-          filter
-        );
-
-    }
-
-
-    const {
-      data,
-      error
-    } =
-      await query;
-
-
-    if(error){
-
-      console.error(
-        'ERROR HISTORIAL:',
-        error
-      );
-
-
-      historyList.innerHTML = `
-
-        <div class="error">
-
-          ❌ No se pudo cargar el historial.
-
-          <code>${escapeHtml(
-            formatSupabaseError(error)
-          )}</code>
-
-        </div>
-
-      `;
-
-      return;
-
-    }
-
-
-    const solicitudes =
-      data || [];
-
-
-    if(solicitudes.length === 0){
-
-      historyList.innerHTML = `
-
-        <div class="empty">
-
-          📭 No hay solicitudes
-          en el historial.
-
-        </div>
-
-      `;
-
-      return;
-
-    }
-
-
-    historyList.innerHTML =
-      solicitudes
-        .map(renderHistoryCard)
-        .join('');
-
-
-  }catch(error){
-
-    console.error(error);
-
-
-    historyList.innerHTML = `
-
-      <div class="error">
-
-        ❌ Error cargando historial.
-
-        <code>${escapeHtml(
-          error.message ||
-          String(error)
-        )}</code>
-
-      </div>
-
-    `;
-
-  }
-
-}
-
-
-/* =====================================================
-   HISTORIAL - TARJETA
-===================================================== */
-
-function renderHistoryCard(solicitud){
-
-  const estado =
-    String(
-      solicitud.estado || 'pendiente'
-    )
-    .toLowerCase()
-    .trim();
-
-
-  const statusClass =
-    getStatusClass(estado);
-
-
-  const icon =
-    getStatusIcon(estado);
-
-
-  const socio =
-    solicitud.socio_nombre ||
-    solicitud.nombre_socio ||
-    solicitud.socio ||
-    null;
-
-
-  return `
-
-    <div class="history-card">
-
-      <div class="top">
-
-        <div>
-
-          <div class="history-title">
-
-            📦 Solicitud #${escapeHtml(
-              String(solicitud.id)
-            )}
-
-          </div>
-
-          <div class="history-date">
-
-            ${escapeHtml(
-              formatHistoryDate(
-                solicitud.created_at ||
-                solicitud.fecha ||
-                solicitud.created
-              )
-            )}
-
-          </div>
-
-        </div>
-
-
-        <span class="pill ${statusClass}">
-
-          ${icon}
-
-          ${escapeHtml(
-            estado
-          )}
-
-        </span>
-
-      </div>
-
-
-      <div class="history-info">
-
-        <b>📍 Ruta</b>
-
-        <br>
-
-        ${escapeHtml(
-          solicitud.origen || '-'
-        )}
-
-        →
-
-        ${escapeHtml(
-          solicitud.destino || '-'
-        )}
-
-        <br><br>
-
-        <b>📦 Mercancía:</b>
-
-        ${escapeHtml(
-          solicitud.mercancia || '-'
-        )}
-
-        <br>
-
-        <b>⚖️ Cantidad:</b>
-
-        ${escapeHtml(
-          String(
-            solicitud.cantidas ??
-            solicitud.cantidad ??
-            '-'
-          )
-        )}
-
-        ${escapeHtml(
-          solicitud.unidad || ''
-        )}
-
-        ${
-          socio
-          ?
-          `
-            <br>
-
-            <b>🚚 Socio:</b>
-
-            ${escapeHtml(
-              socio
-            )}
-          `
-          :
-          ''
-        }
-
-      </div>
-
-    </div>
-
-  `;
-
-}
-
-
-/* =====================================================
-   HISTORIAL CENTRAL
-===================================================== */
-
-async function loadAdminHistory(){
-
-  if(!checkSupabase())
-    return;
-
-
-  const container =
-    document.getElementById(
-      'adminHistory'
-    );
-
-
-  if(!container)
-    return;
-
-
-  container.innerHTML = `
-
-    <div class="loading">
-      ⏳ Cargando historial...
-    </div>
-
-  `;
-
-
-  try{
-
-    const {
-      data,
-      error
-    } =
-      await supabaseClient
-        .from('solicitudes')
-        .select('*')
-        .order(
-          'id',
-          {
-            ascending:false
-          }
-        )
-        .limit(20);
-
-
-    if(error){
-
-      container.innerHTML = `
-
-        <div class="error">
-
-          ❌ No se pudo cargar el historial.
-
-          <code>${escapeHtml(
-            formatSupabaseError(error)
-          )}</code>
-
-        </div>
-
-      `;
-
-      return;
-
-    }
-
-
-    const solicitudes =
-      data || [];
-
-
-    if(solicitudes.length === 0){
-
-      container.innerHTML = `
-
-        <div class="empty">
-
-          📭 No hay solicitudes registradas.
-
-        </div>
-
-      `;
-
-      return;
-
-    }
-
-
-    container.innerHTML =
-      solicitudes
-        .map(renderHistoryCard)
-        .join('');
-
-
-  }catch(error){
-
-    container.innerHTML = `
-
-      <div class="error">
-
-        ❌ Error cargando historial.
-
-        <code>${escapeHtml(
-          error.message ||
-          String(error)
-        )}</code>
-
-      </div>
-
-    `;
-
-  }
-
-}
-
-
-/* =====================================================
    REINICIAR
 ===================================================== */
 
@@ -4486,10 +3878,8 @@ function resetApp(){
 
 
 /* =====================================================
-   ACTUALIZACIÓN AUTOMÁTICA
+   ACTUALIZACIÓN AUTOMÁTICA SIN PARPADEO
 ===================================================== */
-
-let actualizandoSocios = false;
 
 async function actualizarSociosAutomaticamente(){
 
@@ -4500,6 +3890,11 @@ async function actualizarSociosAutomaticamente(){
   if(actualizandoSocios)
     return;
 
+
+  /*
+     No usamos loadPartners(true).
+     Solo comprobamos si hubo cambios.
+  */
 
   actualizandoSocios = true;
 
@@ -4528,13 +3923,47 @@ async function actualizarSociosAutomaticamente(){
     }
 
 
-    socios = data || [];
+    const nuevosSocios =
+      data || [];
+
+
+    const nuevoHash =
+      crearHashSocios(
+        nuevosSocios
+      );
+
+
+    /*
+       CLAVE:
+       Si los datos son iguales, salimos.
+       NO se toca el DOM.
+       NO se reconstruyen tarjetas.
+       NO hay parpadeo.
+    */
+
+    if(nuevoHash === sociosHash){
+
+      return;
+
+    }
+
+
+    socios =
+      nuevosSocios;
+
+    sociosHash =
+      nuevoHash;
 
 
     renderPartners();
 
     updateNetworkStats();
 
+
+    /*
+       Verificamos si el socio seleccionado
+       cambió de estado.
+    */
 
     if(selectedPartner){
 
@@ -4612,87 +4041,13 @@ async function actualizarSociosAutomaticamente(){
 }
 
 
-/* =====================================================
-   ACTUALIZACIÓN AUTOMÁTICA DEL HISTORIAL
-===================================================== */
-
-let actualizandoHistorial = false;
-
-async function actualizarHistorialAutomaticamente(){
-
-  if(!supabaseClient)
-    return;
-
-
-  if(actualizandoHistorial)
-    return;
-
-
-  const historyScreen =
-    document.getElementById(
-      'history'
-    );
-
-
-  const adminScreen =
-    document.getElementById(
-      'admin'
-    );
-
-
-  const historialVisible =
-    historyScreen?.classList.contains('active');
-
-
-  const adminVisible =
-    adminScreen?.classList.contains('active');
-
-
-  if(!historialVisible && !adminVisible)
-    return;
-
-
-  actualizandoHistorial = true;
-
-
-  try{
-
-    if(historialVisible)
-      await loadHistory();
-
-
-    if(adminVisible)
-      await loadAdminHistory();
-
-
-  }catch(error){
-
-    console.error(
-      'Actualización automática del historial:',
-      error
-    );
-
-  }finally{
-
-    actualizandoHistorial = false;
-
-  }
-
-}
-
-
-/* =====================================================
-   INTERVALOS
-===================================================== */
+/*
+   Cada 5 segundos sigue comprobando Supabase,
+   pero ya NO reconstruye la pantalla si nada cambió.
+*/
 
 setInterval(
   actualizarSociosAutomaticamente,
-  5000
-);
-
-
-setInterval(
-  actualizarHistorialAutomaticamente,
   5000
 );
 
