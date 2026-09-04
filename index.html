@@ -312,6 +312,16 @@ select:focus{
   margin-top:10px;
 }
 
+.user-box{
+  background:#edf5ff;
+  border:1px solid #b8d6ef;
+  color:#174d72;
+  padding:12px;
+  border-radius:10px;
+  font-size:12px;
+  margin:10px 0;
+}
+
 hr{
   border:0;
   border-top:1px solid #e0e6ea;
@@ -328,8 +338,6 @@ hr{
   margin-top:10px;
   text-align:center;
 }
-
-/* CONTROL ESTADO */
 
 .admin-status-btn{
   width:100%;
@@ -363,43 +371,37 @@ hr{
   margin-top:10px;
 }
 
-/* HISTORIAL */
-
-.history-card{
+.history-item{
   border:1px solid #dce4e9;
-  border-radius:14px;
-  padding:14px;
-  margin:12px 0;
+  border-radius:12px;
+  padding:13px;
+  margin:10px 0;
   background:#fff;
 }
 
 .history-date{
-  background:#eef5fa;
-  color:#173b57;
-  border-radius:9px;
-  padding:8px 10px;
-  font-size:12px;
-  font-weight:700;
-  margin-bottom:10px;
-}
-
-.history-id{
-  font-size:17px;
-  font-weight:800;
-  color:#173b57;
+  font-size:11px;
+  color:#687681;
+  margin-bottom:6px;
 }
 
 .history-status{
-  margin-top:10px;
-}
-
-.history-filter{
-  margin-bottom:12px;
-}
-
-.date-label{
+  display:inline-block;
+  padding:5px 8px;
+  border-radius:20px;
+  background:#edf7ef;
+  color:#28702f;
   font-size:11px;
-  color:#687681;
+  font-weight:700;
+}
+
+.user-actions{
+  display:flex;
+  gap:8px;
+}
+
+.user-actions button{
+  flex:1;
 }
 
 </style>
@@ -412,13 +414,13 @@ hr{
 
 <header>
 
-  <div class="brand">
-    🚛 RED TRANSPORTE MOCOA
-  </div>
+<div class="brand">
+🚛 RED TRANSPORTE MOCOA
+</div>
 
-  <div class="sub">
-    Red local de transporte de mercancías
-  </div>
+<div class="sub">
+Red local de transporte de mercancías
+</div>
 
 </header>
 
@@ -441,6 +443,8 @@ hr{
 Encuentra un socio transportador disponible en Mocoa.
 </p>
 
+<div id="homeUserBox"></div>
+
 <div class="card">
 
 <b>
@@ -455,24 +459,267 @@ La central buscará los socios disponibles.
 </div>
 
 <button
-  class="btn"
-  onclick="show('request')"
+class="btn"
+onclick="abrirSolicitudSeguro()"
 >
 📦 Solicitar transporte
 </button>
 
 <button
-  class="btn alt"
-  onclick="openPartnerHome()"
+class="btn alt"
+onclick="openPartnerHome()"
 >
 🚚 Soy socio transportador
 </button>
 
 <button
-  class="btn alt"
-  onclick="openAdmin()"
+class="btn alt"
+onclick="openUserLogin()"
+>
+👤 Mi cuenta
+</button>
+
+<button
+class="btn alt"
+onclick="openHistory()"
+>
+📋 Mi historial
+</button>
+
+<button
+class="btn alt"
+onclick="openAdmin()"
 >
 🖥️ Central de operaciones
+</button>
+
+</section>
+
+
+<!-- LOGIN USUARIO -->
+
+<section id="userLogin" class="screen">
+
+<div class="login-box">
+
+<h2>
+👤 Iniciar sesión
+</h2>
+
+<p>
+Ingresa para solicitar transporte y consultar tu historial.
+</p>
+
+<div class="card">
+
+<label>
+Correo electrónico
+</label>
+
+<input
+id="userLoginEmail"
+type="email"
+placeholder="Tu correo"
+autocomplete="email"
+>
+
+<label>
+Contraseña
+</label>
+
+<input
+id="userLoginPassword"
+type="password"
+placeholder="Tu contraseña"
+autocomplete="current-password"
+>
+
+<button
+id="userLoginBtn"
+class="btn"
+onclick="loginUsuario()"
+>
+🔐 Iniciar sesión
+</button>
+
+<div id="userLoginError"></div>
+
+<hr>
+
+<button
+class="btn success"
+onclick="openRegister()"
+>
+👤 Crear cuenta
+</button>
+
+</div>
+
+<button
+class="btn alt"
+onclick="show('home')"
+>
+Volver
+</button>
+
+</div>
+
+</section>
+
+
+<!-- REGISTRO -->
+
+<section id="register" class="screen">
+
+<div class="login-box">
+
+<h2>
+👤 Crear cuenta
+</h2>
+
+<p>
+Registra tus datos para identificar quién solicita cada servicio.
+</p>
+
+<div class="card">
+
+<label>
+Nombre completo
+</label>
+
+<input
+id="registerNombre"
+type="text"
+placeholder="Nombre completo"
+>
+
+<label>
+Teléfono
+</label>
+
+<input
+id="registerTelefono"
+type="tel"
+placeholder="Número de teléfono"
+>
+
+<label>
+Correo electrónico
+</label>
+
+<input
+id="registerCorreo"
+type="email"
+placeholder="Correo electrónico"
+autocomplete="email"
+>
+
+<label>
+Contraseña
+</label>
+
+<input
+id="registerPassword"
+type="password"
+placeholder="Mínimo 6 caracteres"
+autocomplete="new-password"
+>
+
+<button
+id="registerBtn"
+class="btn success"
+onclick="registrarUsuario()"
+>
+👤 REGISTRARME
+</button>
+
+<div id="registerError"></div>
+
+</div>
+
+<button
+class="btn alt"
+onclick="openUserLogin()"
+>
+Ya tengo cuenta
+</button>
+
+<button
+class="btn alt"
+onclick="show('home')"
+>
+Volver
+</button>
+
+</div>
+
+</section>
+
+
+<!-- PERFIL -->
+
+<section id="userProfile" class="screen">
+
+<h2>
+👤 Mi cuenta
+</h2>
+
+<div id="profileData"></div>
+
+<button
+class="btn"
+onclick="openHistory()"
+>
+📋 Ver mi historial
+</button>
+
+<button
+class="btn danger"
+onclick="logoutUsuario()"
+>
+🚪 Cerrar sesión
+</button>
+
+<button
+class="btn alt"
+onclick="show('home')"
+>
+Inicio
+</button>
+
+</section>
+
+
+<!-- HISTORIAL -->
+
+<section id="history" class="screen">
+
+<h2>
+📋 Mi historial
+</h2>
+
+<div id="historyUser"></div>
+
+<div id="historyList">
+
+<div class="loading">
+Cargando historial...
+</div>
+
+</div>
+
+<button
+class="btn"
+onclick="loadHistory()"
+>
+🔄 Actualizar historial
+</button>
+
+<button
+class="btn alt"
+onclick="show('home')"
+>
+Volver
 </button>
 
 </section>
@@ -486,14 +733,16 @@ La central buscará los socios disponibles.
 📦 Nueva solicitud
 </h2>
 
+<div id="requestUserBox"></div>
+
 <label>
 Origen
 </label>
 
 <input
-  id="origin"
-  value="Ferretería - Mocoa"
-  placeholder="Lugar de recogida"
+id="origin"
+value="Ferretería - Mocoa"
+placeholder="Lugar de recogida"
 >
 
 <label>
@@ -501,9 +750,9 @@ Destino
 </label>
 
 <input
-  id="dest"
-  value="Vereda El Rumiyaco"
-  placeholder="Lugar de entrega"
+id="dest"
+value="Vereda El Rumiyaco"
+placeholder="Lugar de entrega"
 >
 
 <label>
@@ -511,9 +760,9 @@ Mercancía
 </label>
 
 <input
-  id="cargo"
-  value="Cemento"
-  placeholder="Ej: cemento, arena, alimentos"
+id="cargo"
+value="Cemento"
+placeholder="Ej: cemento, arena, alimentos"
 >
 
 <div class="row">
@@ -525,10 +774,10 @@ Cantidad
 </label>
 
 <input
-  id="quantity"
-  type="number"
-  min="1"
-  value="100"
+id="quantity"
+type="number"
+min="1"
+value="100"
 >
 
 </div>
@@ -584,16 +833,16 @@ Programado
 </select>
 
 <button
-  id="sendDemandBtn"
-  class="btn"
-  onclick="sendDemand()"
+id="sendDemandBtn"
+class="btn"
+onclick="sendDemand()"
 >
 🚀 Buscar socio disponible
 </button>
 
 <button
-  class="btn alt"
-  onclick="show('home')"
+class="btn alt"
+onclick="show('home')"
 >
 Volver
 </button>
@@ -632,8 +881,8 @@ Buscando socios disponibles...
 </div>
 
 <button
-  class="btn alt"
-  onclick="show('request')"
+class="btn alt"
+onclick="show('request')"
 >
 Nueva solicitud
 </button>
@@ -652,16 +901,16 @@ Nueva solicitud
 <div id="selectedPartnerCard"></div>
 
 <button
-  id="assignBtn"
-  class="btn"
-  onclick="acceptService()"
+id="assignBtn"
+class="btn"
+onclick="acceptService()"
 >
 ✅ Asignar servicio
 </button>
 
 <button
-  class="btn alt"
-  onclick="show('matching')"
+class="btn alt"
+onclick="show('matching')"
 >
 Volver
 </button>
@@ -684,6 +933,16 @@ Servicio asignado correctamente.
 </div>
 
 <div class="card">
+
+<b>
+👤 Cliente
+</b>
+
+<div id="activeUser">
+-
+</div>
+
+<hr>
 
 <b>
 Socio transportador
@@ -732,9 +991,9 @@ Estado del servicio
 </div>
 
 <button
-  id="deliverBtn"
-  class="btn"
-  onclick="deliver()"
+id="deliverBtn"
+class="btn"
+onclick="deliver()"
 >
 📦 Confirmar entrega
 </button>
@@ -781,10 +1040,17 @@ El socio fue liberado correctamente y ya aparece como disponible.
 </div>
 
 <button
-  class="btn"
-  onclick="resetApp()"
+class="btn"
+onclick="resetApp()"
 >
 Nueva solicitud
+</button>
+
+<button
+class="btn alt"
+onclick="openHistory()"
+>
+📋 Ver historial
 </button>
 
 </section>
@@ -823,22 +1089,22 @@ Cargando socios...
 </div>
 
 <button
-  class="btn"
-  onclick="openPartnerDemand()"
+class="btn"
+onclick="openPartnerDemand()"
 >
 🔔 Ver demanda disponible
 </button>
 
 <button
-  class="btn alt"
-  onclick="loadPartners(true)"
+class="btn alt"
+onclick="loadPartners(true)"
 >
 🔄 Actualizar socios
 </button>
 
 <button
-  class="btn alt"
-  onclick="show('home')"
+class="btn alt"
+onclick="show('home')"
 >
 Volver
 </button>
@@ -869,16 +1135,16 @@ Revisa la capacidad de tu vehículo antes de aceptar.
 </div>
 
 <button
-  id="partnerAcceptBtn"
-  class="btn"
-  onclick="acceptPartnerDemand()"
+id="partnerAcceptBtn"
+class="btn"
+onclick="acceptPartnerDemand()"
 >
 ✅ Aceptar servicio
 </button>
 
 <button
-  class="btn alt"
-  onclick="show('partnerHome')"
+class="btn alt"
+onclick="show('partnerHome')"
 >
 Volver
 </button>
@@ -910,10 +1176,10 @@ Correo electrónico
 </label>
 
 <input
-  id="adminEmail"
-  type="email"
-  placeholder="Correo del administrador"
-  autocomplete="email"
+id="adminEmail"
+type="email"
+placeholder="Correo del administrador"
+autocomplete="email"
 >
 
 <label>
@@ -921,16 +1187,16 @@ Contraseña
 </label>
 
 <input
-  id="adminPassword"
-  type="password"
-  placeholder="Contraseña"
-  autocomplete="current-password"
+id="adminPassword"
+type="password"
+placeholder="Contraseña"
+autocomplete="current-password"
 >
 
 <button
-  id="adminLoginBtn"
-  class="btn"
-  onclick="loginAdmin()"
+id="adminLoginBtn"
+class="btn"
+onclick="loginAdmin()"
 >
 🔐 Entrar a la Central
 </button>
@@ -940,8 +1206,8 @@ Contraseña
 </div>
 
 <button
-  class="btn alt"
-  onclick="show('home')"
+class="btn alt"
+onclick="show('home')"
 >
 Volver
 </button>
@@ -970,8 +1236,8 @@ jjmuriel@hotmail.com
 </div>
 
 <button
-  class="btn danger"
-  onclick="logoutAdmin()"
+class="btn danger"
+onclick="logoutAdmin()"
 >
 🚪 Cerrar sesión
 </button>
@@ -985,8 +1251,8 @@ Estado de la red
 </b>
 
 <button
-  class="badge"
-  onclick="loadPartners(true)"
+class="badge"
+onclick="loadPartners(true)"
 >
 🔄 Actualizar
 </button>
@@ -1009,42 +1275,42 @@ Cargando...
 <div class="map">
 
 <div
-  class="marker"
-  style="left:18%;top:30%"
+class="marker"
+style="left:18%;top:30%"
 >
 🟢
 </div>
 
 <div
-  class="marker"
-  style="left:55%;top:18%"
+class="marker"
+style="left:55%;top:18%"
 >
 🟢
 </div>
 
 <div
-  class="marker"
-  style="left:70%;top:55%"
+class="marker"
+style="left:70%;top:55%"
 >
 🔴
 </div>
 
 <div
-  class="marker"
-  style="left:35%;top:68%"
+class="marker"
+style="left:35%;top:68%"
 >
 🟡
 </div>
 
 <div
-  style="
-  position:absolute;
-  left:8px;
-  bottom:12px;
-  background:white;
-  padding:6px 9px;
-  border-radius:8px;
-  font-size:11px"
+style="
+position:absolute;
+left:8px;
+bottom:12px;
+background:white;
+padding:6px 9px;
+border-radius:8px;
+font-size:11px"
 >
 📍 Mocoa
 </div>
@@ -1080,64 +1346,22 @@ No hay solicitudes cargadas.
 </div>
 
 
-<!-- HISTORIAL -->
-
 <div class="card">
 
-<div class="top">
-
 <b>
-📜 Historial de solicitudes
+👥 Solicitudes recientes
 </b>
 
+<div id="adminHistory">
+Cargando solicitudes...
+</div>
+
 <button
-  class="badge"
-  onclick="loadHistory()"
+class="btn alt"
+onclick="loadAdminHistory()"
 >
-🔄 Actualizar
+🔄 Actualizar solicitudes
 </button>
-
-</div>
-
-<p class="small">
-Consulta las solicitudes anteriores con fecha,
-hora, socio y estado.
-</p>
-
-<div class="history-filter">
-
-<select
-  id="historyFilter"
-  onchange="loadHistory()"
->
-
-<option value="todas">
-Todas las solicitudes
-</option>
-
-<option value="pendiente">
-Pendientes
-</option>
-
-<option value="asignada">
-Asignadas
-</option>
-
-<option value="entregada">
-Entregadas
-</option>
-
-</select>
-
-</div>
-
-<div id="historyList">
-
-<div class="loading">
-Cargando historial...
-</div>
-
-</div>
 
 </div>
 
@@ -1152,8 +1376,12 @@ Cargando historial...
 Inicio
 </button>
 
-<button onclick="show('request')">
+<button onclick="abrirSolicitudSeguro()">
 Solicitar
+</button>
+
+<button onclick="openHistory()">
+Historial
 </button>
 
 <button onclick="openPartnerHome()">
@@ -1246,6 +1474,10 @@ let sociosHash = '';
 
 let cargandoSocios = false;
 
+let usuarioActual = null;
+
+let perfilUsuario = null;
+
 
 /* =====================================================
    UTILIDADES
@@ -1296,55 +1528,16 @@ function formatSupabaseError(error){
 }
 
 
-/* =====================================================
-   FECHAS DEL HISTORIAL
-===================================================== */
-
-function formatFecha(fecha){
-
-  if(!fecha){
-
-    return 'Fecha no disponible';
-
-  }
-
-  const d =
-    new Date(fecha);
-
-  if(isNaN(d.getTime())){
-
-    return escapeHtml(
-      String(fecha)
-    );
-
-  }
-
-  return d.toLocaleString(
-    'es-CO',
-    {
-      dateStyle:'medium',
-      timeStyle:'short'
-    }
-  );
-
-}
-
-
 function crearHashSocios(lista){
 
   return JSON.stringify(
     (lista || []).map(s => ({
 
       id:s.id,
-
       nombre:s.nombre,
-
       telefono:s.telefono,
-
       vehiculo:s.vehiculo,
-
       capacidad_ton:s.capacidad_ton,
-
       estado:s.estado
 
     }))
@@ -1375,6 +1568,206 @@ function checkSupabase(){
 }
 
 
+function formatFecha(fecha){
+
+  if(!fecha)
+    return '-';
+
+  try{
+
+    return new Date(fecha).toLocaleString(
+      'es-CO',
+      {
+        dateStyle:'medium',
+        timeStyle:'short'
+      }
+    );
+
+  }catch(error){
+
+    return String(fecha);
+
+  }
+
+}
+
+
+/* =====================================================
+   USUARIO ACTUAL
+===================================================== */
+
+async function cargarUsuarioActual(){
+
+  if(!checkSupabase())
+    return null;
+
+  try{
+
+    const {
+      data,
+      error
+    } =
+      await supabaseClient.auth.getSession();
+
+    if(error){
+
+      console.error(
+        'Error obteniendo sesión:',
+        error
+      );
+
+      usuarioActual = null;
+      perfilUsuario = null;
+
+      return null;
+
+    }
+
+    usuarioActual =
+      data?.session?.user || null;
+
+    perfilUsuario = null;
+
+    if(usuarioActual){
+
+      const {
+        data:perfil,
+        error:perfilError
+      } =
+        await supabaseClient
+          .from('usuarios')
+          .select('*')
+          .eq(
+            'id',
+            usuarioActual.id
+          )
+          .maybeSingle();
+
+      if(perfilError){
+
+        console.warn(
+          'No se pudo cargar perfil:',
+          perfilError
+        );
+
+      }else{
+
+        perfilUsuario =
+          perfil || null;
+
+      }
+
+    }
+
+    actualizarUsuarioUI();
+
+    return usuarioActual;
+
+  }catch(error){
+
+    console.error(error);
+
+    usuarioActual = null;
+    perfilUsuario = null;
+
+    actualizarUsuarioUI();
+
+    return null;
+
+  }
+
+}
+
+
+function actualizarUsuarioUI(){
+
+  const homeBox =
+    document.getElementById(
+      'homeUserBox'
+    );
+
+  const requestBox =
+    document.getElementById(
+      'requestUserBox'
+    );
+
+  if(usuarioActual){
+
+    const nombre =
+      perfilUsuario?.nombre ||
+      usuarioActual.email ||
+      'Usuario';
+
+    const telefono =
+      perfilUsuario?.telefono ||
+      '';
+
+    const html = `
+
+      <div class="user-box">
+
+        👤 <b>${escapeHtml(nombre)}</b>
+
+        <br>
+
+        📧 ${escapeHtml(
+          usuarioActual.email || ''
+        )}
+
+        ${
+          telefono
+          ?
+          `<br>📞 ${escapeHtml(telefono)}`
+          :
+          ''
+        }
+
+      </div>
+
+    `;
+
+    if(homeBox)
+      homeBox.innerHTML = html;
+
+    if(requestBox)
+      requestBox.innerHTML = html;
+
+  }else{
+
+    if(homeBox){
+
+      homeBox.innerHTML = `
+
+        <div class="alert">
+
+          👤 Debes iniciar sesión para
+          registrar una solicitud a tu nombre.
+
+        </div>
+
+      `;
+
+    }
+
+    if(requestBox){
+
+      requestBox.innerHTML = `
+
+        <div class="alert">
+
+          🔐 Inicia sesión para continuar.
+
+        </div>
+
+      `;
+
+    }
+
+  }
+
+}
+
+
 /* =====================================================
    NAVEGACIÓN
 ===================================================== */
@@ -1389,10 +1782,8 @@ function show(id){
 
     });
 
-
   const target =
     document.getElementById(id);
-
 
   if(target){
 
@@ -1408,14 +1799,845 @@ function show(id){
 }
 
 
-function openPartnerHome(){
+function openUserLogin(){
 
-  show('partnerHome');
+  cargarUsuarioActual()
+    .then(() => {
 
-  loadPartners();
+      if(usuarioActual){
+
+        openUserProfile();
+
+      }else{
+
+        show('userLogin');
+
+      }
+
+    });
 
 }
 
+
+function openRegister(){
+
+  show('register');
+
+}
+
+
+async function openUserProfile(){
+
+  await cargarUsuarioActual();
+
+  if(!usuarioActual){
+
+    show('userLogin');
+
+    return;
+
+  }
+
+  const nombre =
+    perfilUsuario?.nombre ||
+    'Sin nombre';
+
+  const telefono =
+    perfilUsuario?.telefono ||
+    'No registrado';
+
+  const correo =
+    perfilUsuario?.correo ||
+    usuarioActual.email ||
+    'No registrado';
+
+  document.getElementById(
+    'profileData'
+  ).innerHTML = `
+
+    <div class="card">
+
+      <div class="top">
+
+        <b>
+          👤 ${escapeHtml(nombre)}
+        </b>
+
+        <span class="pill">
+          Cuenta activa
+        </span>
+
+      </div>
+
+      <p>
+
+        📞 ${escapeHtml(telefono)}
+
+        <br>
+
+        📧 ${escapeHtml(correo)}
+
+      </p>
+
+    </div>
+
+  `;
+
+  show('userProfile');
+
+}
+
+
+async function abrirSolicitudSeguro(){
+
+  await cargarUsuarioActual();
+
+  if(!usuarioActual){
+
+    show('userLogin');
+
+    const box =
+      document.getElementById(
+        'userLoginError'
+      );
+
+    if(box){
+
+      box.innerHTML = `
+
+        <div class="alert">
+
+          🔐 Primero inicia sesión o crea tu cuenta
+          para registrar quién solicita el servicio.
+
+        </div>
+
+      `;
+
+    }
+
+    return;
+
+  }
+
+  actualizarUsuarioUI();
+
+  show('request');
+
+}
+
+
+/* =====================================================
+   REGISTRAR USUARIO
+===================================================== */
+
+async function registrarUsuario(){
+
+  if(!checkSupabase())
+    return;
+
+  const nombre =
+    document.getElementById(
+      'registerNombre'
+    ).value.trim();
+
+  const telefono =
+    document.getElementById(
+      'registerTelefono'
+    ).value.trim();
+
+  const correo =
+    document.getElementById(
+      'registerCorreo'
+    ).value.trim().toLowerCase();
+
+  const password =
+    document.getElementById(
+      'registerPassword'
+    ).value;
+
+  const errorBox =
+    document.getElementById(
+      'registerError'
+    );
+
+  const button =
+    document.getElementById(
+      'registerBtn'
+    );
+
+  errorBox.innerHTML = '';
+
+  if(
+    !nombre ||
+    !telefono ||
+    !correo ||
+    !password
+  ){
+
+    errorBox.innerHTML = `
+
+      <div class="error">
+
+        ❌ Completa todos los campos.
+
+      </div>
+
+    `;
+
+    return;
+
+  }
+
+  if(password.length < 6){
+
+    errorBox.innerHTML = `
+
+      <div class="error">
+
+        ❌ La contraseña debe tener
+        mínimo 6 caracteres.
+
+      </div>
+
+    `;
+
+    return;
+
+  }
+
+  button.disabled = true;
+
+  button.textContent =
+    '⏳ Registrando...';
+
+  try{
+
+    const {
+      data,
+      error
+    } =
+      await supabaseClient.auth.signUp({
+
+        email:correo,
+
+        password:password
+
+      });
+
+    if(error){
+
+      errorBox.innerHTML = `
+
+        <div class="error">
+
+          ❌ No se pudo crear la cuenta.
+
+          <code>${escapeHtml(
+            formatSupabaseError(error)
+          )}</code>
+
+        </div>
+
+      `;
+
+      return;
+
+    }
+
+    if(!data.user){
+
+      throw new Error(
+        'Supabase no devolvió el usuario.'
+      );
+
+    }
+
+    /*
+       Guardamos el perfil del usuario.
+    */
+
+    const {
+      error:perfilError
+    } =
+      await supabaseClient
+        .from('usuarios')
+        .upsert({
+
+          id:data.user.id,
+
+          nombre:nombre,
+
+          telefono:telefono,
+
+          correo:correo
+
+        });
+
+    if(perfilError){
+
+      console.error(
+        'Error guardando perfil:',
+        perfilError
+      );
+
+      /*
+         La cuenta ya existe aunque
+         el perfil no haya podido guardarse.
+      */
+
+      errorBox.innerHTML = `
+
+        <div class="alert">
+
+          ⚠️ La cuenta fue creada, pero
+          no se pudieron guardar todos los datos
+          del perfil.
+
+          <code>${escapeHtml(
+            formatSupabaseError(perfilError)
+          )}</code>
+
+        </div>
+
+      `;
+
+    }
+
+    /*
+       Si Supabase exige confirmación
+       de correo, session puede ser null.
+    */
+
+    if(data.session){
+
+      usuarioActual =
+        data.user;
+
+      await cargarUsuarioActual();
+
+      alert(
+        '✅ Cuenta creada correctamente.'
+      );
+
+      show('home');
+
+    }else{
+
+      errorBox.innerHTML = `
+
+        <div class="success">
+
+          ✅ Cuenta creada correctamente.
+
+          <br><br>
+
+          Revisa tu correo electrónico
+          si Supabase solicita confirmar
+          la cuenta antes de iniciar sesión.
+
+        </div>
+
+      `;
+
+      document.getElementById(
+        'registerNombre'
+      ).value = '';
+
+      document.getElementById(
+        'registerTelefono'
+      ).value = '';
+
+      document.getElementById(
+        'registerCorreo'
+      ).value = '';
+
+      document.getElementById(
+        'registerPassword'
+      ).value = '';
+
+    }
+
+  }catch(error){
+
+    console.error(error);
+
+    errorBox.innerHTML = `
+
+      <div class="error">
+
+        ❌ Error creando la cuenta.
+
+        <code>${escapeHtml(
+          error.message ||
+          String(error)
+        )}</code>
+
+      </div>
+
+    `;
+
+  }finally{
+
+    button.disabled = false;
+
+    button.textContent =
+      '👤 REGISTRARME';
+
+  }
+
+}
+
+
+/* =====================================================
+   LOGIN USUARIO
+===================================================== */
+
+async function loginUsuario(){
+
+  if(!checkSupabase())
+    return;
+
+  const email =
+    document.getElementById(
+      'userLoginEmail'
+    ).value.trim().toLowerCase();
+
+  const password =
+    document.getElementById(
+      'userLoginPassword'
+    ).value;
+
+  const errorBox =
+    document.getElementById(
+      'userLoginError'
+    );
+
+  const button =
+    document.getElementById(
+      'userLoginBtn'
+    );
+
+  errorBox.innerHTML = '';
+
+  if(!email || !password){
+
+    errorBox.innerHTML = `
+
+      <div class="error">
+
+        ❌ Escribe correo y contraseña.
+
+      </div>
+
+    `;
+
+    return;
+
+  }
+
+  button.disabled = true;
+
+  button.textContent =
+    '⏳ Verificando...';
+
+  try{
+
+    const {
+      data,
+      error
+    } =
+      await supabaseClient.auth.signInWithPassword({
+
+        email:email,
+
+        password:password
+
+      });
+
+    if(error){
+
+      errorBox.innerHTML = `
+
+        <div class="error">
+
+          ❌ No se pudo iniciar sesión.
+
+          <code>${escapeHtml(
+            formatSupabaseError(error)
+          )}</code>
+
+        </div>
+
+      `;
+
+      return;
+
+    }
+
+    usuarioActual =
+      data.user;
+
+    await cargarUsuarioActual();
+
+    document.getElementById(
+      'userLoginEmail'
+    ).value = '';
+
+    document.getElementById(
+      'userLoginPassword'
+    ).value = '';
+
+    alert(
+      '✅ Bienvenido a Red Transporte Mocoa.'
+    );
+
+    show('home');
+
+  }catch(error){
+
+    console.error(error);
+
+    errorBox.innerHTML = `
+
+      <div class="error">
+
+        ❌ Error iniciando sesión.
+
+        <code>${escapeHtml(
+          error.message ||
+          String(error)
+        )}</code>
+
+      </div>
+
+    `;
+
+  }finally{
+
+    button.disabled = false;
+
+    button.textContent =
+      '🔐 Iniciar sesión';
+
+  }
+
+}
+
+
+/* =====================================================
+   LOGOUT USUARIO
+===================================================== */
+
+async function logoutUsuario(){
+
+  if(!checkSupabase())
+    return;
+
+  try{
+
+    await supabaseClient.auth.signOut();
+
+  }catch(error){
+
+    console.error(error);
+
+  }
+
+  usuarioActual = null;
+
+  perfilUsuario = null;
+
+  currentDemand = null;
+
+  selectedPartner = null;
+
+  actualizarUsuarioUI();
+
+  show('home');
+
+}
+
+
+/* =====================================================
+   HISTORIAL DEL USUARIO
+===================================================== */
+
+async function openHistory(){
+
+  await cargarUsuarioActual();
+
+  if(!usuarioActual){
+
+    show('userLogin');
+
+    const box =
+      document.getElementById(
+        'userLoginError'
+      );
+
+    if(box){
+
+      box.innerHTML = `
+
+        <div class="alert">
+
+          🔐 Inicia sesión para consultar
+          tu historial.
+
+        </div>
+
+      `;
+
+    }
+
+    return;
+
+  }
+
+  show('history');
+
+  await loadHistory();
+
+}
+
+
+async function loadHistory(){
+
+  if(!checkSupabase())
+    return;
+
+  await cargarUsuarioActual();
+
+  const historyList =
+    document.getElementById(
+      'historyList'
+    );
+
+  const historyUser =
+    document.getElementById(
+      'historyUser'
+    );
+
+  if(!usuarioActual){
+
+    historyList.innerHTML = `
+
+      <div class="alert">
+
+        🔐 Debes iniciar sesión.
+
+      </div>
+
+    `;
+
+    return;
+
+  }
+
+  historyUser.innerHTML = `
+
+    <div class="user-box">
+
+      👤 Historial de:
+
+      <b>
+
+        ${escapeHtml(
+          perfilUsuario?.nombre ||
+          usuarioActual.email
+        )}
+
+      </b>
+
+    </div>
+
+  `;
+
+  historyList.innerHTML = `
+
+    <div class="loading">
+      ⏳ Cargando historial...
+    </div>
+
+  `;
+
+  try{
+
+    const {
+      data,
+      error
+    } =
+      await supabaseClient
+        .from('solicitudes')
+        .select('*')
+        .eq(
+          'usuario_id',
+          usuarioActual.id
+        )
+        .order(
+          'created_at',
+          {
+            ascending:false
+          }
+        );
+
+    if(error){
+
+      historyList.innerHTML = `
+
+        <div class="error">
+
+          ❌ No se pudo cargar el historial.
+
+          <code>${escapeHtml(
+            formatSupabaseError(error)
+          )}</code>
+
+        </div>
+
+      `;
+
+      return;
+
+    }
+
+    const lista =
+      data || [];
+
+    if(lista.length === 0){
+
+      historyList.innerHTML = `
+
+        <div class="empty">
+
+          📋 Todavía no tienes solicitudes
+          registradas.
+
+        </div>
+
+      `;
+
+      return;
+
+    }
+
+    historyList.innerHTML =
+      lista
+        .map(renderHistoryItem)
+        .join('');
+
+  }catch(error){
+
+    historyList.innerHTML = `
+
+      <div class="error">
+
+        ❌ Error cargando historial.
+
+        <code>${escapeHtml(
+          error.message ||
+          String(error)
+        )}</code>
+
+      </div>
+
+    `;
+
+  }
+
+}
+
+
+function renderHistoryItem(solicitud){
+
+  const estado =
+    solicitud.estado ||
+    'pendiente';
+
+  const socio =
+    solicitud.socio_nombre ||
+    solicitud.socio_id ||
+    'Sin asignar';
+
+  return `
+
+    <div class="history-item">
+
+      <div class="history-date">
+
+        🕐 ${escapeHtml(
+          formatFecha(
+            solicitud.created_at
+          )
+        )}
+
+      </div>
+
+      <b>
+
+        📦 Solicitud #${escapeHtml(
+          String(solicitud.id)
+        )}
+
+      </b>
+
+      <p>
+
+        📍 ${escapeHtml(
+          solicitud.origen || '-'
+        )}
+
+        →
+
+        ${escapeHtml(
+          solicitud.destino || '-'
+        )}
+
+        <br>
+
+        📦 ${escapeHtml(
+          solicitud.mercancia || '-'
+        )}
+
+        <br>
+
+        ⚖️ ${escapeHtml(
+          String(
+            solicitud.cantidas ?? '-'
+          )
+        )}
+
+        ${escapeHtml(
+          solicitud.unidad || ''
+        )}
+
+        <br>
+
+        🚚 Socio:
+
+        ${escapeHtml(
+          socio
+        )}
+
+      </p>
+
+      <span class="history-status">
+
+        ${escapeHtml(estado)}
+
+      </span>
+
+    </div>
+
+  `;
+
+}
+
+
+/* =====================================================
+   CENTRAL
+===================================================== */
 
 async function openAdmin(){
 
@@ -1430,7 +2652,6 @@ async function openAdmin(){
     } =
       await supabaseClient.auth.getSession();
 
-
     if(error){
 
       console.error(error);
@@ -1441,10 +2662,8 @@ async function openAdmin(){
 
     }
 
-
     const session =
       data.session;
-
 
     if(!session){
 
@@ -1454,12 +2673,10 @@ async function openAdmin(){
 
     }
 
-
     const email =
       String(
         session.user.email || ''
       ).toLowerCase().trim();
-
 
     if(email !== ADMIN_EMAIL){
 
@@ -1491,13 +2708,11 @@ async function openAdmin(){
 
     }
 
-
     show('admin');
 
     await loadPartners();
 
-    await loadHistory();
-
+    await loadAdminHistory();
 
   }catch(error){
 
@@ -1514,7 +2729,7 @@ async function openAdmin(){
 
 
 /* =====================================================
-   LOGIN ADMINISTRADOR
+   LOGIN ADMIN
 ===================================================== */
 
 async function loginAdmin(){
@@ -1522,33 +2737,27 @@ async function loginAdmin(){
   if(!checkSupabase())
     return;
 
-
   const email =
     document.getElementById(
       'adminEmail'
     ).value.trim().toLowerCase();
-
 
   const password =
     document.getElementById(
       'adminPassword'
     ).value;
 
-
   const errorBox =
     document.getElementById(
       'adminLoginError'
     );
-
 
   const button =
     document.getElementById(
       'adminLoginBtn'
     );
 
-
   errorBox.innerHTML = '';
-
 
   if(!email || !password){
 
@@ -1566,12 +2775,10 @@ async function loginAdmin(){
 
   }
 
-
   button.disabled = true;
 
   button.textContent =
     '⏳ Verificando...';
-
 
   try{
 
@@ -1581,17 +2788,13 @@ async function loginAdmin(){
     } =
       await supabaseClient.auth.signInWithPassword({
 
-        email: email,
+        email:email,
 
-        password: password
+        password:password
 
       });
 
-
     if(error){
-
-      console.error(error);
-
 
       errorBox.innerHTML = `
 
@@ -1611,17 +2814,14 @@ async function loginAdmin(){
 
     }
 
-
     const loggedEmail =
       String(
         data.user?.email || ''
       ).toLowerCase().trim();
 
-
     if(loggedEmail !== ADMIN_EMAIL){
 
       await supabaseClient.auth.signOut();
-
 
       errorBox.innerHTML = `
 
@@ -1638,7 +2838,6 @@ async function loginAdmin(){
 
     }
 
-
     document.getElementById(
       'adminEmail'
     ).value = '';
@@ -1653,13 +2852,11 @@ async function loginAdmin(){
 
     await loadPartners();
 
-    await loadHistory();
-
+    await loadAdminHistory();
 
   }catch(error){
 
     console.error(error);
-
 
     errorBox.innerHTML = `
 
@@ -1689,7 +2886,7 @@ async function loginAdmin(){
 
 
 /* =====================================================
-   CERRAR SESIÓN
+   LOGOUT ADMIN
 ===================================================== */
 
 async function logoutAdmin(){
@@ -1703,10 +2900,7 @@ async function logoutAdmin(){
 
   }catch(error){
 
-    console.error(
-      'Error cerrando sesión:',
-      error
-    );
+    console.error(error);
 
   }
 
@@ -1719,33 +2913,28 @@ async function logoutAdmin(){
    CARGAR SOCIOS
 ===================================================== */
 
-async function loadPartners(forzar = false){
+async function loadPartners(forzar=false){
 
   if(!checkSupabase())
     return;
 
-
   if(cargandoSocios && !forzar)
     return;
-
 
   const partnerList =
     document.getElementById(
       'partnerList'
     );
 
-
   const adminPartners =
     document.getElementById(
       'adminPartners'
     );
 
-
   const networkStats =
     document.getElementById(
       'networkStats'
     );
-
 
   if(
     socios.length === 0 &&
@@ -1757,7 +2946,6 @@ async function loadPartners(forzar = false){
 
   }
 
-
   if(
     socios.length === 0 &&
     adminPartners
@@ -1767,7 +2955,6 @@ async function loadPartners(forzar = false){
       '<div class="loading">Cargando socios...</div>';
 
   }
-
 
   if(
     socios.length === 0 &&
@@ -1779,9 +2966,7 @@ async function loadPartners(forzar = false){
 
   }
 
-
   cargandoSocios = true;
-
 
   try{
 
@@ -1794,11 +2979,9 @@ async function loadPartners(forzar = false){
         .select('*')
         .order('id');
 
-
     if(error){
 
       console.error(error);
-
 
       const message = `
 
@@ -1814,29 +2997,23 @@ async function loadPartners(forzar = false){
 
       `;
 
-
       if(partnerList)
         partnerList.innerHTML = message;
 
-
       if(adminPartners)
         adminPartners.innerHTML = message;
-
 
       return;
 
     }
 
-
     const nuevosSocios =
       data || [];
-
 
     const nuevoHash =
       crearHashSocios(
         nuevosSocios
       );
-
 
     if(
       !forzar &&
@@ -1847,23 +3024,19 @@ async function loadPartners(forzar = false){
 
     }
 
-
     socios =
       nuevosSocios;
 
     sociosHash =
       nuevoHash;
 
-
     renderPartners();
 
     updateNetworkStats();
 
-
   }catch(error){
 
     console.error(error);
-
 
     const message = `
 
@@ -1872,17 +3045,16 @@ async function loadPartners(forzar = false){
         ❌ Error de conexión.
 
         <code>${escapeHtml(
-          error.message || String(error)
+          error.message ||
+          String(error)
         )}</code>
 
       </div>
 
     `;
 
-
     if(partnerList)
       partnerList.innerHTML = message;
-
 
     if(adminPartners)
       adminPartners.innerHTML = message;
@@ -1907,12 +3079,10 @@ function renderPartners(){
       'partnerList'
     );
 
-
   const adminPartners =
     document.getElementById(
       'adminPartners'
     );
-
 
   if(partnerList){
 
@@ -1938,7 +3108,6 @@ function renderPartners(){
     }
 
   }
-
 
   if(adminPartners){
 
@@ -1997,7 +3166,6 @@ function renderPartnerCard(socio){
       .trim()
       === 'disponible';
 
-
   return `
 
     <div class="card">
@@ -2022,7 +3190,6 @@ function renderPartnerCard(socio){
 
       </div>
 
-
       <p>
 
         🚚 ${escapeHtml(vehiculo)}
@@ -2038,7 +3205,6 @@ function renderPartnerCard(socio){
         📞 ${escapeHtml(String(telefono))}
 
       </p>
-
 
       ${
         disponible
@@ -2102,7 +3268,6 @@ function renderAdminPartner(socio){
       .toLowerCase()
       .trim()
       === 'disponible';
-
 
   return `
 
@@ -2191,14 +3356,13 @@ function renderAdminPartner(socio){
 
 
 /* =====================================================
-   CAMBIAR ESTADO DESDE CENTRAL
+   CAMBIAR ESTADO SOCIO
 ===================================================== */
 
 async function cambiarEstadoSocio(id,nuevoEstado){
 
   if(!checkSupabase())
     return;
-
 
   if(
     nuevoEstado !== 'disponible' &&
@@ -2211,14 +3375,12 @@ async function cambiarEstadoSocio(id,nuevoEstado){
 
   }
 
-
   const socio =
     socios.find(
       s =>
         String(s.id) ===
         String(id)
     );
-
 
   if(!socio){
 
@@ -2230,11 +3392,9 @@ async function cambiarEstadoSocio(id,nuevoEstado){
 
   }
 
-
   const nombre =
     socio.nombre ||
     'este socio';
-
 
   const pregunta =
     nuevoEstado === 'disponible'
@@ -2247,16 +3407,13 @@ async function cambiarEstadoSocio(id,nuevoEstado){
 
     `¿Quieres marcar a ${nombre} como OCUPADO?`;
 
-
   if(!confirm(pregunta))
     return;
-
 
   const boton =
     document.getElementById(
       'statusBtn-' + id
     );
-
 
   if(boton){
 
@@ -2267,7 +3424,6 @@ async function cambiarEstadoSocio(id,nuevoEstado){
 
   }
 
-
   try{
 
     const {
@@ -2277,7 +3433,9 @@ async function cambiarEstadoSocio(id,nuevoEstado){
       await supabaseClient
         .from('socios')
         .update({
+
           estado:nuevoEstado
+
         })
         .eq(
           'id',
@@ -2285,7 +3443,6 @@ async function cambiarEstadoSocio(id,nuevoEstado){
         )
         .select()
         .maybeSingle();
-
 
     if(error){
 
@@ -2298,18 +3455,15 @@ async function cambiarEstadoSocio(id,nuevoEstado){
 
     }
 
-
     if(!data){
 
       alert(
-        '⚠️ No se actualizó ningún socio.\n\n' +
-        'Verifica las políticas UPDATE de Supabase.'
+        '⚠️ No se actualizó ningún socio.'
       );
 
       return;
 
     }
-
 
     const index =
       socios.findIndex(
@@ -2317,7 +3471,6 @@ async function cambiarEstadoSocio(id,nuevoEstado){
           String(s.id) ===
           String(id)
       );
-
 
     if(index !== -1){
 
@@ -2331,24 +3484,22 @@ async function cambiarEstadoSocio(id,nuevoEstado){
 
     }
 
-
     sociosHash =
       crearHashSocios(
         socios
       );
 
-
     renderPartners();
 
     updateNetworkStats();
 
-
     alert(
       nuevoEstado === 'disponible'
+
       ? `🟢 ${nombre} ahora está DISPONIBLE.`
+
       : `🔴 ${nombre} ahora está OCUPADO.`
     );
-
 
   }catch(error){
 
@@ -2391,10 +3542,8 @@ function updateNetworkStats(){
       'networkStats'
     );
 
-
   if(!networkStats)
     return;
-
 
   const disponibles =
     socios.filter(s =>
@@ -2406,11 +3555,9 @@ function updateNetworkStats(){
 
     ).length;
 
-
   const ocupados =
     socios.length -
     disponibles;
-
 
   networkStats.innerHTML = `
 
@@ -2463,7 +3610,6 @@ async function selectPartner(id){
   if(!checkSupabase())
     return;
 
-
   try{
 
     const {
@@ -2473,9 +3619,8 @@ async function selectPartner(id){
       await supabaseClient
         .from('socios')
         .select('*')
-        .eq('id', id)
+        .eq('id',id)
         .maybeSingle();
-
 
     if(error){
 
@@ -2487,7 +3632,6 @@ async function selectPartner(id){
       return;
 
     }
-
 
     if(!data){
 
@@ -2501,13 +3645,11 @@ async function selectPartner(id){
 
     }
 
-
     const disponible =
       String(data.estado || '')
         .toLowerCase()
         .trim()
         === 'disponible';
-
 
     if(!disponible){
 
@@ -2523,15 +3665,12 @@ async function selectPartner(id){
 
     }
 
-
     selectedPartner = data;
-
 
     const card =
       document.getElementById(
         'selectedPartnerCard'
       );
-
 
     card.innerHTML = `
 
@@ -2586,14 +3725,11 @@ async function selectPartner(id){
 
     `;
 
-
     document.getElementById(
       'assignmentError'
     ).innerHTML = '';
 
-
     show('assignment');
-
 
   }catch(error){
 
@@ -2619,24 +3755,30 @@ async function sendDemand(){
   if(!checkSupabase())
     return;
 
+  await cargarUsuarioActual();
+
+  if(!usuarioActual){
+
+    show('userLogin');
+
+    return;
+
+  }
 
   const origin =
     document.getElementById(
       'origin'
     ).value.trim();
 
-
   const dest =
     document.getElementById(
       'dest'
     ).value.trim();
 
-
   const cargo =
     document.getElementById(
       'cargo'
     ).value.trim();
-
 
   const quantity =
     Number(
@@ -2645,30 +3787,25 @@ async function sendDemand(){
       ).value
     );
 
-
   const unit =
     document.getElementById(
       'unit'
     ).value;
-
 
   const when =
     document.getElementById(
       'when'
     ).value;
 
-
   const requestError =
     document.getElementById(
       'requestError'
     );
 
-
   const button =
     document.getElementById(
       'sendDemandBtn'
     );
-
 
   if(
     !origin ||
@@ -2692,7 +3829,6 @@ async function sendDemand(){
 
   }
 
-
   requestError.innerHTML = '';
 
   button.disabled = true;
@@ -2701,7 +3837,6 @@ async function sendDemand(){
     '⏳ Creando solicitud...';
 
   show('matching');
-
 
   document.getElementById(
     'matchingList'
@@ -2715,6 +3850,11 @@ async function sendDemand(){
 
   `;
 
+
+  /*
+     AQUÍ QUEDA REGISTRADO
+     QUIÉN SOLICITA EL SERVICIO.
+  */
 
   const insertData = {
 
@@ -2730,7 +3870,25 @@ async function sendDemand(){
 
     estado:'pendiente',
 
-    socio_id:null
+    socio_id:null,
+
+    usuario_id:
+      usuarioActual.id,
+
+    usuario_nombre:
+      perfilUsuario?.nombre ||
+      usuarioActual.email,
+
+    usuario_telefono:
+      perfilUsuario?.telefono ||
+      '',
+
+    usuario_correo:
+      perfilUsuario?.correo ||
+      usuarioActual.email,
+
+    created_at:
+      new Date().toISOString()
 
   };
 
@@ -2747,14 +3905,12 @@ async function sendDemand(){
         .select()
         .single();
 
-
     if(error){
 
       console.error(
         'ERROR INSERT:',
         error
       );
-
 
       document.getElementById(
         'matchingList'
@@ -2776,9 +3932,7 @@ async function sendDemand(){
 
     }
 
-
     currentDemand = data;
-
 
     document.getElementById(
       'demandText'
@@ -2787,6 +3941,17 @@ async function sendDemand(){
       <b>
         Solicitud #${escapeHtml(
           String(data.id)
+        )}
+      </b>
+
+      <br><br>
+
+      👤 Solicitada por:
+
+      <b>
+        ${escapeHtml(
+          data.usuario_nombre ||
+          usuarioActual.email
         )}
       </b>
 
@@ -2814,15 +3979,21 @@ async function sendDemand(){
 
       🕐 ${escapeHtml(when)}
 
-    `;
+      <br>
 
+      📅 ${escapeHtml(
+        formatFecha(
+          data.created_at
+        )
+      )}
+
+    `;
 
     document.getElementById(
       'partnerDemandNumber'
     ).textContent =
       'Solicitud #' +
       String(data.id);
-
 
     document.getElementById(
       'partnerDemandText'
@@ -2847,8 +4018,15 @@ async function sendDemand(){
       ${escapeHtml(String(quantity))}
       ${escapeHtml(unit)}
 
-    `;
+      <br><br>
 
+      👤 Cliente:
+      ${escapeHtml(
+        data.usuario_nombre ||
+        usuarioActual.email
+      )}
+
+    `;
 
     document.getElementById(
       'adminDemand'
@@ -2859,6 +4037,30 @@ async function sendDemand(){
           String(data.id)
         )}
       </b>
+
+      <br>
+
+      👤 Cliente:
+
+      <b>
+        ${escapeHtml(
+          data.usuario_nombre ||
+          usuarioActual.email
+        )}
+      </b>
+
+      <br>
+
+      📞 ${escapeHtml(
+        data.usuario_telefono || ''
+      )}
+
+      <br>
+
+      📧 ${escapeHtml(
+        data.usuario_correo ||
+        usuarioActual.email
+      )}
 
       <br>
 
@@ -2882,22 +4084,17 @@ async function sendDemand(){
 
       <br>
 
+      📅 ${escapeHtml(
+        formatFecha(data.created_at)
+      )}
+
+      <br>
+
       Estado:
 
       <b>
         pendiente
       </b>
-
-      <br><br>
-
-      <span class="date-label">
-        📅 Creada:
-        ${escapeHtml(
-          formatFecha(
-            data.created_at
-          )
-        )}
-      </span>
 
     `;
 
@@ -2959,11 +4156,15 @@ async function sendDemand(){
 
     }
 
+    /*
+       Actualizamos historial y Central.
+    */
+
+    await loadAdminHistory();
 
   }catch(error){
 
     console.error(error);
-
 
     document.getElementById(
       'matchingList'
@@ -3007,7 +4208,6 @@ function renderMatchingPartner(socio){
 
   if(estado !== 'disponible')
     return '';
-
 
   return `
 
@@ -3077,7 +4277,6 @@ async function acceptService(){
   if(!checkSupabase())
     return;
 
-
   if(!currentDemand){
 
     alert(
@@ -3087,7 +4286,6 @@ async function acceptService(){
     return;
 
   }
-
 
   if(!selectedPartner){
 
@@ -3099,18 +4297,15 @@ async function acceptService(){
 
   }
 
-
   const errorBox =
     document.getElementById(
       'assignmentError'
     );
 
-
   const button =
     document.getElementById(
       'assignBtn'
     );
-
 
   button.disabled = true;
 
@@ -3119,12 +4314,11 @@ async function acceptService(){
 
   errorBox.innerHTML = '';
 
-
   try{
 
     const {
-      data: socioActualizado,
-      error: socioError
+      data:socioActualizado,
+      error:socioError
     } =
       await supabaseClient
         .from('socios')
@@ -3141,7 +4335,6 @@ async function acceptService(){
         )
         .select()
         .maybeSingle();
-
 
     if(socioError){
 
@@ -3162,7 +4355,6 @@ async function acceptService(){
       return;
 
     }
-
 
     if(!socioActualizado){
 
@@ -3191,10 +4383,9 @@ async function acceptService(){
 
     }
 
-
     const {
-      data: solicitudActualizada,
-      error: solicitudError
+      data:solicitudActualizada,
+      error:solicitudError
     } =
       await supabaseClient
         .from('solicitudes')
@@ -3203,7 +4394,11 @@ async function acceptService(){
           estado:'asignada',
 
           socio_id:
-            selectedPartner.id
+            selectedPartner.id,
+
+          socio_nombre:
+            selectedPartner.nombre ||
+            ''
 
         })
         .eq(
@@ -3216,7 +4411,6 @@ async function acceptService(){
         )
         .select()
         .maybeSingle();
-
 
     if(solicitudError){
 
@@ -3233,7 +4427,6 @@ async function acceptService(){
           'estado',
           'ocupado'
         );
-
 
       errorBox.innerHTML = `
 
@@ -3253,7 +4446,6 @@ async function acceptService(){
 
     }
 
-
     if(!solicitudActualizada){
 
       await supabaseClient
@@ -3269,7 +4461,6 @@ async function acceptService(){
           'estado',
           'ocupado'
         );
-
 
       errorBox.innerHTML = `
 
@@ -3292,10 +4483,8 @@ async function acceptService(){
 
     }
 
-
     currentDemand =
       solicitudActualizada;
-
 
     document.getElementById(
       'activePartner'
@@ -3303,13 +4492,38 @@ async function acceptService(){
       selectedPartner.nombre ||
       'Socio';
 
-
     document.getElementById(
       'deliveredPartner'
     ).textContent =
       selectedPartner.nombre ||
       'Socio';
 
+    document.getElementById(
+      'activeUser'
+    ).innerHTML = `
+
+      👤 ${escapeHtml(
+        currentDemand.usuario_nombre ||
+        usuarioActual?.email ||
+        '-'
+      )}
+
+      <br>
+
+      📞 ${escapeHtml(
+        currentDemand.usuario_telefono ||
+        ''
+      )}
+
+      <br>
+
+      📧 ${escapeHtml(
+        currentDemand.usuario_correo ||
+        usuarioActual?.email ||
+        ''
+      )}
+
+    `;
 
     document.getElementById(
       'activeServiceText'
@@ -3351,29 +4565,19 @@ async function acceptService(){
         currentDemand.unidad || ''
       )}
 
-      <br><br>
-
-      📅 Solicitud:
-      ${escapeHtml(
-        formatFecha(
-          currentDemand.created_at
-        )
-      )}
-
     `;
 
-
     await loadPartners(true);
+
+    await loadAdminHistory();
 
     await loadHistory();
 
     show('active');
 
-
   }catch(error){
 
     console.error(error);
-
 
     errorBox.innerHTML = `
 
@@ -3411,7 +4615,6 @@ async function openPartnerDemand(){
   if(!checkSupabase())
     return;
 
-
   try{
 
     const {
@@ -3433,7 +4636,6 @@ async function openPartnerDemand(){
         )
         .limit(1)
         .maybeSingle();
-
 
     if(error){
 
@@ -3460,10 +4662,8 @@ async function openPartnerDemand(){
 
     }
 
-
     currentDemand =
       data || null;
-
 
   }catch(error){
 
@@ -3490,7 +4690,6 @@ async function openPartnerDemand(){
 
   }
 
-
   if(!currentDemand){
 
     document.getElementById(
@@ -3498,11 +4697,9 @@ async function openPartnerDemand(){
     ).innerHTML =
       'No hay solicitudes pendientes.';
 
-
     document.getElementById(
       'partnerAcceptBtn'
     ).disabled = true;
-
 
     show('partnerDemand');
 
@@ -3510,11 +4707,9 @@ async function openPartnerDemand(){
 
   }
 
-
   document.getElementById(
     'partnerAcceptBtn'
   ).disabled = false;
-
 
   document.getElementById(
     'partnerDemandNumber'
@@ -3523,7 +4718,6 @@ async function openPartnerDemand(){
     String(
       currentDemand.id
     );
-
 
   document.getElementById(
     'partnerDemandText'
@@ -3567,16 +4761,23 @@ async function openPartnerDemand(){
 
     <br><br>
 
-    📅 Creada:
+    👤 Cliente:
 
-    ${escapeHtml(
-      formatFecha(
-        currentDemand.created_at
-      )
+    <b>
+      ${escapeHtml(
+        currentDemand.usuario_nombre ||
+        'No registrado'
+      )}
+    </b>
+
+    <br>
+
+    📞 ${escapeHtml(
+      currentDemand.usuario_telefono ||
+      ''
     )}
 
   `;
-
 
   show('partnerDemand');
 
@@ -3592,7 +4793,6 @@ async function acceptPartnerDemand(){
   if(!checkSupabase())
     return;
 
-
   if(!currentDemand){
 
     alert(
@@ -3603,9 +4803,7 @@ async function acceptPartnerDemand(){
 
   }
 
-
   await loadPartners();
-
 
   if(selectedPartner){
 
@@ -3622,7 +4820,6 @@ async function acceptPartnerDemand(){
         )
         .maybeSingle();
 
-
     if(error){
 
       alert(
@@ -3634,11 +4831,9 @@ async function acceptPartnerDemand(){
 
     }
 
-
     selectedPartner = data;
 
   }
-
 
   if(!selectedPartner){
 
@@ -3652,7 +4847,6 @@ async function acceptPartnerDemand(){
 
       );
 
-
     if(disponibles.length > 0){
 
       selectedPartner =
@@ -3661,7 +4855,6 @@ async function acceptPartnerDemand(){
     }
 
   }
-
 
   if(!selectedPartner){
 
@@ -3673,12 +4866,11 @@ async function acceptPartnerDemand(){
 
   }
 
-
   try{
 
     const {
-      data: socioActualizado,
-      error: socioError
+      data:socioActualizado,
+      error:socioError
     } =
       await supabaseClient
         .from('socios')
@@ -3696,7 +4888,6 @@ async function acceptPartnerDemand(){
         .select()
         .maybeSingle();
 
-
     if(socioError){
 
       alert(
@@ -3707,7 +4898,6 @@ async function acceptPartnerDemand(){
       return;
 
     }
-
 
     if(!socioActualizado){
 
@@ -3727,10 +4917,9 @@ async function acceptPartnerDemand(){
 
     }
 
-
     const {
-      data: solicitudActualizada,
-      error: solicitudError
+      data:solicitudActualizada,
+      error:solicitudError
     } =
       await supabaseClient
         .from('solicitudes')
@@ -3739,7 +4928,11 @@ async function acceptPartnerDemand(){
           estado:'asignada',
 
           socio_id:
-            selectedPartner.id
+            selectedPartner.id,
+
+          socio_nombre:
+            selectedPartner.nombre ||
+            ''
 
         })
         .eq(
@@ -3752,7 +4945,6 @@ async function acceptPartnerDemand(){
         )
         .select()
         .maybeSingle();
-
 
     if(solicitudError){
 
@@ -3770,7 +4962,6 @@ async function acceptPartnerDemand(){
           'ocupado'
         );
 
-
       alert(
         'No se pudo aceptar:\n\n' +
         formatSupabaseError(solicitudError)
@@ -3779,7 +4970,6 @@ async function acceptPartnerDemand(){
       return;
 
     }
-
 
     if(!solicitudActualizada){
 
@@ -3797,7 +4987,6 @@ async function acceptPartnerDemand(){
           'ocupado'
         );
 
-
       alert(
         '⚠️ Esta solicitud ya fue tomada por otro usuario.'
       );
@@ -3812,22 +5001,43 @@ async function acceptPartnerDemand(){
 
     }
 
-
     currentDemand =
       solicitudActualizada;
-
 
     document.getElementById(
       'activePartner'
     ).textContent =
       selectedPartner.nombre;
 
-
     document.getElementById(
       'deliveredPartner'
     ).textContent =
       selectedPartner.nombre;
 
+    document.getElementById(
+      'activeUser'
+    ).innerHTML = `
+
+      👤 ${escapeHtml(
+        currentDemand.usuario_nombre ||
+        'Cliente'
+      )}
+
+      <br>
+
+      📞 ${escapeHtml(
+        currentDemand.usuario_telefono ||
+        ''
+      )}
+
+      <br>
+
+      📧 ${escapeHtml(
+        currentDemand.usuario_correo ||
+        ''
+      )}
+
+    `;
 
     document.getElementById(
       'activeServiceText'
@@ -3867,24 +5077,13 @@ async function acceptPartnerDemand(){
         currentDemand.unidad || ''
       )}
 
-      <br><br>
-
-      📅 Solicitud:
-      ${escapeHtml(
-        formatFecha(
-          currentDemand.created_at
-        )
-      )}
-
     `;
-
 
     await loadPartners(true);
 
-    await loadHistory();
+    await loadAdminHistory();
 
     show('active');
-
 
   }catch(error){
 
@@ -3910,7 +5109,6 @@ async function deliver(){
   if(!checkSupabase())
     return;
 
-
   if(!currentDemand){
 
     alert(
@@ -3921,18 +5119,15 @@ async function deliver(){
 
   }
 
-
   const button =
     document.getElementById(
       'deliverBtn'
     );
 
-
   const errorBox =
     document.getElementById(
       'deliveryError'
     );
-
 
   button.disabled = true;
 
@@ -3941,12 +5136,11 @@ async function deliver(){
 
   errorBox.innerHTML = '';
 
-
   try{
 
     const {
-      data: solicitud,
-      error: consultaError
+      data:solicitud,
+      error:consultaError
     } =
       await supabaseClient
         .from('solicitudes')
@@ -3957,7 +5151,6 @@ async function deliver(){
         )
         .maybeSingle();
 
-
     if(consultaError){
 
       throw new Error(
@@ -3967,7 +5160,6 @@ async function deliver(){
 
     }
 
-
     if(!solicitud){
 
       throw new Error(
@@ -3976,12 +5168,10 @@ async function deliver(){
 
     }
 
-
     const socioId =
       solicitud.socio_id ||
       selectedPartner?.id ||
       null;
-
 
     if(!socioId){
 
@@ -3991,27 +5181,15 @@ async function deliver(){
 
     }
 
-
-    /*
-      Intentamos guardar la fecha de entrega.
-      Si la tabla no tiene delivered_at,
-      hacemos la actualización normal.
-    */
-
-    let solicitudEntregada = null;
-
-    let entregaError = null;
-
-
-    const resultadoConFecha =
+    const {
+      data:solicitudEntregada,
+      error:entregaError
+    } =
       await supabaseClient
         .from('solicitudes')
         .update({
 
-          estado:'entregada',
-
-          delivered_at:
-            new Date().toISOString()
+          estado:'entregada'
 
         })
         .eq(
@@ -4025,65 +5203,6 @@ async function deliver(){
         .select()
         .maybeSingle();
 
-
-    solicitudEntregada =
-      resultadoConFecha.data;
-
-    entregaError =
-      resultadoConFecha.error;
-
-
-    /*
-      Si delivered_at no existe, intentamos
-      actualizar solamente estado.
-    */
-
-    if(
-      entregaError &&
-      (
-        String(
-          entregaError.message || ''
-        )
-        .toLowerCase()
-        .includes('delivered_at')
-        ||
-        String(
-          entregaError.message || ''
-        )
-        .toLowerCase()
-        .includes('column')
-      )
-    ){
-
-      const resultadoSimple =
-        await supabaseClient
-          .from('solicitudes')
-          .update({
-
-            estado:'entregada'
-
-          })
-          .eq(
-            'id',
-            solicitud.id
-          )
-          .eq(
-            'estado',
-            'asignada'
-          )
-          .select()
-          .maybeSingle();
-
-
-      solicitudEntregada =
-        resultadoSimple.data;
-
-      entregaError =
-        resultadoSimple.error;
-
-    }
-
-
     if(entregaError){
 
       throw new Error(
@@ -4093,56 +5212,9 @@ async function deliver(){
 
     }
 
-
-    if(!solicitudEntregada){
-
-      const {
-        data: verificacionSolicitud,
-        error: verificacionError
-      } =
-        await supabaseClient
-          .from('solicitudes')
-          .select('*')
-          .eq(
-            'id',
-            solicitud.id
-          )
-          .maybeSingle();
-
-
-      if(verificacionError){
-
-        throw new Error(
-          'No se pudo verificar el estado:\n' +
-          formatSupabaseError(verificacionError)
-        );
-
-      }
-
-
-      if(
-        verificacionSolicitud &&
-        verificacionSolicitud.estado ===
-        'entregada'
-      ){
-
-        solicitudEntregada =
-          verificacionSolicitud;
-
-      }else{
-
-        throw new Error(
-          'La solicitud no pudo cambiar a entregada.'
-        );
-
-      }
-
-    }
-
-
     const {
-      data: socioLiberado,
-      error: socioError
+      data:socioLiberado,
+      error:socioError
     } =
       await supabaseClient
         .from('socios')
@@ -4162,7 +5234,6 @@ async function deliver(){
         .select()
         .maybeSingle();
 
-
     if(socioError){
 
       throw new Error(
@@ -4172,10 +5243,9 @@ async function deliver(){
 
     }
 
-
     const {
-      data: socioVerificado,
-      error: verificarSocioError
+      data:socioVerificado,
+      error:verificarSocioError
     } =
       await supabaseClient
         .from('socios')
@@ -4186,27 +5256,17 @@ async function deliver(){
         )
         .maybeSingle();
 
-
     if(verificarSocioError){
 
       throw new Error(
-        'No se pudo verificar el nuevo estado:\n' +
+        'No se pudo verificar el nuevo estado del socio:\n' +
         formatSupabaseError(verificarSocioError)
       );
 
     }
 
-
-    if(!socioVerificado){
-
-      throw new Error(
-        'El socio no fue encontrado.'
-      );
-
-    }
-
-
     if(
+      !socioVerificado ||
       String(
         socioVerificado.estado || ''
       )
@@ -4216,18 +5276,14 @@ async function deliver(){
     ){
 
       throw new Error(
-        'El socio todavía aparece como "' +
-        socioVerificado.estado +
-        '".'
+        'El servicio terminó, pero el socio todavía no aparece disponible.'
       );
 
     }
 
-
     currentDemand =
       solicitudEntregada ||
       solicitud;
-
 
     selectedPartner = {
 
@@ -4244,7 +5300,6 @@ async function deliver(){
 
     };
 
-
     document.getElementById(
       'deliveredPartner'
     ).textContent =
@@ -4252,11 +5307,15 @@ async function deliver(){
       selectedPartner.nombre ||
       'Socio';
 
-
     await loadPartners(true);
 
-    await loadHistory();
+    await loadAdminHistory();
 
+    if(usuarioActual){
+
+      await loadHistory();
+
+    }
 
     const socioActual =
       socios.find(
@@ -4265,7 +5324,6 @@ async function deliver(){
           String(socioId)
       );
 
-
     if(socioActual){
 
       selectedPartner =
@@ -4273,9 +5331,7 @@ async function deliver(){
 
     }
 
-
     show('delivered');
-
 
   }catch(error){
 
@@ -4284,15 +5340,11 @@ async function deliver(){
       error
     );
 
-
     errorBox.innerHTML = `
 
       <div class="error">
 
-        ❌ <b>
-        No se pudo finalizar completamente
-        el servicio.
-        </b>
+        ❌ <b>No se pudo finalizar completamente el servicio.</b>
 
         <code>${escapeHtml(
           error.message ||
@@ -4302,7 +5354,6 @@ async function deliver(){
       </div>
 
     `;
-
 
   }finally{
 
@@ -4317,93 +5368,55 @@ async function deliver(){
 
 
 /* =====================================================
-   HISTORIAL
+   HISTORIAL CENTRAL
 ===================================================== */
 
-async function loadHistory(){
+async function loadAdminHistory(){
 
   if(!checkSupabase())
     return;
 
-
-  const historyList =
+  const box =
     document.getElementById(
-      'historyList'
+      'adminHistory'
     );
 
-
-  if(!historyList)
+  if(!box)
     return;
 
-
-  historyList.innerHTML = `
+  box.innerHTML = `
 
     <div class="loading">
-      ⏳ Cargando historial...
+      ⏳ Cargando solicitudes...
     </div>
 
   `;
 
-
-  const filtro =
-    document.getElementById(
-      'historyFilter'
-    )?.value ||
-    'todas';
-
-
   try{
-
-    /*
-      Primero obtenemos las solicitudes.
-      No dependemos de una relación FK con socios,
-      por lo que funciona aunque la relación no
-      esté configurada para joins.
-    */
-
-    let query =
-      supabaseClient
-        .from('solicitudes')
-        .select('*')
-        .order(
-          'id',
-          {
-            ascending:false
-          }
-        );
-
-
-    if(filtro !== 'todas'){
-
-      query =
-        query.eq(
-          'estado',
-          filtro
-        );
-
-    }
-
 
     const {
       data,
       error
     } =
-      await query;
-
+      await supabaseClient
+        .from('solicitudes')
+        .select('*')
+        .order(
+          'created_at',
+          {
+            ascending:false
+          }
+        )
+        .limit(30);
 
     if(error){
 
-      console.error(
-        'Error historial:',
-        error
-      );
-
-
-      historyList.innerHTML = `
+      box.innerHTML = `
 
         <div class="error">
 
-          ❌ No se pudo cargar el historial.
+          ❌ No se pudieron cargar
+          las solicitudes.
 
           <code>${escapeHtml(
             formatSupabaseError(error)
@@ -4417,18 +5430,13 @@ async function loadHistory(){
 
     }
 
+    if(!data || data.length === 0){
 
-    const solicitudes =
-      data || [];
-
-
-    if(solicitudes.length === 0){
-
-      historyList.innerHTML = `
+      box.innerHTML = `
 
         <div class="empty">
 
-          📜 No hay solicitudes en el historial.
+          📋 No hay solicitudes registradas.
 
         </div>
 
@@ -4438,83 +5446,18 @@ async function loadHistory(){
 
     }
 
-
-    /*
-      Obtenemos los socios relacionados.
-    */
-
-    const idsSocios =
-      [
-        ...new Set(
-          solicitudes
-            .map(s => s.socio_id)
-            .filter(Boolean)
-            .map(id => String(id))
-        )
-      ];
-
-
-    let sociosHistorial = [];
-
-
-    if(idsSocios.length > 0){
-
-      const {
-        data: sociosData,
-        error: sociosError
-      } =
-        await supabaseClient
-          .from('socios')
-          .select(
-            'id,nombre,vehiculo'
-          )
-          .in(
-            'id',
-            idsSocios
-          );
-
-
-      if(!sociosError){
-
-        sociosHistorial =
-          sociosData || [];
-
-      }
-
-    }
-
-
-    historyList.innerHTML =
-      solicitudes
-        .map(solicitud => {
-
-          const socio =
-            sociosHistorial.find(
-              s =>
-                String(s.id) ===
-                String(solicitud.socio_id)
-            );
-
-
-          return renderHistoryCard(
-            solicitud,
-            socio
-          );
-
-        })
+    box.innerHTML =
+      data
+        .map(renderAdminHistoryItem)
         .join('');
-
 
   }catch(error){
 
-    console.error(error);
-
-
-    historyList.innerHTML = `
+    box.innerHTML = `
 
       <div class="error">
 
-        ❌ Error cargando historial.
+        ❌ Error cargando solicitudes.
 
         <code>${escapeHtml(
           error.message ||
@@ -4530,127 +5473,62 @@ async function loadHistory(){
 }
 
 
-/* =====================================================
-   TARJETA HISTORIAL
-===================================================== */
-
-function renderHistoryCard(
-  solicitud,
-  socio
-){
-
-  const estado =
-    String(
-      solicitud.estado || 'desconocido'
-    )
-    .toLowerCase()
-    .trim();
-
-
-  let estadoHtml = '';
-
-
-  if(estado === 'entregada'){
-
-    estadoHtml = `
-
-      <span class="pill">
-        🟢 ENTREGADA
-      </span>
-
-    `;
-
-  }else if(estado === 'asignada'){
-
-    estadoHtml = `
-
-      <span class="pill red">
-        🔴 EN SERVICIO
-      </span>
-
-    `;
-
-  }else if(estado === 'pendiente'){
-
-    estadoHtml = `
-
-      <span class="pill">
-        🟡 PENDIENTE
-      </span>
-
-    `;
-
-  }else{
-
-    estadoHtml = `
-
-      <span class="pill red">
-        ${escapeHtml(estado)}
-      </span>
-
-    `;
-
-  }
-
-
-  const fechaCreacion =
-    formatFecha(
-      solicitud.created_at
-    );
-
-
-  const fechaEntrega =
-    solicitud.delivered_at
-    ? formatFecha(
-        solicitud.delivered_at
-      )
-    : null;
-
+function renderAdminHistoryItem(solicitud){
 
   return `
 
-    <div class="history-card">
+    <div class="history-item">
 
       <div class="history-date">
 
-        📅 Creada:
-        ${escapeHtml(
-          fechaCreacion
-        )}
-
-      </div>
-
-
-      <div class="history-id">
-
-        📦 Solicitud #
-        ${escapeHtml(
-          String(
-            solicitud.id
+        🕐 ${escapeHtml(
+          formatFecha(
+            solicitud.created_at
           )
         )}
 
       </div>
 
+      <b>
 
-      <div class="history-status">
+        📦 Solicitud #${escapeHtml(
+          String(solicitud.id)
+        )}
 
-        ${estadoHtml}
-
-      </div>
-
+      </b>
 
       <p>
 
-        📍 <b>Origen:</b>
+        👤 <b>
 
-        ${escapeHtml(
-          solicitud.origen || '-'
+          ${escapeHtml(
+            solicitud.usuario_nombre ||
+            'Cliente no registrado'
+          )}
+
+        </b>
+
+        <br>
+
+        📞 ${escapeHtml(
+          solicitud.usuario_telefono ||
+          'Sin teléfono'
         )}
 
         <br>
 
-        📍 <b>Destino:</b>
+        📧 ${escapeHtml(
+          solicitud.usuario_correo ||
+          'Sin correo'
+        )}
+
+        <br><br>
+
+        📍 ${escapeHtml(
+          solicitud.origen || '-'
+        )}
+
+        →
 
         ${escapeHtml(
           solicitud.destino || '-'
@@ -4658,17 +5536,13 @@ function renderHistoryCard(
 
         <br>
 
-        📦 <b>Mercancía:</b>
-
-        ${escapeHtml(
+        📦 ${escapeHtml(
           solicitud.mercancia || '-'
         )}
 
         <br>
 
-        ⚖️ <b>Cantidad:</b>
-
-        ${escapeHtml(
+        ⚖️ ${escapeHtml(
           String(
             solicitud.cantidas ?? '-'
           )
@@ -4678,85 +5552,24 @@ function renderHistoryCard(
           solicitud.unidad || ''
         )}
 
+        <br>
+
+        🚚 Socio:
+
+        ${escapeHtml(
+          solicitud.socio_nombre ||
+          'Sin asignar'
+        )}
+
       </p>
 
+      <span class="history-status">
 
-      <div class="card dark">
+        ${escapeHtml(
+          solicitud.estado || 'pendiente'
+        )}
 
-        🚚 <b>Socio:</b>
-
-        ${
-          socio
-
-          ?
-
-          escapeHtml(
-            socio.nombre ||
-            'Socio'
-          )
-
-          :
-
-          solicitud.socio_id
-
-          ?
-
-          'Socio #' +
-          escapeHtml(
-            String(
-              solicitud.socio_id
-            )
-          )
-
-          :
-
-          'Sin socio asignado'
-
-        }
-
-        ${
-          socio?.vehiculo
-
-          ?
-
-          `<br>
-           🚛 ${escapeHtml(
-             socio.vehiculo
-           )}`
-
-          :
-
-          ''
-
-        }
-
-      </div>
-
-
-      ${
-        fechaEntrega
-
-        ?
-
-        `
-
-          <div class="success">
-
-            ✅ Entregada:
-
-            ${escapeHtml(
-              fechaEntrega
-            )}
-
-          </div>
-
-        `
-
-        :
-
-        ''
-
-      }
+      </span>
 
     </div>
 
@@ -4775,27 +5588,22 @@ function resetApp(){
 
   selectedPartner = null;
 
-
   document.getElementById(
     'selectedPartnerCard'
   ).innerHTML = '';
-
 
   document.getElementById(
     'requestError'
   ).innerHTML = '';
 
-
   document.getElementById(
     'assignmentError'
   ).innerHTML = '';
-
 
   const deliveryError =
     document.getElementById(
       'deliveryError'
     );
-
 
   if(deliveryError){
 
@@ -4803,8 +5611,7 @@ function resetApp(){
 
   }
 
-
-  show('request');
+  show('home');
 
 }
 
@@ -4818,13 +5625,10 @@ async function actualizarSociosAutomaticamente(){
   if(!supabaseClient)
     return;
 
-
   if(actualizandoSocios)
     return;
 
-
   actualizandoSocios = true;
-
 
   try{
 
@@ -4837,7 +5641,6 @@ async function actualizarSociosAutomaticamente(){
         .select('*')
         .order('id');
 
-
     if(error){
 
       console.error(
@@ -4849,16 +5652,13 @@ async function actualizarSociosAutomaticamente(){
 
     }
 
-
     const nuevosSocios =
       data || [];
-
 
     const nuevoHash =
       crearHashSocios(
         nuevosSocios
       );
-
 
     if(nuevoHash === sociosHash){
 
@@ -4866,78 +5666,15 @@ async function actualizarSociosAutomaticamente(){
 
     }
 
-
     socios =
       nuevosSocios;
 
     sociosHash =
       nuevoHash;
 
-
     renderPartners();
 
     updateNetworkStats();
-
-
-    if(selectedPartner){
-
-      const socioActual =
-        socios.find(s =>
-          String(s.id) ===
-          String(selectedPartner.id)
-        );
-
-
-      if(
-        socioActual &&
-        String(
-          socioActual.estado || ''
-        )
-        .toLowerCase()
-        .trim()
-        !== 'disponible'
-      ){
-
-        if(
-          document
-            .getElementById('assignment')
-            ?.classList.contains('active')
-        ){
-
-          selectedPartner = null;
-
-
-          const errorBox =
-            document.getElementById(
-              'assignmentError'
-            );
-
-
-          if(errorBox){
-
-            errorBox.innerHTML = `
-
-              <div class="error">
-
-                🔴 El socio seleccionado acaba
-                de ser ocupado por otro usuario.
-
-                <br><br>
-
-                Selecciona otro socio disponible.
-
-              </div>
-
-            `;
-
-          }
-
-        }
-
-      }
-
-    }
-
 
   }catch(error){
 
@@ -4955,34 +5692,51 @@ async function actualizarSociosAutomaticamente(){
 }
 
 
-setInterval(
-  actualizarSociosAutomaticamente,
-  5000
-);
+/* =====================================================
+   ESCUCHAR CAMBIOS DE AUTENTICACIÓN
+===================================================== */
+
+if(supabaseClient){
+
+  supabaseClient.auth.onAuthStateChange(
+    async (event,session) => {
+
+      usuarioActual =
+        session?.user || null;
+
+      if(usuarioActual){
+
+        /*
+           No hacemos una consulta compleja
+           dentro del callback inmediatamente.
+        */
+
+        setTimeout(
+          () => cargarUsuarioActual(),
+          0
+        );
+
+      }else{
+
+        perfilUsuario = null;
+
+        actualizarUsuarioUI();
+
+      }
+
+    }
+  );
+
+}
 
 
 /* =====================================================
-   ACTUALIZACIÓN AUTOMÁTICA DEL HISTORIAL
+   ACTUALIZACIÓN CADA 5 SEGUNDOS
 ===================================================== */
 
 setInterval(
-  async () => {
-
-    const adminScreen =
-      document.getElementById('admin');
-
-
-    if(
-      adminScreen &&
-      adminScreen.classList.contains('active')
-    ){
-
-      await loadHistory();
-
-    }
-
-  },
-  10000
+  actualizarSociosAutomaticamente,
+  5000
 );
 
 
@@ -4993,6 +5747,8 @@ setInterval(
 document.addEventListener(
   'DOMContentLoaded',
   async () => {
+
+    await cargarUsuarioActual();
 
     await loadPartners();
 
@@ -5006,39 +5762,3 @@ document.addEventListener(
 </body>
 
 </html>
-
-const insertData = {
-
-  origen: origin,
-
-  destino: dest,
-
-  mercancia: cargo,
-
-  cantidas: quantity,
-
-  unidad: unit,
-
-  estado: 'pendiente',
-
-  socio_id: null,
-
-  usuario_id:
-    usuarioActual.id,
-
-  usuario_nombre:
-    perfilUsuario?.nombre ||
-    usuarioActual.email,
-
-  usuario_telefono:
-    perfilUsuario?.telefono ||
-    '',
-
-  usuario_correo:
-    perfilUsuario?.correo ||
-    usuarioActual.email,
-
-  created_at:
-    new Date().toISOString()
-
-};
