@@ -405,6 +405,12 @@ hr{
   color:#b52b2b;
 }
 
+
+.optional{
+  font-weight:normal;
+  opacity:.7;
+  font-size:.9em;
+}
 </style>
 
 </head>
@@ -470,27 +476,6 @@ La central buscará los socios disponibles.
 
 <button
   class="btn alt"
-  onclick="openPartnerHome()"
->
-🚚 Soy socio transportador
-</button>
-
-<button
-  class="btn alt"
-  onclick="openRegister()"
->
-👤 Crear cuenta
-</button>
-
-<button
-  class="btn alt"
-  onclick="openUserLogin()"
->
-🔐 Iniciar sesión
-</button>
-
-<button
-  class="btn alt"
   onclick="openHistory()"
 >
 📋 Mi historial
@@ -498,9 +483,9 @@ La central buscará los socios disponibles.
 
 <button
   class="btn alt"
-  onclick="openAdmin()"
+  onclick="logoutUser()"
 >
-🖥️ Central de operaciones
+🚪 Cerrar sesión
 </button>
 
 </section>
@@ -543,7 +528,7 @@ Teléfono <span class="required">*</span>
 >
 
 <label>
-Correo electrónico <span class="required">*</span>
+Correo electrónico <span class="optional">(opcional)</span>
 </label>
 
 <input
@@ -578,7 +563,7 @@ Contraseña <span class="required">*</span>
 
 <button
   class="btn alt"
-  onclick="show('home')"
+  onclick="usuarioActual ? show('home') : show('register')"
 >
 Volver
 </button>
@@ -605,13 +590,14 @@ Ingresa para solicitar transporte y consultar tu historial.
 <div class="card">
 
 <label>
-Correo electrónico
+Correo o teléfono
 </label>
 
 <input
   id="userLoginEmail"
-  type="email"
-  placeholder="correo@ejemplo.com"
+  type="text"
+  inputmode="email"
+  placeholder="correo@ejemplo.com o 3101234567"
 >
 
 <label>
@@ -1479,16 +1465,8 @@ Inicio
 Solicitar
 </button>
 
-<button onclick="openPartnerHome()">
-Socios
-</button>
-
 <button onclick="openHistory()">
 Historial
-</button>
-
-<button onclick="openAdmin()">
-Central
 </button>
 
 </div>
@@ -1821,7 +1799,7 @@ async function cargarUsuarioActual(){
         error:perfilError
       } =
         await supabaseClient
-          .from('usuarios')
+          .from('perfiles')
           .select('*')
           .eq(
             'id',
@@ -1945,6 +1923,12 @@ async function registerUser(){
     return;
 
 
+  if(!usuarioActual){
+    show('register');
+    return;
+  }
+
+
   const nombre =
     document.getElementById(
       'registerName'
@@ -1987,7 +1971,6 @@ async function registerUser(){
   if(
     !nombre ||
     !telefono ||
-    !correo ||
     !password
   ){
 
@@ -1995,7 +1978,7 @@ async function registerUser(){
 
       <div class="error">
 
-        ❌ Completa todos los campos.
+        ❌ Completa nombre, teléfono y contraseña.
 
       </div>
 
@@ -2031,17 +2014,30 @@ async function registerUser(){
 
   try{
 
+    const telefonoLimpio = telefono.replace(/\D/g, '');
+
+    // Si el cliente no tiene correo, usamos un correo interno
+    // basado en el teléfono para que Supabase Auth pueda crear
+    // la cuenta con contraseña.
+    const correoAuth = correo ||
+      `${telefonoLimpio}@redtransportemocoa.app`;
+
     const {
       data,
       error
-    } =
-      await supabaseClient.auth.signUp({
+    } = await supabaseClient.auth.signUp({
 
-        email:correo,
+      email:correoAuth,
+      password:password,
+      options:{
+        data:{
+          nombre:nombre,
+          telefono:telefono,
+          correo_real:correo || null
+        }
+      }
 
-        password:password
-
-      });
+    });
 
 
     if(error){
@@ -2082,16 +2078,14 @@ async function registerUser(){
       error:perfilError
     } =
       await supabaseClient
-        .from('usuarios')
+        .from('perfiles')
         .upsert({
 
           id:data.user.id,
 
           nombre:nombre,
 
-          telefono:telefono,
-
-          correo:correo
+          telefono:telefono
 
         });
 
@@ -2138,9 +2132,7 @@ async function registerUser(){
 
       nombre:nombre,
 
-      telefono:telefono,
-
-      correo:correo
+      telefono:telefono
 
     };
 
@@ -2222,17 +2214,20 @@ async function loginUser(){
     return;
 
 
-  const email =
+  const identificador =
     document.getElementById(
       'userLoginEmail'
     ).value.trim().toLowerCase();
-
 
   const password =
     document.getElementById(
       'userLoginPassword'
     ).value;
 
+  const authEmail = /\d/.test(identificador) &&
+    !identificador.includes('@')
+    ? `${identificador.replace(/\D/g, '')}@redtransportemocoa.app`
+    : identificador;
 
   const errorBox =
     document.getElementById(
@@ -2249,13 +2244,13 @@ async function loginUser(){
   errorBox.innerHTML = '';
 
 
-  if(!email || !password){
+  if(!identificador || !password){
 
     errorBox.innerHTML = `
 
       <div class="error">
 
-        ❌ Escribe correo y contraseña.
+        ❌ Escribe tu correo o teléfono y la contraseña.
 
       </div>
 
@@ -2280,7 +2275,7 @@ async function loginUser(){
     } =
       await supabaseClient.auth.signInWithPassword({
 
-        email:email,
+        email:authEmail,
 
         password:password
 
@@ -5665,6 +5660,12 @@ async function openHistory(){
     return;
 
 
+  if(!usuarioActual){
+    show('register');
+    return;
+  }
+
+
   await cargarUsuarioActual();
 
 
@@ -6294,7 +6295,7 @@ if(supabaseClient){
             data
           } =
             await supabaseClient
-              .from('usuarios')
+              .from('perfiles')
               .select('*')
               .eq(
                 'id',
@@ -6320,6 +6321,10 @@ if(supabaseClient){
 
       actualizarCajasUsuario();
 
+      if(!usuarioActual && event === 'SIGNED_OUT'){
+        show('register');
+      }
+
     }
   );
 
@@ -6336,10 +6341,9 @@ document.addEventListener(
 
     await cargarUsuarioActual();
 
-    // Si NO hay usuario registrado/iniciado,
-    // obligamos a crear cuenta antes de usar la aplicación.
-    if (!usuarioActual) {
-      show('registro');
+    // El cliente debe tener una cuenta antes de usar la aplicación.
+    if(!usuarioActual){
+      show('register');
       return;
     }
 
