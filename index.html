@@ -405,12 +405,12 @@ hr{
   color:#b52b2b;
 }
 
-
 .optional{
+  color:#666;
+  font-size:0.9em;
   font-weight:normal;
-  opacity:.7;
-  font-size:.9em;
 }
+
 </style>
 
 </head>
@@ -476,6 +476,27 @@ La central buscará los socios disponibles.
 
 <button
   class="btn alt"
+  onclick="openPartnerHome()"
+>
+🚚 Soy socio transportador
+</button>
+
+<button
+  class="btn alt"
+  onclick="openRegister()"
+>
+👤 Crear cuenta
+</button>
+
+<button
+  class="btn alt"
+  onclick="openUserLogin()"
+>
+🔐 Iniciar sesión
+</button>
+
+<button
+  class="btn alt"
   onclick="openHistory()"
 >
 📋 Mi historial
@@ -483,9 +504,9 @@ La central buscará los socios disponibles.
 
 <button
   class="btn alt"
-  onclick="logoutUser()"
+  onclick="openAdmin()"
 >
-🚪 Cerrar sesión
+🖥️ Central de operaciones
 </button>
 
 </section>
@@ -563,7 +584,7 @@ Contraseña <span class="required">*</span>
 
 <button
   class="btn alt"
-  onclick="usuarioActual ? show('home') : show('register')"
+  onclick="show('home')"
 >
 Volver
 </button>
@@ -590,14 +611,13 @@ Ingresa para solicitar transporte y consultar tu historial.
 <div class="card">
 
 <label>
-Correo o teléfono
+Correo electrónico
 </label>
 
 <input
   id="userLoginEmail"
-  type="text"
-  inputmode="email"
-  placeholder="correo@ejemplo.com o 3101234567"
+  type="email"
+  placeholder="correo@ejemplo.com"
 >
 
 <label>
@@ -1465,8 +1485,16 @@ Inicio
 Solicitar
 </button>
 
+<button onclick="openPartnerHome()">
+Socios
+</button>
+
 <button onclick="openHistory()">
 Historial
+</button>
+
+<button onclick="openAdmin()">
+Central
 </button>
 
 </div>
@@ -1923,12 +1951,6 @@ async function registerUser(){
     return;
 
 
-  if(!usuarioActual){
-    show('register');
-    return;
-  }
-
-
   const nombre =
     document.getElementById(
       'registerName'
@@ -1978,7 +2000,7 @@ async function registerUser(){
 
       <div class="error">
 
-        ❌ Completa nombre, teléfono y contraseña.
+        ❌ Completa todos los campos.
 
       </div>
 
@@ -2014,30 +2036,17 @@ async function registerUser(){
 
   try{
 
-    const telefonoLimpio = telefono.replace(/\D/g, '');
-
-    // Si el cliente no tiene correo, usamos un correo interno
-    // basado en el teléfono para que Supabase Auth pueda crear
-    // la cuenta con contraseña.
-    const correoAuth = correo ||
-      `${telefonoLimpio}@redtransportemocoa.app`;
-
     const {
       data,
       error
-    } = await supabaseClient.auth.signUp({
+    } =
+      await supabaseClient.auth.signUp({
 
-      email:correoAuth,
-      password:password,
-      options:{
-        data:{
-          nombre:nombre,
-          telefono:telefono,
-          correo_real:correo || null
-        }
-      }
+        email:correo,
 
-    });
+        password:password
+
+      });
 
 
     if(error){
@@ -2085,7 +2094,8 @@ async function registerUser(){
 
           nombre:nombre,
 
-          telefono:telefono
+          telefono:telefono,
+
 
         });
 
@@ -2132,7 +2142,9 @@ async function registerUser(){
 
       nombre:nombre,
 
-      telefono:telefono
+      telefono:telefono,
+
+      correo:correo
 
     };
 
@@ -2214,20 +2226,17 @@ async function loginUser(){
     return;
 
 
-  const identificador =
+  const email =
     document.getElementById(
       'userLoginEmail'
     ).value.trim().toLowerCase();
+
 
   const password =
     document.getElementById(
       'userLoginPassword'
     ).value;
 
-  const authEmail = /\d/.test(identificador) &&
-    !identificador.includes('@')
-    ? `${identificador.replace(/\D/g, '')}@redtransportemocoa.app`
-    : identificador;
 
   const errorBox =
     document.getElementById(
@@ -2244,13 +2253,13 @@ async function loginUser(){
   errorBox.innerHTML = '';
 
 
-  if(!identificador || !password){
+  if(!email || !password){
 
     errorBox.innerHTML = `
 
       <div class="error">
 
-        ❌ Escribe tu correo o teléfono y la contraseña.
+        ❌ Escribe correo y contraseña.
 
       </div>
 
@@ -2275,7 +2284,7 @@ async function loginUser(){
     } =
       await supabaseClient.auth.signInWithPassword({
 
-        email:authEmail,
+        email:email,
 
         password:password
 
@@ -2308,6 +2317,11 @@ async function loginUser(){
 
 
     await cargarUsuarioActual();
+
+    if(!usuarioActual){
+      show('register');
+      return;
+    }
 
     actualizarCajasUsuario();
 
@@ -5660,12 +5674,6 @@ async function openHistory(){
     return;
 
 
-  if(!usuarioActual){
-    show('register');
-    return;
-  }
-
-
   await cargarUsuarioActual();
 
 
@@ -6321,10 +6329,6 @@ if(supabaseClient){
 
       actualizarCajasUsuario();
 
-      if(!usuarioActual && event === 'SIGNED_OUT'){
-        show('register');
-      }
-
     }
   );
 
@@ -6340,12 +6344,6 @@ document.addEventListener(
   async () => {
 
     await cargarUsuarioActual();
-
-    // El cliente debe tener una cuenta antes de usar la aplicación.
-    if(!usuarioActual){
-      show('register');
-      return;
-    }
 
     actualizarCajasUsuario();
 
