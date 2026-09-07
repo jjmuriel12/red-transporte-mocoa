@@ -1821,7 +1821,7 @@ async function cargarUsuarioActual(){
         error:perfilError
       } =
         await supabaseClient
-          .from('usuarios')
+          .from('perfiles')
           .select('*')
           .eq(
             'id',
@@ -2082,7 +2082,7 @@ async function registerUser(){
       error:perfilError
     } =
       await supabaseClient
-        .from('usuarios')
+        .from('perfiles')
         .upsert({
 
           id:data.user.id,
@@ -2091,7 +2091,6 @@ async function registerUser(){
 
           telefono:telefono,
 
-          correo:correo
 
         });
 
@@ -6294,7 +6293,7 @@ if(supabaseClient){
             data
           } =
             await supabaseClient
-              .from('usuarios')
+              .from('perfiles')
               .select('*')
               .eq(
                 'id',
