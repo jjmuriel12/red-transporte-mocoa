@@ -405,12 +405,6 @@ hr{
   color:#b52b2b;
 }
 
-.optional{
-  color:#666;
-  font-size:0.9em;
-  font-weight:normal;
-}
-
 </style>
 
 </head>
@@ -451,21 +445,8 @@ hr{
 </h1>
 
 <p>
-Encuentra un socio transportador disponible en Mocoa.
+Transporte de mercancías en Mocoa.
 </p>
-
-<div class="card">
-
-<b>
-📦 Solicita tu transporte
-</b>
-
-<p>
-Indica origen, destino, mercancía y cantidad.
-La central buscará los socios disponibles.
-</p>
-
-</div>
 
 <button
   class="btn"
@@ -476,37 +457,16 @@ La central buscará los socios disponibles.
 
 <button
   class="btn alt"
-  onclick="openPartnerHome()"
->
-🚚 Soy socio transportador
-</button>
-
-<button
-  class="btn alt"
-  onclick="openRegister()"
->
-👤 Crear cuenta
-</button>
-
-<button
-  class="btn alt"
-  onclick="openUserLogin()"
->
-🔐 Iniciar sesión
-</button>
-
-<button
-  class="btn alt"
   onclick="openHistory()"
 >
 📋 Mi historial
 </button>
 
 <button
-  class="btn alt"
-  onclick="openAdmin()"
+  class="btn danger"
+  onclick="logoutUser()"
 >
-🖥️ Central de operaciones
+🚪 Cerrar sesión
 </button>
 
 </section>
@@ -549,7 +509,7 @@ Teléfono <span class="required">*</span>
 >
 
 <label>
-Correo electrónico <span class="optional">(opcional)</span>
+Correo electrónico <span style="color:#687681;font-weight:400">(opcional)</span>
 </label>
 
 <input
@@ -1485,16 +1445,8 @@ Inicio
 Solicitar
 </button>
 
-<button onclick="openPartnerHome()">
-Socios
-</button>
-
 <button onclick="openHistory()">
 Historial
-</button>
-
-<button onclick="openAdmin()">
-Central
 </button>
 
 </div>
@@ -1733,7 +1685,7 @@ async function openRequest(){
 
   if(!usuarioActual){
 
-    show('userLogin');
+    show('register');
 
     const box =
       document.getElementById(
@@ -1875,20 +1827,11 @@ function actualizarCajasUsuario(){
 
   const nombre =
     perfilUsuario?.nombre ||
-    usuarioActual?.email ||
-    'Usuario';
-
+    'Cliente';
 
   const telefono =
     perfilUsuario?.telefono ||
     '';
-
-
-  const correo =
-    perfilUsuario?.correo ||
-    usuarioActual?.email ||
-    '';
-
 
   const html = `
 
@@ -1899,12 +1842,6 @@ function actualizarCajasUsuario(){
       ${
         telefono
         ? `<br>📞 ${escapeHtml(telefono)}`
-        : ''
-      }
-
-      ${
-        correo
-        ? `<br>✉️ ${escapeHtml(correo)}`
         : ''
       }
 
@@ -1939,7 +1876,6 @@ function actualizarCajasUsuario(){
   });
 
 }
-
 
 /* =====================================================
    REGISTRO USUARIO
@@ -2036,13 +1972,17 @@ async function registerUser(){
 
   try{
 
+    const correoAuth =
+      correo ||
+      (telefono.replace(/\D/g,'') + '@clientes.redtransportemocoa.local');
+
     const {
       data,
       error
     } =
       await supabaseClient.auth.signUp({
 
-        email:correo,
+        email:correoAuth,
 
         password:password
 
@@ -2094,8 +2034,7 @@ async function registerUser(){
 
           nombre:nombre,
 
-          telefono:telefono,
-
+          telefono:telefono
 
         });
 
@@ -2142,9 +2081,7 @@ async function registerUser(){
 
       nombre:nombre,
 
-      telefono:telefono,
-
-      correo:correo
+      telefono:telefono
 
     };
 
@@ -2318,11 +2255,6 @@ async function loginUser(){
 
     await cargarUsuarioActual();
 
-    if(!usuarioActual){
-      show('register');
-      return;
-    }
-
     actualizarCajasUsuario();
 
 
@@ -2398,7 +2330,7 @@ async function logoutUser(){
   selectedPartner = null;
 
 
-  show('home');
+  show('register');
 
 }
 
@@ -6329,6 +6261,10 @@ if(supabaseClient){
 
       actualizarCajasUsuario();
 
+      if(!usuarioActual){
+        show('register');
+      }
+
     }
   );
 
@@ -6344,6 +6280,11 @@ document.addEventListener(
   async () => {
 
     await cargarUsuarioActual();
+
+    if(!usuarioActual){
+      show('register');
+      return;
+    }
 
     actualizarCajasUsuario();
 
