@@ -6336,13 +6336,6 @@ document.addEventListener(
 
     await cargarUsuarioActual();
 
-    // Si NO hay usuario registrado/iniciado,
-    // obligamos a crear cuenta antes de usar la aplicación.
-    if (!usuarioActual) {
-      show('registro');
-      return;
-    }
-
     actualizarCajasUsuario();
 
     await loadPartners();
