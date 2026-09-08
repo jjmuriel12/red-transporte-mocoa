@@ -405,6 +405,27 @@ hr{
   color:#b52b2b;
 }
 
+
+/* =====================================================
+   NUEVA ESTRUCTURA: APP CLIENTE / APP CENTRAL
+===================================================== */
+.central-only{display:none!important}
+.client-only{display:block}
+
+.app-mode-central .client-only{display:none!important}
+.app-mode-central .central-only{display:block}
+.app-mode-client .central-only{display:none!important}
+.app-mode-client .client-only{display:block}
+
+.simple-title{
+  text-align:center;
+  font-weight:800;
+}
+
+.central-header{
+  margin-bottom:14px;
+}
+
 </style>
 
 </head>
@@ -432,7 +453,7 @@ hr{
      INICIO
 ============================== -->
 
-<section id="home" class="screen active">
+<section id="home" class="screen active client-only">
 
 <div id="homeUserBox"></div>
 
@@ -441,67 +462,51 @@ hr{
 </div>
 
 <h1>
-¿Necesitas transporte?
+RED TRANSPORTE MOCOA
 </h1>
 
 <p>
-Encuentra un socio transportador disponible en Mocoa.
+Tu transporte de mercancías, fácil y rápido.
 </p>
 
 <div class="card">
-
-<b>
-📦 Solicita tu transporte
-</b>
-
+<b>📦 1. Solicita tu transporte</b>
 <p>
-Indica origen, destino, mercancía y cantidad.
-La central buscará los socios disponibles.
+Dinos de dónde sale, para dónde va y qué necesitas transportar.
 </p>
-
 </div>
 
-<button
-  class="btn"
-  onclick="openRequest()"
->
-📦 Solicitar transporte
+<button class="btn" onclick="openRequest()">
+📦 SOLICITAR TRANSPORTE
 </button>
 
-<button
-  class="btn alt"
-  onclick="openPartnerHome()"
->
-🚚 Soy socio transportador
+<div class="card">
+<b>📋 2. Mira tus servicios</b>
+<p>
+Consulta tus solicitudes y revisa en qué estado están.
+</p>
+</div>
+
+<button class="btn alt" onclick="openHistory()">
+📋 MIS SERVICIOS
 </button>
 
-<button
-  class="btn alt"
-  onclick="openRegister()"
->
-👤 Crear cuenta
+<div class="card">
+<b>👤 3. Tu cuenta</b>
+<p>
+Regístrate una sola vez para poder solicitar y consultar tus servicios.
+</p>
+</div>
+
+<div class="user-actions">
+<button class="btn alt" onclick="openRegister()">
+👤 CREAR CUENTA
 </button>
 
-<button
-  class="btn alt"
-  onclick="openUserLogin()"
->
-🔐 Iniciar sesión
+<button class="btn alt" onclick="openUserLogin()">
+🔐 ENTRAR
 </button>
-
-<button
-  class="btn alt"
-  onclick="openHistory()"
->
-📋 Mi historial
-</button>
-
-<button
-  class="btn alt"
-  onclick="openAdmin()"
->
-🖥️ Central de operaciones
-</button>
+</div>
 
 </section>
 
@@ -510,7 +515,7 @@ La central buscará los socios disponibles.
      REGISTRO USUARIO
 ============================== -->
 
-<section id="register" class="screen">
+<section id="register" class="screen" client-only>
 
 <h2>
 👤 Crear cuenta
@@ -590,7 +595,7 @@ Volver
      LOGIN USUARIO
 ============================== -->
 
-<section id="userLogin" class="screen">
+<section id="userLogin" class="screen" client-only>
 
 <div class="login-box">
 
@@ -661,7 +666,7 @@ Volver
      SOLICITUD
 ============================== -->
 
-<section id="request" class="screen">
+<section id="request" class="screen" client-only>
 
 <h2>
 📦 Nueva solicitud
@@ -790,7 +795,7 @@ Volver
      MATCHING
 ============================== -->
 
-<section id="matching" class="screen">
+<section id="matching" class="screen" client-only>
 
 <h2>
 🔎 Socios disponibles
@@ -830,7 +835,7 @@ Nueva solicitud
      ASIGNACIÓN
 ============================== -->
 
-<section id="assignment" class="screen">
+<section id="assignment" class="screen" client-only>
 
 <h2>
 🎯 Socio seleccionado
@@ -1016,7 +1021,7 @@ Nueva solicitud
      HISTORIAL USUARIO
 ============================== -->
 
-<section id="history" class="screen">
+<section id="history" class="screen" client-only>
 
 <h2>
 📋 Mi historial
@@ -1046,7 +1051,7 @@ Volver
      PANEL SOCIO
 ============================== -->
 
-<section id="partnerHome" class="screen">
+<section id="partnerHome" class="screen" central-only>
 
 <h2>
 🚚 Panel del socio
@@ -1113,7 +1118,7 @@ Volver
      REGISTRO SOCIO
 ============================== -->
 
-<section id="partnerRegister" class="screen">
+<section id="partnerRegister" class="screen" central-only>
 
 <h2>
 🚚 Quiero ser socio
@@ -1215,7 +1220,7 @@ Volver
      DEMANDA SOCIO
 ============================== -->
 
-<section id="partnerDemand" class="screen">
+<section id="partnerDemand" class="screen" central-only>
 
 <h2>
 🔔 Demanda disponible
@@ -1259,7 +1264,7 @@ Volver
      LOGIN ADMIN
 ============================== -->
 
-<section id="adminLogin" class="screen">
+<section id="adminLogin" class="screen" central-only>
 
 <div class="login-box">
 
@@ -1324,7 +1329,7 @@ Volver
      CENTRAL
 ============================== -->
 
-<section id="admin" class="screen">
+<section id="admin" class="screen" central-only>
 
 <h2>
 🖥️ Central de operaciones
@@ -1469,7 +1474,7 @@ Cargando solicitudes...
      NAVEGACIÓN
 ============================== -->
 
-<div class="nav">
+<div class="nav client-only">
 
 <button onclick="show('home')">
 Inicio
@@ -1479,16 +1484,8 @@ Inicio
 Solicitar
 </button>
 
-<button onclick="openPartnerHome()">
-Socios
-</button>
-
 <button onclick="openHistory()">
 Historial
-</button>
-
-<button onclick="openAdmin()">
-Central
 </button>
 
 </div>
@@ -1501,6 +1498,43 @@ Central
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
+
+/* =====================================================
+   MODO DE LA APLICACIÓN
+   cliente.html = experiencia sencilla del cliente
+   central.html = aplicación madre / administración
+===================================================== */
+const APP_MODE = window.RED_TRANSPORTE_APP_MODE || 'cliente';
+
+document.documentElement.classList.add(
+  APP_MODE === 'central' ? 'app-mode-central' : 'app-mode-client'
+);
+
+function iniciarModoAplicacion(){
+  if(APP_MODE === 'central'){
+    /*
+      La Central siempre empieza protegida.
+      El administrador entra mediante loginAdmin().
+    */
+    const home = document.getElementById('home');
+    const adminLogin = document.getElementById('adminLogin');
+
+    if(home) home.classList.remove('active');
+    if(adminLogin){
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      adminLogin.classList.add('active');
+    }
+  }else{
+    /*
+      El cliente solamente ve la experiencia sencilla.
+      Socios y Central siguen dentro del código madre,
+      pero no forman parte de esta aplicación.
+    */
+    document.querySelectorAll('.central-only').forEach(el => el.style.display = 'none');
+  }
+}
+
+
 
 /* =====================================================
    CONFIGURACIÓN SUPABASE
@@ -6349,3 +6383,6 @@ document.addEventListener(
 </body>
 
 </html>
+<script>
+document.addEventListener('DOMContentLoaded', iniciarModoAplicacion);
+</script>
