@@ -1,22 +1,4 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>App de Transporte</title>
-<script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
-<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
-<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-<style>
-  * { box-sizing: border-box; }
-  body { margin: 0; }
-</style>
-</head>
-<body>
-<div id="root"></div>
-
-<script type="text/babel">
-const { useState } = React;
+import { useState } from "react";
 
 const SERVICIOS = [
   {
@@ -58,3 +40,460 @@ const SERVICIOS = [
       </svg>
     ),
   },
+  {
+    id: "transportista",
+    titulo: "Soy transportista",
+    descripcion: "Ofrece tu vehículo para transportar carga o personas.",
+    campos: ["nombre", "vehiculo", "placa", "zona"],
+    Icono: (props) => (
+      <svg viewBox="0 0 48 48" fill="none" {...props}>
+        <circle cx="24" cy="24" r="16" stroke="currentColor" strokeWidth="2" />
+        <circle cx="24" cy="24" r="4" fill="currentColor" />
+        <path
+          d="M24 8V16M24 32V40M8 24H16M32 24H40"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+        />
+      </svg>
+    ),
+  },
+];
+
+const CONDUCTORES = [
+  {
+    id: "c1",
+    nombre: "Andrés Rojas",
+    vehiculo: "Camioneta estacas",
+    capacidadKg: 800,
+    zona: "Bogotá, Chapinero",
+    calificacion: 4.8,
+  },
+  {
+    id: "c2",
+    nombre: "Marcela Peña",
+    vehiculo: "Furgón mediano",
+    capacidadKg: 1500,
+    zona: "Bogotá, Suba",
+    calificacion: 4.9,
+  },
+  {
+    id: "c3",
+    nombre: "Julián Torres",
+    vehiculo: "Moto carguera",
+    capacidadKg: 60,
+    zona: "Bogotá, Centro",
+    calificacion: 4.6,
+  },
+  {
+    id: "c4",
+    nombre: "Diana Salazar",
+    vehiculo: "Camión turbo",
+    capacidadKg: 4000,
+    zona: "Bogotá, Fontibón",
+    calificacion: 4.7,
+  },
+];
+
+const ETIQUETAS = {
+  origen: "Origen",
+  destino: "Destino",
+  peso: "Peso aproximado (kg)",
+  descripcion: "Descripción de la carga",
+  pasajeros: "Número de pasajeros",
+  fechaHora: "Fecha y hora",
+  nombre: "Nombre completo",
+  vehiculo: "Tipo de vehículo",
+  placa: "Placa",
+  zona: "Zona de operación",
+};
+
+export default function App() {
+  const [seleccion, setSeleccion] = useState(null);
+  const [datos, setDatos] = useState({});
+  const [enviado, setEnviado] = useState(false);
+  const [conductorElegido, setConductorElegido] = useState(null);
+  const [error, setError] = useState(null);
+
+  const servicio = SERVICIOS.find((s) => s.id === seleccion);
+
+  const manejarCambio = (campo, valor) => {
+    setDatos((prev) => ({ ...prev, [campo]: valor }));
+  };
+
+  const manejarEnvio = (e) => {
+    e.preventDefault();
+    const faltantes = servicio.campos.filter((campo) => !datos[campo]?.trim());
+    if (faltantes.length > 0) {
+      setError(
+        `Falta llenar: ${faltantes.map((c) => ETIQUETAS[c]).join(", ")}`
+      );
+      return;
+    }
+    setError(null);
+    setEnviado(true);
+  };
+
+  const volver = () => {
+    setSeleccion(null);
+    setDatos({});
+    setEnviado(false);
+    setConductorElegido(null);
+    setError(null);
+  };
+
+  // Para mercancía filtramos por capacidad; para los demás mostramos todos.
+  const conductoresDisponibles =
+    seleccion === "mercancia" && datos.peso
+      ? CONDUCTORES.filter((c) => c.capacidadKg >= Number(datos.peso))
+      : CONDUCTORES;
+
+  return (
+    <div
+      style={{
+        minHeight: "100vh",
+        background: "#0F1720",
+        color: "#E8EDF2",
+        fontFamily:
+          "Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+        padding: "48px 24px",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+      }}
+    >
+      <div style={{ maxWidth: 880, width: "100%" }}>
+        <header
+          style={{
+            marginBottom: 40,
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "flex-start",
+            gap: 16,
+            flexWrap: "wrap",
+          }}
+        >
+          <div>
+            <h1
+              style={{
+                fontSize: 34,
+                fontWeight: 700,
+                margin: 0,
+                letterSpacing: "-0.02em",
+              }}
+            >
+              ¿Qué necesitas hoy?
+            </h1>
+            <p style={{ color: "#8A97A3", fontSize: 16, marginTop: 8 }}>
+              Elige un servicio para continuar.
+            </p>
+          </div>
+
+          {seleccion && (
+            <button
+              onClick={volver}
+              style={{
+                background: "#16212C",
+                border: "1px solid #263141",
+                borderRadius: 8,
+                padding: "10px 16px",
+                color: "#E8EDF2",
+                fontSize: 14,
+                fontWeight: 700,
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                gap: 8,
+                flexShrink: 0,
+              }}
+            >
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                style={{ width: 16, height: 16 }}
+              >
+                <path
+                  d="M3 11L12 4L21 11"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+                <path
+                  d="M5 10V19C5 19.5523 5.44772 20 6 20H9V15C9 14.4477 9.44772 14 10 14H14C14.5523 14 15 14.4477 15 15V20H18C18.5523 20 19 19.5523 19 19V10"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+              Inicio
+            </button>
+          )}
+        </header>
+
+        {!seleccion && (
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+              gap: 16,
+            }}
+          >
+            {SERVICIOS.map((s) => (
+              <button
+                key={s.id}
+                onClick={() => setSeleccion(s.id)}
+                style={{
+                  background: "#16212C",
+                  border: "1px solid #263141",
+                  borderRadius: 14,
+                  padding: 24,
+                  textAlign: "left",
+                  cursor: "pointer",
+                  color: "inherit",
+                  transition: "border-color 0.15s ease, transform 0.15s ease",
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 14,
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.borderColor = "#FF7A33";
+                  e.currentTarget.style.transform = "translateY(-2px)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.borderColor = "#263141";
+                  e.currentTarget.style.transform = "translateY(0)";
+                }}
+              >
+                <s.Icono
+                  style={{ width: 36, height: 36, color: "#FF7A33" }}
+                />
+                <div>
+                  <div style={{ fontSize: 18, fontWeight: 700 }}>
+                    {s.titulo}
+                  </div>
+                  <div
+                    style={{ fontSize: 14, color: "#8A97A3", marginTop: 6 }}
+                  >
+                    {s.descripcion}
+                  </div>
+                </div>
+              </button>
+            ))}
+          </div>
+        )}
+
+        {servicio && !enviado && (
+          <div
+            style={{
+              background: "#16212C",
+              border: "1px solid #263141",
+              borderRadius: 14,
+              padding: 32,
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 12,
+                marginBottom: 24,
+              }}
+            >
+              <servicio.Icono
+                style={{ width: 28, height: 28, color: "#FF7A33" }}
+              />
+              <h2 style={{ fontSize: 22, fontWeight: 700, margin: 0 }}>
+                {servicio.titulo}
+              </h2>
+            </div>
+
+            <form
+              onSubmit={manejarEnvio}
+              style={{ display: "flex", flexDirection: "column", gap: 16 }}
+            >
+              {servicio.campos.map((campo) => (
+                <label
+                  key={campo}
+                  style={{ display: "flex", flexDirection: "column", gap: 6 }}
+                >
+                  <span style={{ fontSize: 13, color: "#8A97A3" }}>
+                    {ETIQUETAS[campo]}
+                  </span>
+                  <input
+                    value={datos[campo] || ""}
+                    onChange={(e) => {
+                      manejarCambio(campo, e.target.value);
+                      if (error) setError(null);
+                    }}
+                    style={{
+                      background: "#0F1720",
+                      border: "1px solid #263141",
+                      borderRadius: 8,
+                      padding: "10px 12px",
+                      color: "#E8EDF2",
+                      fontSize: 15,
+                      outline: "none",
+                    }}
+                    onFocus={(e) =>
+                      (e.target.style.borderColor = "#FF7A33")
+                    }
+                    onBlur={(e) => (e.target.style.borderColor = "#263141")}
+                  />
+                </label>
+              ))}
+
+              {error && (
+                <div
+                  style={{
+                    background: "rgba(255, 122, 51, 0.12)",
+                    border: "1px solid #FF7A33",
+                    borderRadius: 8,
+                    padding: "10px 12px",
+                    color: "#FF7A33",
+                    fontSize: 13,
+                  }}
+                >
+                  {error}
+                </div>
+              )}
+
+              <button
+                type="submit"
+                style={{
+                  marginTop: 8,
+                  background: "#FF7A33",
+                  border: "none",
+                  borderRadius: 8,
+                  padding: "12px 20px",
+                  color: "#0F1720",
+                  fontWeight: 700,
+                  fontSize: 15,
+                  cursor: "pointer",
+                }}
+              >
+                Enviar solicitud
+              </button>
+            </form>
+          </div>
+        )}
+
+        {enviado && !conductorElegido && (
+          <div
+            style={{
+              background: "#16212C",
+              border: "1px solid #263141",
+              borderRadius: 14,
+              padding: 32,
+            }}
+          >
+            <div style={{ fontSize: 20, fontWeight: 700, marginBottom: 6 }}>
+              Transportistas disponibles
+            </div>
+            <p style={{ color: "#8A97A3", fontSize: 14, marginBottom: 24 }}>
+              {conductoresDisponibles.length > 0
+                ? `Encontramos ${conductoresDisponibles.length} disponibles para tu carga.`
+                : "Nadie tiene capacidad suficiente ahora mismo. Intenta más tarde."}
+            </p>
+
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                gap: 12,
+              }}
+            >
+              {conductoresDisponibles.map((c) => (
+                <div
+                  key={c.id}
+                  style={{
+                    background: "#0F1720",
+                    border: "1px solid #263141",
+                    borderRadius: 10,
+                    padding: 18,
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    gap: 16,
+                    flexWrap: "wrap",
+                  }}
+                >
+                  <div>
+                    <div style={{ fontWeight: 700, fontSize: 16 }}>
+                      {c.nombre}
+                    </div>
+                    <div
+                      style={{ color: "#8A97A3", fontSize: 13, marginTop: 4 }}
+                    >
+                      {c.vehiculo} · hasta {c.capacidadKg} kg · {c.zona}
+                    </div>
+                    <div
+                      style={{ color: "#FF7A33", fontSize: 13, marginTop: 4 }}
+                    >
+                      ★ {c.calificacion}
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => setConductorElegido(c)}
+                    style={{
+                      background: "#FF7A33",
+                      border: "none",
+                      borderRadius: 8,
+                      padding: "10px 16px",
+                      color: "#0F1720",
+                      fontWeight: 700,
+                      fontSize: 14,
+                      cursor: "pointer",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    Elegir
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {enviado && conductorElegido && (
+          <div
+            style={{
+              background: "#16212C",
+              border: "1px solid #263141",
+              borderRadius: 14,
+              padding: 32,
+              textAlign: "center",
+            }}
+          >
+            <div style={{ fontSize: 20, fontWeight: 700, marginBottom: 8 }}>
+              Solicitud confirmada
+            </div>
+            <p style={{ color: "#8A97A3", fontSize: 15, marginBottom: 4 }}>
+              {conductorElegido.nombre} te contactará pronto con su{" "}
+              {conductorElegido.vehiculo.toLowerCase()}.
+            </p>
+            <p style={{ color: "#8A97A3", fontSize: 15, marginBottom: 24 }}>
+              Servicio: {servicio.titulo}
+            </p>
+            <button
+              onClick={volver}
+              style={{
+                background: "#FF7A33",
+                border: "none",
+                borderRadius: 8,
+                padding: "10px 18px",
+                color: "#0F1720",
+                fontWeight: 700,
+                fontSize: 14,
+                cursor: "pointer",
+              }}
+            >
+              Hacer otra solicitud
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
