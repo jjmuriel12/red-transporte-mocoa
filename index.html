@@ -163,20 +163,73 @@ export default function App() {
       }}
     >
       <div style={{ maxWidth: 880, width: "100%" }}>
-        <header style={{ marginBottom: 40 }}>
-          <h1
-            style={{
-              fontSize: 34,
-              fontWeight: 700,
-              margin: 0,
-              letterSpacing: "-0.02em",
-            }}
-          >
-            ¿Qué necesitas hoy?
-          </h1>
-          <p style={{ color: "#8A97A3", fontSize: 16, marginTop: 8 }}>
-            Elige un servicio para continuar.
-          </p>
+        <header
+          style={{
+            marginBottom: 40,
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "flex-start",
+            gap: 16,
+            flexWrap: "wrap",
+          }}
+        >
+          <div>
+            <h1
+              style={{
+                fontSize: 34,
+                fontWeight: 700,
+                margin: 0,
+                letterSpacing: "-0.02em",
+              }}
+            >
+              RED TRANSPORTE MOCOA
+            </h1>
+            <p style={{ color: "#8A97A3", fontSize: 16, marginTop: 8 }}>
+              Elige un servicio para continuar.
+            </p>
+          </div>
+
+          {seleccion && (
+            <button
+              onClick={volver}
+              style={{
+                background: "#16212C",
+                border: "1px solid #263141",
+                borderRadius: 8,
+                padding: "10px 16px",
+                color: "#E8EDF2",
+                fontSize: 14,
+                fontWeight: 700,
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                gap: 8,
+                flexShrink: 0,
+              }}
+            >
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                style={{ width: 16, height: 16 }}
+              >
+                <path
+                  d="M3 11L12 4L21 11"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+                <path
+                  d="M5 10V19C5 19.5523 5.44772 20 6 20H9V15C9 14.4477 9.44772 14 10 14H14C14.5523 14 15 14.4477 15 15V20H18C18.5523 20 19 19.5523 19 19V10"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+              Inicio
+            </button>
+          )}
         </header>
 
         {!seleccion && (
@@ -240,21 +293,6 @@ export default function App() {
               padding: 32,
             }}
           >
-            <button
-              onClick={volver}
-              style={{
-                background: "none",
-                border: "none",
-                color: "#8A97A3",
-                fontSize: 14,
-                cursor: "pointer",
-                padding: 0,
-                marginBottom: 20,
-              }}
-            >
-              ← Elegir otro servicio
-            </button>
-
             <div
               style={{
                 display: "flex",
@@ -350,21 +388,6 @@ export default function App() {
               padding: 32,
             }}
           >
-            <button
-              onClick={volver}
-              style={{
-                background: "none",
-                border: "none",
-                color: "#8A97A3",
-                fontSize: 14,
-                cursor: "pointer",
-                padding: 0,
-                marginBottom: 20,
-              }}
-            >
-              ← Empezar de nuevo
-            </button>
-
             <div style={{ fontSize: 20, fontWeight: 700, marginBottom: 6 }}>
               Transportistas disponibles
             </div>
