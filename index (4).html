@@ -7,6 +7,7 @@
 <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
 <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
 <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   * { box-sizing: border-box; }
   body { margin: 0; }
@@ -16,7 +17,7 @@
 <div id="root"></div>
 
 <script type="text/babel">
-const { useState } = React;
+const { useState, useEffect } = React;
 
 
 const SERVICIOS = [
@@ -46,7 +47,7 @@ const SERVICIOS = [
     id: "pasajero",
     titulo: "Transporte de pasajeros",
     descripcion: "Pide un viaje para ti o para alguien más.",
-    campos: ["origen", "destino", "pasajeros", "fechaHora"],
+    campos: ["origen", "destino", "pasajeros", "fecha", "hora"],
     Icono: (props) => (
       <svg viewBox="0 0 48 48" fill="none" {...props}>
         <circle cx="24" cy="14" r="6" stroke="currentColor" strokeWidth="2" />
@@ -81,7 +82,11 @@ const SERVICIOS = [
 
 const SUPABASE_URL = "https://lmmbbivyhhjepjfengtt.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_3rK7v9Jhd0ZRv02vU4JTeg_5Q8iXArI";
-const CLAVE_ADMIN = "12227878Cv+";
+// La clave anónima es pública por diseño (así funciona Supabase); la
+// seguridad real de quién puede leer/editar/borrar datos se controla con
+// las políticas de Row Level Security (RLS) en la base de datos, no aquí.
+
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 const ETIQUETAS = {
   origen: "Origen",
@@ -89,7 +94,8 @@ const ETIQUETAS = {
   peso: "Peso aproximado (kg)",
   descripcion: "Descripción de la carga",
   pasajeros: "Número de pasajeros",
-  fechaHora: "Fecha y hora",
+  fecha: "Fecha del viaje",
+  hora: "Hora del viaje",
   nombre: "Nombre completo",
   telefono: "Número de celular",
   vehiculo: "Tipo de vehículo",
@@ -98,6 +104,15 @@ const ETIQUETAS = {
   placa: "Placa",
   zona: "Zona de operación",
 };
+
+const OPCIONES_HORA = Array.from({ length: 48 }, (_, i) => {
+  const horas24 = Math.floor(i / 2);
+  const minutos = i % 2 === 0 ? "00" : "30";
+  const valor = `${String(horas24).padStart(2, "0")}:${minutos}`;
+  const horas12 = horas24 % 12 === 0 ? 12 : horas24 % 12;
+  const sufijo = horas24 < 12 ? "a.m." : "p.m.";
+  return { valor, etiqueta: `${horas12}:${minutos} ${sufijo}` };
+});
 
 function App() {
   const [seleccion, setSeleccion] = useState(null);
@@ -110,12 +125,34 @@ function App() {
   const [errorSocios, setErrorSocios] = useState(null);
   const [tipoTransportista, setTipoTransportista] = useState(null); // "carga" | "pasajeros"
   const [pasajerosDisponibles, setPasajerosDisponibles] = useState([]);
-  const [fechaPartes, setFechaPartes] = useState({ dia: "", mes: "", anio: "" });
 
-  // --- Panel de administrador ---
+  // --- Panel de administrador (Supabase Auth) ---
+  const [emailAdmin, setEmailAdmin] = useState("");
   const [passwordAdmin, setPasswordAdmin] = useState("");
   const [adminAutenticado, setAdminAutenticado] = useState(false);
+  const [verificandoSesion, setVerificandoSesion] = useState(true);
   const [errorPassword, setErrorPassword] = useState(null);
+  const [ingresandoAdmin, setIngresandoAdmin] = useState(false);
+
+  // --- Recuperación de contraseña del administrador ---
+  const [modoRecuperacion, setModoRecuperacion] = useState(() => {
+    const hash = window.location.hash || "";
+    const search = window.location.search || "";
+    return (
+      hash.includes("type=recovery") ||
+      hash.includes("access_token=") ||
+      search.includes("code=")
+    ) ? "nueva" : null;
+  });
+  const [emailRecuperacion, setEmailRecuperacion] = useState("");
+  const [enviandoRecuperacion, setEnviandoRecuperacion] = useState(false);
+  const [mensajeRecuperacion, setMensajeRecuperacion] = useState("");
+  const [errorRecuperacion, setErrorRecuperacion] = useState("");
+  const [nuevaPassword, setNuevaPassword] = useState("");
+  const [confirmarPassword, setConfirmarPassword] = useState("");
+  const [guardandoPassword, setGuardandoPassword] = useState(false);
+  const [mensajeNuevaPassword, setMensajeNuevaPassword] = useState("");
+  const [errorNuevaPassword, setErrorNuevaPassword] = useState("");
   const [adminTab, setAdminTab] = useState("carga"); // "carga" | "pasajeros"
   const [sociosAdmin, setSociosAdmin] = useState([]);
   const [cargandoAdmin, setCargandoAdmin] = useState(false);
@@ -123,6 +160,17 @@ function App() {
   const [edicionId, setEdicionId] = useState(null);
   const [edicionDatos, setEdicionDatos] = useState({});
   const [guardandoEdicion, setGuardandoEdicion] = useState(false);
+
+  // --- Asignación de solicitudes ---
+  const [asignando, setAsignando] = useState(false);
+  const [errorAsignacion, setErrorAsignacion] = useState(null);
+
+  // --- Autoservicio de disponibilidad ---
+  const [telefonoConsulta, setTelefonoConsulta] = useState("");
+  const [buscandoAutoservicio, setBuscandoAutoservicio] = useState(false);
+  const [errorAutoservicio, setErrorAutoservicio] = useState(null);
+  const [registroPropio, setRegistroPropio] = useState(null);
+  const [actualizandoEstado, setActualizandoEstado] = useState(false);
 
   const servicio = SERVICIOS.find((s) => s.id === seleccion);
 
@@ -227,16 +275,17 @@ function App() {
     setEnviado(false);
     setConductorElegido(null);
     setError(null);
+    setErrorAsignacion(null);
     setSocios([]);
     setErrorSocios(null);
     setTipoTransportista(null);
     setPasajerosDisponibles([]);
-    setPasswordAdmin("");
-    setAdminAutenticado(false);
-    setErrorPassword(null);
     setSociosAdmin([]);
     setEdicionId(null);
     setErrorAdmin(null);
+    setTelefonoConsulta("");
+    setErrorAutoservicio(null);
+    setRegistroPropio(null);
   };
 
   const tablaAdmin = adminTab === "pasajeros" ? "socios_pasajeros" : "socios";
@@ -269,14 +318,304 @@ function App() {
     cargarSociosAdmin(tab === "pasajeros" ? "socios_pasajeros" : "socios");
   };
 
-  const verificarPassword = (e) => {
+  // Al cargar la app, revisa si ya hay una sesión de Supabase Auth activa
+  // (así el admin no tiene que volver a iniciar sesión cada vez que recarga).
+  useEffect(() => {
+    const hash = window.location.hash || "";
+    const search = window.location.search || "";
+    const vieneDeRecuperacion =
+      hash.includes("type=recovery") ||
+      hash.includes("access_token=") ||
+      search.includes("code=") ||
+      modoRecuperacion === "nueva";
+
+    if (vieneDeRecuperacion) {
+      setSeleccion("admin");
+      setModoRecuperacion("nueva");
+    }
+
+    const { data: listener } = supabase.auth.onAuthStateChange(
+      (evento, session) => {
+        if (evento === "PASSWORD_RECOVERY") {
+          setSeleccion("admin");
+          setModoRecuperacion("nueva");
+          setAdminAutenticado(false);
+          return;
+        }
+        if (!modoRecuperacion) {
+          setAdminAutenticado(!!session);
+        }
+      }
+    );
+
+    supabase.auth.getSession().then(({ data }) => {
+      if (!vieneDeRecuperacion) {
+        setAdminAutenticado(!!data.session);
+        if (data.session) cargarSociosAdmin();
+      }
+      setVerificandoSesion(false);
+    });
+
+    return () => listener.subscription.unsubscribe();
+  }, []);
+
+  const enviarRecuperacion = async (e) => {
     e.preventDefault();
-    if (passwordAdmin === CLAVE_ADMIN) {
+    setEnviandoRecuperacion(true);
+    setMensajeRecuperacion("");
+    setErrorRecuperacion("");
+
+    const email = emailRecuperacion.trim();
+    if (!email) {
+      setErrorRecuperacion("Escribe tu correo.");
+      setEnviandoRecuperacion(false);
+      return;
+    }
+
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: window.location.origin + window.location.pathname,
+    });
+
+    setEnviandoRecuperacion(false);
+    if (error) {
+      setErrorRecuperacion(error.message || "No pudimos enviar el enlace.");
+      return;
+    }
+
+    setMensajeRecuperacion(
+      "Te enviamos un enlace a tu correo. Revisa también Spam."
+    );
+  };
+
+  const guardarNuevaPassword = async (e) => {
+    e.preventDefault();
+    setGuardandoPassword(true);
+    setMensajeNuevaPassword("");
+    setErrorNuevaPassword("");
+
+    if (nuevaPassword.length < 6) {
+      setErrorNuevaPassword("La contraseña debe tener al menos 6 caracteres.");
+      setGuardandoPassword(false);
+      return;
+    }
+
+    if (nuevaPassword !== confirmarPassword) {
+      setErrorNuevaPassword("Las contraseñas no coinciden.");
+      setGuardandoPassword(false);
+      return;
+    }
+
+    const { error } = await supabase.auth.updateUser({
+      password: nuevaPassword,
+    });
+
+    setGuardandoPassword(false);
+
+    if (error) {
+      setErrorNuevaPassword(
+        error.message || "No pudimos cambiar la contraseña."
+      );
+      return;
+    }
+
+    setMensajeNuevaPassword(
+      "Contraseña cambiada correctamente. Ya puedes entrar como administrador."
+    );
+    setNuevaPassword("");
+    setConfirmarPassword("");
+
+    setTimeout(() => {
+      setModoRecuperacion(null);
       setAdminAutenticado(true);
-      setErrorPassword(null);
       cargarSociosAdmin();
-    } else {
-      setErrorPassword("Contraseña incorrecta.");
+    }, 1200);
+  };
+
+  const verificarPassword = async (e) => {
+    e.preventDefault();
+    setIngresandoAdmin(true);
+    setErrorPassword(null);
+    const { error: errorLogin } = await supabase.auth.signInWithPassword({
+      email: emailAdmin.trim(),
+      password: passwordAdmin,
+    });
+    setIngresandoAdmin(false);
+    if (errorLogin) {
+      setErrorPassword("Correo o contraseña incorrectos.");
+      return;
+    }
+    setAdminAutenticado(true);
+    setPasswordAdmin("");
+    cargarSociosAdmin();
+  };
+
+  const cerrarSesionAdmin = async () => {
+    await supabase.auth.signOut();
+    setAdminAutenticado(false);
+    setEmailAdmin("");
+    setPasswordAdmin("");
+    setErrorPassword(null);
+    setModoRecuperacion(null);
+    setEmailRecuperacion("");
+    setNuevaPassword("");
+    setConfirmarPassword("");
+    setMensajeRecuperacion("");
+    setErrorRecuperacion("");
+    setMensajeNuevaPassword("");
+    setErrorNuevaPassword("");
+    setEdicionId(null);
+    setSeleccion(null);
+  };
+
+  const elegirConductor = async (c) => {
+    setAsignando(true);
+    setErrorAsignacion(null);
+    const tablaSocio = seleccion === "pasajero" ? "socios_pasajeros" : "socios";
+    try {
+      const respPatch = await fetch(
+        `${SUPABASE_URL}/rest/v1/${tablaSocio}?id=eq.${c.id}`,
+        {
+          method: "PATCH",
+          headers: {
+            apikey: SUPABASE_ANON_KEY,
+            Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ estado: "no disponible" }),
+        }
+      );
+      if (!respPatch.ok) {
+        throw new Error(`${respPatch.status}: ${await respPatch.text()}`);
+      }
+
+      const fechaHoraTexto =
+        datos.fecha && datos.hora ? `${datos.fecha} ${datos.hora}` : null;
+
+      const respPost = await fetch(`${SUPABASE_URL}/rest/v1/solicitudes`, {
+        method: "POST",
+        headers: {
+          apikey: SUPABASE_ANON_KEY,
+          Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+          "Content-Type": "application/json",
+          Prefer: "return=minimal",
+        },
+        body: JSON.stringify([
+          {
+            tipo: seleccion,
+            origen: datos.origen || null,
+            destino: datos.destino || null,
+            peso: datos.peso ? Number(datos.peso) : null,
+            pasajeros: datos.pasajeros ? Number(datos.pasajeros) : null,
+            fecha_hora: fechaHoraTexto,
+            descripcion: datos.descripcion || null,
+            transportista_id: c.id,
+            transportista_tabla: tablaSocio,
+            transportista_nombre: c.nombre,
+            estado: "asignado",
+          },
+        ]),
+      });
+      if (!respPost.ok) {
+        throw new Error(`${respPost.status}: ${await respPost.text()}`);
+      }
+
+      setConductorElegido(c);
+    } catch (err) {
+      setErrorAsignacion(
+        "No pudimos completar la asignación. Intenta de nuevo. (" +
+          (err.message || "error desconocido") +
+          ")"
+      );
+    } finally {
+      setAsignando(false);
+    }
+  };
+
+  const buscarMiRegistro = async (e) => {
+    e.preventDefault();
+    const telefonoLimpio = telefonoConsulta.trim();
+    if (!telefonoLimpio) {
+      setErrorAutoservicio("Escribe tu número de celular.");
+      return;
+    }
+    setBuscandoAutoservicio(true);
+    setErrorAutoservicio(null);
+    setRegistroPropio(null);
+    try {
+      const [respCarga, respPasajeros] = await Promise.all([
+        fetch(
+          `${SUPABASE_URL}/rest/v1/socios?select=*&telefono=eq.${encodeURIComponent(
+            telefonoLimpio
+          )}`,
+          {
+            headers: {
+              apikey: SUPABASE_ANON_KEY,
+              Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+            },
+          }
+        ),
+        fetch(
+          `${SUPABASE_URL}/rest/v1/socios_pasajeros?select=*&telefono=eq.${encodeURIComponent(
+            telefonoLimpio
+          )}`,
+          {
+            headers: {
+              apikey: SUPABASE_ANON_KEY,
+              Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+            },
+          }
+        ),
+      ]);
+      if (!respCarga.ok || !respPasajeros.ok) {
+        throw new Error("No pudimos consultar tu registro.");
+      }
+      const datosCarga = await respCarga.json();
+      const datosPasajeros = await respPasajeros.json();
+      if (datosCarga.length > 0) {
+        setRegistroPropio({ ...datosCarga[0], tabla: "socios" });
+      } else if (datosPasajeros.length > 0) {
+        setRegistroPropio({
+          ...datosPasajeros[0],
+          tabla: "socios_pasajeros",
+        });
+      } else {
+        setErrorAutoservicio(
+          "No encontramos ningún registro con ese número de celular."
+        );
+      }
+    } catch (err) {
+      setErrorAutoservicio(err.message || "Error al buscar tu registro.");
+    } finally {
+      setBuscandoAutoservicio(false);
+    }
+  };
+
+  const cambiarMiDisponibilidad = async (nuevoEstado) => {
+    setActualizandoEstado(true);
+    setErrorAutoservicio(null);
+    try {
+      const resp = await fetch(
+        `${SUPABASE_URL}/rest/v1/${registroPropio.tabla}?id=eq.${registroPropio.id}`,
+        {
+          method: "PATCH",
+          headers: {
+            apikey: SUPABASE_ANON_KEY,
+            Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+            "Content-Type": "application/json",
+            Prefer: "return=representation",
+          },
+          body: JSON.stringify({ estado: nuevoEstado }),
+        }
+      );
+      if (!resp.ok) throw new Error(`${resp.status}: ${await resp.text()}`);
+      const data = await resp.json();
+      setRegistroPropio({ ...data[0], tabla: registroPropio.tabla });
+    } catch (err) {
+      setErrorAutoservicio(
+        err.message || "No pudimos actualizar tu estado."
+      );
+    } finally {
+      setActualizandoEstado(false);
     }
   };
 
@@ -506,7 +845,29 @@ function App() {
         )}
 
         {!seleccion && (
-          <div style={{ marginTop: 24, textAlign: "center" }}>
+          <div
+            style={{
+              marginTop: 24,
+              textAlign: "center",
+              display: "flex",
+              gap: 20,
+              justifyContent: "center",
+              flexWrap: "wrap",
+            }}
+          >
+            <button
+              onClick={() => setSeleccion("autoservicio")}
+              style={{
+                background: "none",
+                border: "none",
+                color: "#8A97A3",
+                fontSize: 13,
+                cursor: "pointer",
+                textDecoration: "underline",
+              }}
+            >
+              ¿Ya te desocupaste? Actualiza tu disponibilidad
+            </button>
             <button
               onClick={() => setSeleccion("admin")}
               style={{
@@ -523,7 +884,334 @@ function App() {
           </div>
         )}
 
-        {seleccion === "admin" && !adminAutenticado && (
+        {seleccion === "autoservicio" && (
+          <div
+            style={{
+              background: "#16212C",
+              border: "1px solid #263141",
+              borderRadius: 14,
+              padding: 32,
+            }}
+          >
+            <h2 style={{ fontSize: 22, fontWeight: 700, marginTop: 0 }}>
+              Actualiza tu disponibilidad
+            </h2>
+            <p style={{ color: "#8A97A3", fontSize: 14, marginBottom: 24 }}>
+              Escribe el número de celular con el que te registraste.
+            </p>
+
+            <form
+              onSubmit={buscarMiRegistro}
+              style={{
+                display: "flex",
+                gap: 10,
+                flexWrap: "wrap",
+                marginBottom: 20,
+              }}
+            >
+              <input
+                value={telefonoConsulta}
+                onChange={(e) => {
+                  setTelefonoConsulta(e.target.value);
+                  if (errorAutoservicio) setErrorAutoservicio(null);
+                }}
+                placeholder="Ej: 3001234567"
+                style={{
+                  flex: 1,
+                  minWidth: 200,
+                  background: "#0F1720",
+                  border: "1px solid #263141",
+                  borderRadius: 8,
+                  padding: "10px 12px",
+                  color: "#E8EDF2",
+                  fontSize: 15,
+                  outline: "none",
+                }}
+              />
+              <button
+                type="submit"
+                disabled={buscandoAutoservicio}
+                style={{
+                  background: "#FF7A33",
+                  border: "none",
+                  borderRadius: 8,
+                  padding: "10px 18px",
+                  color: "#0F1720",
+                  fontWeight: 700,
+                  fontSize: 14,
+                  cursor: buscandoAutoservicio ? "default" : "pointer",
+                  opacity: buscandoAutoservicio ? 0.7 : 1,
+                }}
+              >
+                {buscandoAutoservicio ? "Buscando..." : "Buscar"}
+              </button>
+            </form>
+
+            {errorAutoservicio && (
+              <div
+                style={{
+                  background: "rgba(255, 122, 51, 0.12)",
+                  border: "1px solid #FF7A33",
+                  borderRadius: 8,
+                  padding: "10px 12px",
+                  color: "#FF7A33",
+                  fontSize: 13,
+                  marginBottom: 20,
+                }}
+              >
+                {errorAutoservicio}
+              </div>
+            )}
+
+            {registroPropio && (
+              <div
+                style={{
+                  background: "#0F1720",
+                  border: "1px solid #263141",
+                  borderRadius: 10,
+                  padding: 20,
+                }}
+              >
+                <div style={{ fontWeight: 700, fontSize: 16 }}>
+                  {registroPropio.nombre}
+                </div>
+                <div
+                  style={{ color: "#8A97A3", fontSize: 13, marginTop: 4 }}
+                >
+                  {registroPropio.vehiculo}
+                </div>
+                <div
+                  style={{
+                    marginTop: 14,
+                    marginBottom: 18,
+                    fontSize: 14,
+                  }}
+                >
+                  Estado actual:{" "}
+                  <span
+                    style={{
+                      fontWeight: 700,
+                      color:
+                        registroPropio.estado === "disponible"
+                          ? "#3ED598"
+                          : "#FF7A33",
+                    }}
+                  >
+                    {registroPropio.estado === "disponible"
+                      ? "Disponible"
+                      : "No disponible"}
+                  </span>
+                </div>
+                <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+                  <button
+                    onClick={() => cambiarMiDisponibilidad("disponible")}
+                    disabled={
+                      actualizandoEstado ||
+                      registroPropio.estado === "disponible"
+                    }
+                    style={{
+                      background: "#FF7A33",
+                      border: "none",
+                      borderRadius: 8,
+                      padding: "10px 16px",
+                      color: "#0F1720",
+                      fontWeight: 700,
+                      fontSize: 14,
+                      cursor:
+                        actualizandoEstado ||
+                        registroPropio.estado === "disponible"
+                          ? "default"
+                          : "pointer",
+                      opacity:
+                        actualizandoEstado ||
+                        registroPropio.estado === "disponible"
+                          ? 0.5
+                          : 1,
+                    }}
+                  >
+                    Marcarme disponible
+                  </button>
+                  <button
+                    onClick={() => cambiarMiDisponibilidad("no disponible")}
+                    disabled={
+                      actualizandoEstado ||
+                      registroPropio.estado === "no disponible"
+                    }
+                    style={{
+                      background: "transparent",
+                      border: "1px solid #263141",
+                      borderRadius: 8,
+                      padding: "10px 16px",
+                      color: "#8A97A3",
+                      fontWeight: 700,
+                      fontSize: 14,
+                      cursor:
+                        actualizandoEstado ||
+                        registroPropio.estado === "no disponible"
+                          ? "default"
+                          : "pointer",
+                      opacity:
+                        actualizandoEstado ||
+                        registroPropio.estado === "no disponible"
+                          ? 0.5
+                          : 1,
+                    }}
+                  >
+                    Marcarme no disponible
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {seleccion === "admin" && verificandoSesion && (
+          <p style={{ color: "#8A97A3", fontSize: 14, textAlign: "center" }}>
+            Verificando sesión...
+          </p>
+        )}
+
+        {seleccion === "admin" && !verificandoSesion && modoRecuperacion === "solicitar" && (
+          <div
+            style={{
+              background: "#16212C",
+              border: "1px solid #263141",
+              borderRadius: 14,
+              padding: 32,
+              maxWidth: 360,
+              margin: "0 auto",
+            }}
+          >
+            <h2 style={{ fontSize: 20, fontWeight: 700, marginTop: 0 }}>
+              Recuperar contraseña
+            </h2>
+            <p style={{ color: "#8A97A3", fontSize: 14, lineHeight: 1.5 }}>
+              Escribe el correo del administrador y te enviaremos un enlace para crear una nueva contraseña.
+            </p>
+            <form
+              onSubmit={enviarRecuperacion}
+              style={{ display: "flex", flexDirection: "column", gap: 16 }}
+            >
+              <input
+                type="email"
+                placeholder="Correo del administrador"
+                value={emailRecuperacion}
+                onChange={(e) => setEmailRecuperacion(e.target.value)}
+                style={{
+                  background: "#0F1720", border: "1px solid #263141",
+                  borderRadius: 8, padding: "10px 12px", color: "#E8EDF2",
+                  fontSize: 15, outline: "none",
+                }}
+              />
+              {errorRecuperacion && (
+                <div style={{ color: "#FF7A33", fontSize: 13 }}>
+                  {errorRecuperacion}
+                </div>
+              )}
+              {mensajeRecuperacion && (
+                <div style={{ color: "#8A97A3", fontSize: 13 }}>
+                  {mensajeRecuperacion}
+                </div>
+              )}
+              <button
+                type="submit"
+                disabled={enviandoRecuperacion}
+                style={{
+                  background: "#FF7A33", border: "none", borderRadius: 8,
+                  padding: "12px 20px", color: "#0F1720", fontWeight: 700,
+                  fontSize: 15, cursor: enviandoRecuperacion ? "default" : "pointer",
+                  opacity: enviandoRecuperacion ? 0.7 : 1,
+                }}
+              >
+                {enviandoRecuperacion ? "Enviando..." : "Enviar enlace"}
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setModoRecuperacion(null);
+                  setErrorRecuperacion("");
+                  setMensajeRecuperacion("");
+                }}
+                style={{
+                  background: "transparent", border: "1px solid #263141",
+                  borderRadius: 8, padding: "10px 20px", color: "#8A97A3",
+                  fontWeight: 700, fontSize: 14, cursor: "pointer",
+                }}
+              >
+                Volver
+              </button>
+            </form>
+          </div>
+        )}
+
+        {seleccion === "admin" && !verificandoSesion && modoRecuperacion === "nueva" && (
+          <div
+            style={{
+              background: "#16212C", border: "1px solid #263141",
+              borderRadius: 14, padding: 32, maxWidth: 360, margin: "0 auto",
+            }}
+          >
+            <h2 style={{ fontSize: 20, fontWeight: 700, marginTop: 0 }}>
+              Crear nueva contraseña
+            </h2>
+            <p style={{ color: "#8A97A3", fontSize: 14, lineHeight: 1.5 }}>
+              Escribe tu nueva contraseña y confírmala.
+            </p>
+            <form
+              onSubmit={guardarNuevaPassword}
+              style={{ display: "flex", flexDirection: "column", gap: 16 }}
+            >
+              <input
+                type="password"
+                autoComplete="new-password"
+                placeholder="Nueva contraseña"
+                value={nuevaPassword}
+                onChange={(e) => setNuevaPassword(e.target.value)}
+                style={{
+                  background: "#0F1720", border: "1px solid #263141",
+                  borderRadius: 8, padding: "10px 12px", color: "#E8EDF2",
+                  fontSize: 15, outline: "none",
+                }}
+              />
+              <input
+                type="password"
+                autoComplete="new-password"
+                placeholder="Confirmar contraseña"
+                value={confirmarPassword}
+                onChange={(e) => setConfirmarPassword(e.target.value)}
+                style={{
+                  background: "#0F1720", border: "1px solid #263141",
+                  borderRadius: 8, padding: "10px 12px", color: "#E8EDF2",
+                  fontSize: 15, outline: "none",
+                }}
+              />
+              {errorNuevaPassword && (
+                <div style={{ color: "#FF7A33", fontSize: 13 }}>
+                  {errorNuevaPassword}
+                </div>
+              )}
+              {mensajeNuevaPassword && (
+                <div style={{ color: "#8A97A3", fontSize: 13 }}>
+                  {mensajeNuevaPassword}
+                </div>
+              )}
+              <button
+                type="submit"
+                disabled={guardandoPassword}
+                style={{
+                  background: "#FF7A33", border: "none", borderRadius: 8,
+                  padding: "12px 20px", color: "#0F1720", fontWeight: 700,
+                  fontSize: 15, cursor: guardandoPassword ? "default" : "pointer",
+                  opacity: guardandoPassword ? 0.7 : 1,
+                }}
+              >
+                {guardandoPassword ? "Guardando..." : "Guardar nueva contraseña"}
+              </button>
+            </form>
+          </div>
+        )}
+
+        {seleccion === "admin" && !verificandoSesion && !adminAutenticado && !modoRecuperacion && (
           <div
             style={{
               background: "#16212C",
@@ -545,10 +1233,36 @@ function App() {
                 style={{ display: "flex", flexDirection: "column", gap: 6 }}
               >
                 <span style={{ fontSize: 13, color: "#8A97A3" }}>
+                  Correo
+                </span>
+                <input
+                  type="email"
+                  autoComplete="username"
+                  value={emailAdmin}
+                  onChange={(e) => {
+                    setEmailAdmin(e.target.value);
+                    setErrorPassword(null);
+                  }}
+                  style={{
+                    background: "#0F1720",
+                    border: "1px solid #263141",
+                    borderRadius: 8,
+                    padding: "10px 12px",
+                    color: "#E8EDF2",
+                    fontSize: 15,
+                    outline: "none",
+                  }}
+                />
+              </label>
+              <label
+                style={{ display: "flex", flexDirection: "column", gap: 6 }}
+              >
+                <span style={{ fontSize: 13, color: "#8A97A3" }}>
                   Contraseña
                 </span>
                 <input
                   type="password"
+                  autoComplete="current-password"
                   value={passwordAdmin}
                   onChange={(e) => {
                     setPasswordAdmin(e.target.value);
@@ -565,6 +1279,22 @@ function App() {
                   }}
                 />
               </label>
+              <button
+                type="button"
+                onClick={() => {
+                  setModoRecuperacion("solicitar");
+                  setEmailRecuperacion(emailAdmin);
+                  setErrorPassword(null);
+                  setMensajeRecuperacion("");
+                  setErrorRecuperacion("");
+                }}
+                style={{
+                  background: "none", border: "none", color: "#FF7A33",
+                  cursor: "pointer", padding: 0, textAlign: "left", fontSize: 13,
+                }}
+              >
+                ¿Olvidaste tu contraseña?
+              </button>
               {errorPassword && (
                 <div style={{ color: "#FF7A33", fontSize: 13 }}>
                   {errorPassword}
@@ -572,6 +1302,7 @@ function App() {
               )}
               <button
                 type="submit"
+                disabled={ingresandoAdmin}
                 style={{
                   background: "#FF7A33",
                   border: "none",
@@ -580,10 +1311,11 @@ function App() {
                   color: "#0F1720",
                   fontWeight: 700,
                   fontSize: 15,
-                  cursor: "pointer",
+                  cursor: ingresandoAdmin ? "default" : "pointer",
+                  opacity: ingresandoAdmin ? 0.7 : 1,
                 }}
               >
-                Entrar
+                {ingresandoAdmin ? "Entrando..." : "Entrar"}
               </button>
             </form>
           </div>
@@ -598,8 +1330,34 @@ function App() {
               padding: 32,
             }}
           >
-            <div style={{ fontSize: 20, fontWeight: 700, marginBottom: 16 }}>
-              Transportistas registrados
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                marginBottom: 16,
+                gap: 12,
+                flexWrap: "wrap",
+              }}
+            >
+              <div style={{ fontSize: 20, fontWeight: 700 }}>
+                Transportistas registrados
+              </div>
+              <button
+                onClick={cerrarSesionAdmin}
+                style={{
+                  background: "transparent",
+                  border: "1px solid #263141",
+                  borderRadius: 8,
+                  padding: "8px 14px",
+                  color: "#8A97A3",
+                  fontSize: 13,
+                  fontWeight: 700,
+                  cursor: "pointer",
+                }}
+              >
+                Salir
+              </button>
             </div>
 
             <div style={{ display: "flex", gap: 8, marginBottom: 20 }}>
@@ -996,106 +1754,50 @@ function App() {
                         : "Capacidad de carga (toneladas)"
                       : ETIQUETAS[campo]}
                   </span>
-                  {campo === "fechaHora" ? (
-                    <div
-                      style={{
-                        display: "grid",
-                        gridTemplateColumns: "0.8fr 1.4fr 1fr 1fr",
-                        gap: 8,
+                  {campo === "hora" ? (
+                    <select
+                      value={datos.hora || ""}
+                      onChange={(e) => {
+                        manejarCambio("hora", e.target.value);
+                        if (error) setError(null);
                       }}
+                      style={{
+                        background: "#0F1720",
+                        border: "1px solid #263141",
+                        borderRadius: 8,
+                        padding: "10px 12px",
+                        color: datos.hora ? "#E8EDF2" : "#8A97A3",
+                        fontSize: 15,
+                        outline: "none",
+                        appearance: "none",
+                        WebkitAppearance: "none",
+                        backgroundImage:
+                          "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23FF7A33' stroke-width='2'><path d='M6 9l6 6 6-6'/></svg>\")",
+                        backgroundRepeat: "no-repeat",
+                        backgroundPosition: "right 12px center",
+                        cursor: "pointer",
+                      }}
+                      onFocus={(e) =>
+                        (e.target.style.borderColor = "#FF7A33")
+                      }
+                      onBlur={(e) => (e.target.style.borderColor = "#263141")}
                     >
-                      {(() => {
-                        const hoy = new Date();
-                        const anioActual = hoy.getFullYear();
-                        const mesHoy = hoy.getMonth() + 1;
-                        const diaHoy = hoy.getDate();
-                        const anio = Number(fechaPartes.anio || anioActual);
-                        const mes = Number(fechaPartes.mes || mesHoy);
-                        const diasDelMes = new Date(anio, mes, 0).getDate();
-                        const hora = (datos[campo] || "").split("T")[1] || "";
-                        const selectStyle = {
-                          background: "#0F1720",
-                          border: "1px solid #263141",
-                          borderRadius: 8,
-                          padding: "10px 8px",
-                          color: "#E8EDF2",
-                          fontSize: 14,
-                          outline: "none",
-                        };
-
-                        const actualizarFecha = (parte, valor) => {
-                          const nuevas = { ...fechaPartes, [parte]: valor };
-                          let d = nuevas.dia;
-                          let m = nuevas.mes;
-                          let a = nuevas.anio;
-
-                          if (parte === "anio" && !a) a = String(anioActual);
-                          if (parte === "mes" && !m) m = String(mesHoy);
-                          if (m && a) {
-                            const maxDias = new Date(Number(a), Number(m), 0).getDate();
-                            if (d && Number(d) > maxDias) d = String(maxDias);
-                          }
-
-                          setFechaPartes({ dia: d, mes: m, anio: a });
-
-                          if (d && m && a) {
-                            const fecha = `${a}-${String(m).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
-                            manejarCambio(campo, `${fecha}T${hora || "08:00"}`);
-                          } else {
-                            manejarCambio(campo, "");
-                          }
-                          if (error) setError(null);
-                        };
-
-                        return (
-                          <>
-                            <select
-                              value={fechaPartes.dia}
-                              onChange={(e) => actualizarFecha("dia", e.target.value)}
-                              style={selectStyle}
-                            >
-                              <option value="">Día</option>
-                              {Array.from({ length: diasDelMes }, (_, i) => i + 1).map((d) => (
-                                <option key={d} value={String(d)}>{d}</option>
-                              ))}
-                            </select>
-                            <select
-                              value={fechaPartes.mes}
-                              onChange={(e) => actualizarFecha("mes", e.target.value)}
-                              style={selectStyle}
-                            >
-                              <option value="">Mes</option>
-                              {[[1,"Enero"],[2,"Febrero"],[3,"Marzo"],[4,"Abril"],[5,"Mayo"],[6,"Junio"],[7,"Julio"],[8,"Agosto"],[9,"Septiembre"],[10,"Octubre"],[11,"Noviembre"],[12,"Diciembre"]].map(([n,nombre]) => (
-                                <option key={n} value={String(n)}>{nombre}</option>
-                              ))}
-                            </select>
-                            <select
-                              value={fechaPartes.anio}
-                              onChange={(e) => actualizarFecha("anio", e.target.value)}
-                              style={selectStyle}
-                            >
-                              <option value="">Año</option>
-                              {Array.from({ length: 4 }, (_, i) => anioActual + i).map((a) => (
-                                <option key={a} value={String(a)}>{a}</option>
-                              ))}
-                            </select>
-                            <input
-                              type="time"
-                              value={hora}
-                              onChange={(e) => {
-                                const fecha = datos[campo] ? datos[campo].split("T")[0] : "";
-                                if (fecha) manejarCambio(campo, `${fecha}T${e.target.value}`);
-                                if (error) setError(null);
-                              }}
-                              style={{ ...selectStyle, colorScheme: "dark" }}
-                            />
-                          </>
-                        );
-                      })()}
-                    </div>
+                      <option value="" disabled>
+                        Elige una hora
+                      </option>
+                      {OPCIONES_HORA.map((h) => (
+                        <option
+                          key={h.valor}
+                          value={h.valor}
+                          style={{ background: "#16212C", color: "#E8EDF2" }}
+                        >
+                          {h.etiqueta}
+                        </option>
+                      ))}
+                    </select>
                   ) : (
                     <input
-                      type="text"
+                      type={campo === "fecha" ? "date" : "text"}
                       value={datos[campo] || ""}
                       onChange={(e) => {
                         manejarCambio(campo, e.target.value);
@@ -1109,6 +1811,7 @@ function App() {
                         color: "#E8EDF2",
                         fontSize: 15,
                         outline: "none",
+                        colorScheme: "dark",
                       }}
                       onFocus={(e) =>
                         (e.target.style.borderColor = "#FF7A33")
@@ -1279,6 +1982,22 @@ function App() {
               </p>
             )}
 
+            {errorAsignacion && (
+              <div
+                style={{
+                  background: "rgba(255, 122, 51, 0.12)",
+                  border: "1px solid #FF7A33",
+                  borderRadius: 8,
+                  padding: "10px 12px",
+                  color: "#FF7A33",
+                  fontSize: 13,
+                  marginBottom: 20,
+                }}
+              >
+                {errorAsignacion}
+              </div>
+            )}
+
             <div
               style={{
                 display: "flex",
@@ -1320,7 +2039,8 @@ function App() {
                     </div>
                   </div>
                   <button
-                    onClick={() => setConductorElegido(c)}
+                    onClick={() => elegirConductor(c)}
+                    disabled={asignando}
                     style={{
                       background: "#FF7A33",
                       border: "none",
@@ -1329,11 +2049,12 @@ function App() {
                       color: "#0F1720",
                       fontWeight: 700,
                       fontSize: 14,
-                      cursor: "pointer",
+                      cursor: asignando ? "default" : "pointer",
+                      opacity: asignando ? 0.7 : 1,
                       whiteSpace: "nowrap",
                     }}
                   >
-                    Elegir
+                    {asignando ? "Asignando..." : "Elegir"}
                   </button>
                 </div>
               ))}
@@ -1361,24 +2082,87 @@ function App() {
             <p style={{ color: "#8A97A3", fontSize: 15, marginBottom: 4 }}>
               Tel: {conductorElegido.telefono}
             </p>
-            <p style={{ color: "#8A97A3", fontSize: 15, marginBottom: 24 }}>
-              Servicio: {servicio.titulo}
-            </p>
-            <button
-              onClick={volver}
+            <p
               style={{
-                background: "#FF7A33",
-                border: "none",
-                borderRadius: 8,
-                padding: "10px 18px",
-                color: "#0F1720",
-                fontWeight: 700,
-                fontSize: 14,
-                cursor: "pointer",
+                color: "#8A97A3",
+                fontSize: 15,
+                marginBottom: datos.fecha && datos.hora ? 4 : 24,
               }}
             >
-              Hacer otra solicitud
-            </button>
+              Servicio: {servicio.titulo}
+            </p>
+            {datos.fecha && datos.hora && (
+              <p
+                style={{
+                  color: "#E8EDF2",
+                  fontSize: 15,
+                  fontWeight: 700,
+                  marginBottom: 24,
+                }}
+              >
+                Fecha y hora del viaje:{" "}
+                {new Date(`${datos.fecha}T${datos.hora}`).toLocaleString(
+                  "es-CO",
+                  {
+                    weekday: "long",
+                    day: "numeric",
+                    month: "long",
+                    hour: "numeric",
+                    minute: "2-digit",
+                    hour12: true,
+                  }
+                )}
+              </p>
+            )}
+            <div
+              style={{
+                display: "flex",
+                gap: 10,
+                justifyContent: "center",
+                flexWrap: "wrap",
+              }}
+            >
+              <a
+                href={`https://wa.me/57${conductorElegido.telefono.replace(
+                  /\D/g,
+                  ""
+                )}?text=${encodeURIComponent(
+                  `Hola ${conductorElegido.nombre}, te escribo por la app de transporte para el servicio de ${servicio.titulo}${
+                    datos.origen ? ` desde ${datos.origen}` : ""
+                  }${datos.destino ? ` hasta ${datos.destino}` : ""}.`
+                )}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  background: "#25D366",
+                  border: "none",
+                  borderRadius: 8,
+                  padding: "10px 18px",
+                  color: "#0F1720",
+                  fontWeight: 700,
+                  fontSize: 14,
+                  textDecoration: "none",
+                  display: "inline-block",
+                }}
+              >
+                Escribir por WhatsApp
+              </a>
+              <button
+                onClick={volver}
+                style={{
+                  background: "#FF7A33",
+                  border: "none",
+                  borderRadius: 8,
+                  padding: "10px 18px",
+                  color: "#0F1720",
+                  fontWeight: 700,
+                  fontSize: 14,
+                  cursor: "pointer",
+                }}
+              >
+                Hacer otra solicitud
+              </button>
+            </div>
           </div>
         )}
       </div>
