@@ -133,6 +133,26 @@ function App() {
   const [verificandoSesion, setVerificandoSesion] = useState(true);
   const [errorPassword, setErrorPassword] = useState(null);
   const [ingresandoAdmin, setIngresandoAdmin] = useState(false);
+
+  // --- Recuperación de contraseña del administrador ---
+  const [modoRecuperacion, setModoRecuperacion] = useState(() => {
+    const hash = window.location.hash || "";
+    const search = window.location.search || "";
+    return (
+      hash.includes("type=recovery") ||
+      hash.includes("access_token=") ||
+      search.includes("code=")
+    ) ? "nueva" : null;
+  });
+  const [emailRecuperacion, setEmailRecuperacion] = useState("");
+  const [enviandoRecuperacion, setEnviandoRecuperacion] = useState(false);
+  const [mensajeRecuperacion, setMensajeRecuperacion] = useState("");
+  const [errorRecuperacion, setErrorRecuperacion] = useState("");
+  const [nuevaPassword, setNuevaPassword] = useState("");
+  const [confirmarPassword, setConfirmarPassword] = useState("");
+  const [guardandoPassword, setGuardandoPassword] = useState(false);
+  const [mensajeNuevaPassword, setMensajeNuevaPassword] = useState("");
+  const [errorNuevaPassword, setErrorNuevaPassword] = useState("");
   const [adminTab, setAdminTab] = useState("carga"); // "carga" | "pasajeros"
   const [sociosAdmin, setSociosAdmin] = useState([]);
   const [cargandoAdmin, setCargandoAdmin] = useState(false);
@@ -301,20 +321,115 @@ function App() {
   // Al cargar la app, revisa si ya hay una sesión de Supabase Auth activa
   // (así el admin no tiene que volver a iniciar sesión cada vez que recarga).
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
-      setAdminAutenticado(!!data.session);
-      setVerificandoSesion(false);
-      if (data.session) cargarSociosAdmin();
-    });
+    const hash = window.location.hash || "";
+    const search = window.location.search || "";
+    const vieneDeRecuperacion =
+      hash.includes("type=recovery") ||
+      hash.includes("access_token=") ||
+      search.includes("code=") ||
+      modoRecuperacion === "nueva";
+
+    if (vieneDeRecuperacion) {
+      setSeleccion("admin");
+      setModoRecuperacion("nueva");
+    }
 
     const { data: listener } = supabase.auth.onAuthStateChange(
-      (_evento, session) => {
-        setAdminAutenticado(!!session);
+      (evento, session) => {
+        if (evento === "PASSWORD_RECOVERY") {
+          setSeleccion("admin");
+          setModoRecuperacion("nueva");
+          setAdminAutenticado(false);
+          return;
+        }
+        if (!modoRecuperacion) {
+          setAdminAutenticado(!!session);
+        }
       }
     );
 
+    supabase.auth.getSession().then(({ data }) => {
+      if (!vieneDeRecuperacion) {
+        setAdminAutenticado(!!data.session);
+        if (data.session) cargarSociosAdmin();
+      }
+      setVerificandoSesion(false);
+    });
+
     return () => listener.subscription.unsubscribe();
   }, []);
+
+  const enviarRecuperacion = async (e) => {
+    e.preventDefault();
+    setEnviandoRecuperacion(true);
+    setMensajeRecuperacion("");
+    setErrorRecuperacion("");
+
+    const email = emailRecuperacion.trim();
+    if (!email) {
+      setErrorRecuperacion("Escribe tu correo.");
+      setEnviandoRecuperacion(false);
+      return;
+    }
+
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: window.location.origin + window.location.pathname,
+    });
+
+    setEnviandoRecuperacion(false);
+    if (error) {
+      setErrorRecuperacion(error.message || "No pudimos enviar el enlace.");
+      return;
+    }
+
+    setMensajeRecuperacion(
+      "Te enviamos un enlace a tu correo. Revisa también Spam."
+    );
+  };
+
+  const guardarNuevaPassword = async (e) => {
+    e.preventDefault();
+    setGuardandoPassword(true);
+    setMensajeNuevaPassword("");
+    setErrorNuevaPassword("");
+
+    if (nuevaPassword.length < 6) {
+      setErrorNuevaPassword("La contraseña debe tener al menos 6 caracteres.");
+      setGuardandoPassword(false);
+      return;
+    }
+
+    if (nuevaPassword !== confirmarPassword) {
+      setErrorNuevaPassword("Las contraseñas no coinciden.");
+      setGuardandoPassword(false);
+      return;
+    }
+
+    const { error } = await supabase.auth.updateUser({
+      password: nuevaPassword,
+    });
+
+    setGuardandoPassword(false);
+
+    if (error) {
+      setErrorNuevaPassword(
+        error.message || "No pudimos cambiar la contraseña."
+      );
+      return;
+    }
+
+    setMensajeNuevaPassword(
+      "Contraseña cambiada correctamente. Ya puedes entrar como administrador."
+    );
+    setNuevaPassword("");
+    setConfirmarPassword("");
+
+    setTimeout(() => {
+      setModoRecuperacion(null);
+      setAdminAutenticado(true);
+      cargarSociosAdmin();
+    }, 1200);
+  };
 
   const verificarPassword = async (e) => {
     e.preventDefault();
@@ -340,6 +455,14 @@ function App() {
     setEmailAdmin("");
     setPasswordAdmin("");
     setErrorPassword(null);
+    setModoRecuperacion(null);
+    setEmailRecuperacion("");
+    setNuevaPassword("");
+    setConfirmarPassword("");
+    setMensajeRecuperacion("");
+    setErrorRecuperacion("");
+    setMensajeNuevaPassword("");
+    setErrorNuevaPassword("");
     setEdicionId(null);
     setSeleccion(null);
   };
@@ -948,7 +1071,147 @@ function App() {
           </p>
         )}
 
-        {seleccion === "admin" && !verificandoSesion && !adminAutenticado && (
+        {seleccion === "admin" && !verificandoSesion && modoRecuperacion === "solicitar" && (
+          <div
+            style={{
+              background: "#16212C",
+              border: "1px solid #263141",
+              borderRadius: 14,
+              padding: 32,
+              maxWidth: 360,
+              margin: "0 auto",
+            }}
+          >
+            <h2 style={{ fontSize: 20, fontWeight: 700, marginTop: 0 }}>
+              Recuperar contraseña
+            </h2>
+            <p style={{ color: "#8A97A3", fontSize: 14, lineHeight: 1.5 }}>
+              Escribe el correo del administrador y te enviaremos un enlace para crear una nueva contraseña.
+            </p>
+            <form
+              onSubmit={enviarRecuperacion}
+              style={{ display: "flex", flexDirection: "column", gap: 16 }}
+            >
+              <input
+                type="email"
+                placeholder="Correo del administrador"
+                value={emailRecuperacion}
+                onChange={(e) => setEmailRecuperacion(e.target.value)}
+                style={{
+                  background: "#0F1720", border: "1px solid #263141",
+                  borderRadius: 8, padding: "10px 12px", color: "#E8EDF2",
+                  fontSize: 15, outline: "none",
+                }}
+              />
+              {errorRecuperacion && (
+                <div style={{ color: "#FF7A33", fontSize: 13 }}>
+                  {errorRecuperacion}
+                </div>
+              )}
+              {mensajeRecuperacion && (
+                <div style={{ color: "#8A97A3", fontSize: 13 }}>
+                  {mensajeRecuperacion}
+                </div>
+              )}
+              <button
+                type="submit"
+                disabled={enviandoRecuperacion}
+                style={{
+                  background: "#FF7A33", border: "none", borderRadius: 8,
+                  padding: "12px 20px", color: "#0F1720", fontWeight: 700,
+                  fontSize: 15, cursor: enviandoRecuperacion ? "default" : "pointer",
+                  opacity: enviandoRecuperacion ? 0.7 : 1,
+                }}
+              >
+                {enviandoRecuperacion ? "Enviando..." : "Enviar enlace"}
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setModoRecuperacion(null);
+                  setErrorRecuperacion("");
+                  setMensajeRecuperacion("");
+                }}
+                style={{
+                  background: "transparent", border: "1px solid #263141",
+                  borderRadius: 8, padding: "10px 20px", color: "#8A97A3",
+                  fontWeight: 700, fontSize: 14, cursor: "pointer",
+                }}
+              >
+                Volver
+              </button>
+            </form>
+          </div>
+        )}
+
+        {seleccion === "admin" && !verificandoSesion && modoRecuperacion === "nueva" && (
+          <div
+            style={{
+              background: "#16212C", border: "1px solid #263141",
+              borderRadius: 14, padding: 32, maxWidth: 360, margin: "0 auto",
+            }}
+          >
+            <h2 style={{ fontSize: 20, fontWeight: 700, marginTop: 0 }}>
+              Crear nueva contraseña
+            </h2>
+            <p style={{ color: "#8A97A3", fontSize: 14, lineHeight: 1.5 }}>
+              Escribe tu nueva contraseña y confírmala.
+            </p>
+            <form
+              onSubmit={guardarNuevaPassword}
+              style={{ display: "flex", flexDirection: "column", gap: 16 }}
+            >
+              <input
+                type="password"
+                autoComplete="new-password"
+                placeholder="Nueva contraseña"
+                value={nuevaPassword}
+                onChange={(e) => setNuevaPassword(e.target.value)}
+                style={{
+                  background: "#0F1720", border: "1px solid #263141",
+                  borderRadius: 8, padding: "10px 12px", color: "#E8EDF2",
+                  fontSize: 15, outline: "none",
+                }}
+              />
+              <input
+                type="password"
+                autoComplete="new-password"
+                placeholder="Confirmar contraseña"
+                value={confirmarPassword}
+                onChange={(e) => setConfirmarPassword(e.target.value)}
+                style={{
+                  background: "#0F1720", border: "1px solid #263141",
+                  borderRadius: 8, padding: "10px 12px", color: "#E8EDF2",
+                  fontSize: 15, outline: "none",
+                }}
+              />
+              {errorNuevaPassword && (
+                <div style={{ color: "#FF7A33", fontSize: 13 }}>
+                  {errorNuevaPassword}
+                </div>
+              )}
+              {mensajeNuevaPassword && (
+                <div style={{ color: "#8A97A3", fontSize: 13 }}>
+                  {mensajeNuevaPassword}
+                </div>
+              )}
+              <button
+                type="submit"
+                disabled={guardandoPassword}
+                style={{
+                  background: "#FF7A33", border: "none", borderRadius: 8,
+                  padding: "12px 20px", color: "#0F1720", fontWeight: 700,
+                  fontSize: 15, cursor: guardandoPassword ? "default" : "pointer",
+                  opacity: guardandoPassword ? 0.7 : 1,
+                }}
+              >
+                {guardandoPassword ? "Guardando..." : "Guardar nueva contraseña"}
+              </button>
+            </form>
+          </div>
+        )}
+
+        {seleccion === "admin" && !verificandoSesion && !adminAutenticado && !modoRecuperacion && (
           <div
             style={{
               background: "#16212C",
@@ -1016,6 +1279,22 @@ function App() {
                   }}
                 />
               </label>
+              <button
+                type="button"
+                onClick={() => {
+                  setModoRecuperacion("solicitar");
+                  setEmailRecuperacion(emailAdmin);
+                  setErrorPassword(null);
+                  setMensajeRecuperacion("");
+                  setErrorRecuperacion("");
+                }}
+                style={{
+                  background: "none", border: "none", color: "#FF7A33",
+                  cursor: "pointer", padding: 0, textAlign: "left", fontSize: 13,
+                }}
+              >
+                ¿Olvidaste tu contraseña?
+              </button>
               {errorPassword && (
                 <div style={{ color: "#FF7A33", fontSize: 13 }}>
                   {errorPassword}
