@@ -4,10 +4,23 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>App de Transporte</title>
-<script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
-<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
-<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.development.js"></script>
+<script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.development.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.28.4/babel.min.js"></script>
+<script>
+  // Silencia únicamente la advertencia informativa del transformador Babel en el navegador
+  (function () {
+    const advertenciaOriginal = console.warn;
+    console.warn = function (...args) {
+      if (typeof args[0] === "string" && args[0].includes("in-browser Babel transformer")) {
+        return;
+      }
+      advertenciaOriginal.apply(console, args);
+    };
+  })();
+</script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <style>
   * { box-sizing: border-box; }
   body { margin: 0; }
@@ -154,7 +167,16 @@ function App() {
   const [mensajeNuevaPassword, setMensajeNuevaPassword] = useState("");
   const [errorNuevaPassword, setErrorNuevaPassword] = useState("");
   const [adminTab, setAdminTab] = useState("carga"); // "carga" | "pasajeros"
+  const [adminVista, setAdminVista] = useState("transportistas");
+  const [viajesAdmin, setViajesAdmin] = useState([]);
+  const [cargandoViajesAdmin, setCargandoViajesAdmin] = useState(false);
+  const [errorViajesAdmin, setErrorViajesAdmin] = useState(null);
+  const [filtroSocio, setFiltroSocio] = useState("");
+  const [filtroMes, setFiltroMes] = useState("");
+  const [filtroDesde, setFiltroDesde] = useState("");
+  const [filtroHasta, setFiltroHasta] = useState("");
   const [sociosAdmin, setSociosAdmin] = useState([]);
+  const [sociosTodosAdmin, setSociosTodosAdmin] = useState([]);
   const [cargandoAdmin, setCargandoAdmin] = useState(false);
   const [errorAdmin, setErrorAdmin] = useState(null);
   const [edicionId, setEdicionId] = useState(null);
@@ -322,6 +344,99 @@ function App() {
     }
   };
 
+  const cargarViajesAdmin = async () => {
+    setCargandoViajesAdmin(true);
+    setErrorViajesAdmin(null);
+    try {
+      const headersAdmin = await obtenerHeadersAdmin();
+      const resp = await fetch(`${SUPABASE_URL}/rest/v1/solicitudes?select=*`, { headers: headersAdmin });
+      if (!resp.ok) throw new Error(`${resp.status}: ${await resp.text()}`);
+      const data = await resp.json();
+      setViajesAdmin(Array.isArray(data) ? data : []);
+
+      const [respCarga, respPasajeros] = await Promise.all([
+        fetch(`${SUPABASE_URL}/rest/v1/socios?select=id,nombre`, { headers: headersAdmin }),
+        fetch(`${SUPABASE_URL}/rest/v1/socios_pasajeros?select=id,nombre`, { headers: headersAdmin }),
+      ]);
+      const carga = respCarga.ok ? await respCarga.json() : [];
+      const pasajeros = respPasajeros.ok ? await respPasajeros.json() : [];
+      setSociosTodosAdmin([...(Array.isArray(carga) ? carga : []), ...(Array.isArray(pasajeros) ? pasajeros : [])]);
+    } catch (err) {
+      setErrorViajesAdmin(err.message || "No pudimos cargar el historial de viajes.");
+    } finally {
+      setCargandoViajesAdmin(false);
+    }
+  };
+
+  const obtenerNombreSocio = (id) => {
+    if (!id) return "Sin asignar";
+    const encontrado = sociosTodosAdmin.find((s) => String(s.id) === String(id)) || sociosAdmin.find((s) => String(s.id) === String(id));
+    return encontrado?.nombre || `Socio ${String(id).slice(0, 8)}`;
+  };
+
+  const viajesFiltradosAdmin = viajesAdmin.filter((v) => {
+    const socioOk = !filtroSocio || String(v.transportista_id || "") === String(filtroSocio);
+    const fecha = String(v.fecha_hora || "").slice(0, 10);
+    const mesOk = !filtroMes || fecha.startsWith(filtroMes);
+    const desdeOk = !filtroDesde || fecha >= filtroDesde;
+    const hastaOk = !filtroHasta || fecha <= filtroHasta;
+    return socioOk && mesOk && desdeOk && hastaOk;
+  });
+
+  const limpiarFiltrosHistorial = () => {
+    setFiltroSocio("");
+    setFiltroMes("");
+    setFiltroDesde("");
+    setFiltroHasta("");
+  };
+
+  const exportarHistorialExcel = () => {
+    if (!window.XLSX) {
+      alert("No se pudo cargar el exportador de Excel. Revisa tu conexión a Internet.");
+      return;
+    }
+    if (window.location.protocol === "file:") {
+      alert(
+        "No se puede descargar el Excel abriendo el archivo directamente (doble clic).\n\n" +
+        "Abre la app desde tu sitio publicado (http/https) o desde un servidor local, por ejemplo:\n" +
+        "python -m http.server 8000\n\ny luego entra a http://localhost:8000/"
+      );
+      return;
+    }
+    const filas = viajesFiltradosAdmin.map((v) => ({
+      "Orden": v.id || "",
+      "Estado": v.estado || "",
+      "Servicio": v.tipo || "",
+      "Origen": v.origen || "",
+      "Destino": v.destino || "",
+      "Peso (kg)": v.peso ?? "",
+      "Pasajeros": v.pasajeros ?? "",
+      "Fecha y hora": v.fecha_hora || "",
+      "Socio": obtenerNombreSocio(v.transportista_id),
+      "ID socio": v.transportista_id || "",
+      "Descripción": v.descripcion || "",
+    }));
+    const hoja = window.XLSX.utils.json_to_sheet(filas);
+    const libro = window.XLSX.utils.book_new();
+    window.XLSX.utils.book_append_sheet(libro, hoja, "Viajes");
+    const hoy = new Date().toISOString().slice(0, 10);
+    try {
+      const datosExcel = window.XLSX.write(libro, { bookType: "xlsx", type: "array" });
+      const blob = new Blob([datosExcel], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+      const url = URL.createObjectURL(blob);
+      const enlace = document.createElement("a");
+      enlace.href = url;
+      enlace.download = `historial-viajes-${hoy}.xlsx`;
+      document.body.appendChild(enlace);
+      enlace.click();
+      enlace.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    } catch (e) {
+      console.error("Error al exportar Excel:", e);
+      alert("No se pudo descargar el archivo Excel. Intenta nuevamente.");
+    }
+  };
+
   const cambiarAdminTab = (tab) => {
     setAdminTab(tab);
     setEdicionId(null);
@@ -361,7 +476,10 @@ function App() {
     supabase.auth.getSession().then(({ data }) => {
       if (!vieneDeRecuperacion) {
         setAdminAutenticado(!!data.session);
-        if (data.session) cargarSociosAdmin();
+        if (data.session) {
+          cargarSociosAdmin();
+          cargarViajesAdmin();
+        }
       }
       setVerificandoSesion(false);
     });
@@ -438,6 +556,7 @@ function App() {
       setModoRecuperacion(null);
       setAdminAutenticado(true);
       cargarSociosAdmin();
+      cargarViajesAdmin();
     }, 1200);
   };
 
@@ -457,6 +576,7 @@ function App() {
     setAdminAutenticado(true);
     setPasswordAdmin("");
     cargarSociosAdmin();
+    cargarViajesAdmin();
   };
 
   const cerrarSesionAdmin = async () => {
@@ -474,6 +594,8 @@ function App() {
     setMensajeNuevaPassword("");
     setErrorNuevaPassword("");
     setEdicionId(null);
+    setAdminVista("transportistas");
+    setViajesAdmin([]);
     setSeleccion(null);
   };
 
@@ -1327,7 +1449,7 @@ function App() {
           </div>
         )}
 
-        {seleccion === "admin" && adminAutenticado && (
+        {seleccion === "admin" && adminAutenticado && adminVista === "transportistas" && (
           <div
             style={{
               background: "#16212C",
@@ -1397,6 +1519,21 @@ function App() {
                 }}
               >
                 Pasajeros
+              </button>
+              <button
+                onClick={() => { setAdminVista("historial"); cargarViajesAdmin(); }}
+                style={{
+                  background: "#0F1720",
+                  border: "1px solid #263141",
+                  borderRadius: 8,
+                  padding: "8px 16px",
+                  color: "#E8EDF2",
+                  fontWeight: 700,
+                  fontSize: 13,
+                  cursor: "pointer",
+                }}
+              >
+                Historial de viajes
               </button>
             </div>
 
@@ -1641,6 +1778,90 @@ function App() {
                 );
               })}
             </div>
+          </div>
+        )}
+
+        {seleccion === "admin" && adminAutenticado && adminVista === "historial" && (
+          <div
+            style={{
+              background: "#16212C",
+              border: "1px solid #263141",
+              borderRadius: 14,
+              padding: 32,
+            }}
+          >
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, flexWrap: "wrap", marginBottom: 20 }}>
+              <div>
+                <div style={{ fontSize: 20, fontWeight: 700 }}>Historial de viajes</div>
+                <div style={{ color: "#8A97A3", fontSize: 14, marginTop: 6 }}>Órdenes reales registradas en la aplicación.</div>
+              </div>
+              <button onClick={() => setAdminVista("transportistas")} style={{ background: "#0F1720", border: "1px solid #263141", borderRadius: 8, padding: "8px 14px", color: "#E8EDF2", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>
+                Transportistas
+              </button>
+            </div>
+
+            {!cargandoViajesAdmin && !errorViajesAdmin && viajesAdmin.length > 0 && (
+              <>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(170px, 1fr))", gap: 10, marginBottom: 14 }}>
+                  <select value={filtroSocio} onChange={(e) => setFiltroSocio(e.target.value)} style={{ background: "#0F1720", border: "1px solid #263141", borderRadius: 8, padding: "10px 12px", color: "#E8EDF2", fontSize: 13 }}>
+                    <option value="">Todos los socios</option>
+                    {[...new Map(sociosTodosAdmin.filter((s) => s && s.id).map((s) => [String(s.id), s.nombre || `Socio ${String(s.id).slice(0, 8)}`])).entries()]
+                      .sort((a, b) => String(a[1]).localeCompare(String(b[1]), "es"))
+                      .map(([id, nombre]) => (
+                        <option key={id} value={id}>{nombre}</option>
+                      ))}
+                  </select>
+                  <select value={filtroMes} onChange={(e) => setFiltroMes(e.target.value)} style={{ background: "#0F1720", border: "1px solid #263141", borderRadius: 8, padding: "10px 12px", color: "#E8EDF2", fontSize: 13 }}>
+                    <option value="">Todos los meses</option>
+                    {Array.from(new Set(viajesAdmin.map((v) => String(v.fecha_hora || "").slice(0, 7)).filter(Boolean))).sort().reverse().map((mes) => (
+                      <option key={mes} value={mes}>{mes}</option>
+                    ))}
+                  </select>
+                  <input type="date" value={filtroDesde} onChange={(e) => setFiltroDesde(e.target.value)} title="Desde" style={{ background: "#0F1720", border: "1px solid #263141", borderRadius: 8, padding: "10px 12px", color: "#E8EDF2", fontSize: 13 }} />
+                  <input type="date" value={filtroHasta} onChange={(e) => setFiltroHasta(e.target.value)} title="Hasta" style={{ background: "#0F1720", border: "1px solid #263141", borderRadius: 8, padding: "10px 12px", color: "#E8EDF2", fontSize: 13 }} />
+                </div>
+                <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 20 }}>
+                  <button onClick={limpiarFiltrosHistorial} style={{ background: "#0F1720", border: "1px solid #263141", borderRadius: 8, padding: "9px 14px", color: "#E8EDF2", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>Limpiar filtros</button>
+                  <button onClick={exportarHistorialExcel} style={{ background: "#FF7A33", border: "none", borderRadius: 8, padding: "9px 14px", color: "#0F1720", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>📊 Ver en Excel</button>
+                  <div style={{ color: "#8A97A3", fontSize: 13, padding: "9px 4px" }}>{viajesFiltradosAdmin.length} de {viajesAdmin.length} órdenes</div>
+                </div>
+              </>
+            )}
+
+            {cargandoViajesAdmin && <p style={{ color: "#8A97A3", fontSize: 14 }}>Cargando órdenes...</p>}
+            {errorViajesAdmin && (
+              <div style={{ background: "rgba(255, 122, 51, 0.12)", border: "1px solid #FF7A33", borderRadius: 8, padding: "10px 12px", color: "#FF7A33", fontSize: 13, marginBottom: 16 }}>
+                {errorViajesAdmin}
+              </div>
+            )}
+            {!cargandoViajesAdmin && !errorViajesAdmin && viajesAdmin.length === 0 && (
+              <p style={{ color: "#8A97A3", fontSize: 14 }}>Todavía no hay órdenes de viaje registradas.</p>
+            )}
+            {!cargandoViajesAdmin && viajesAdmin.length > 0 && viajesFiltradosAdmin.length === 0 && (
+              <p style={{ color: "#8A97A3", fontSize: 14 }}>No hay órdenes que coincidan con los filtros.</p>
+            )}
+            {!cargandoViajesAdmin && viajesFiltradosAdmin.length > 0 && (
+              <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                {viajesFiltradosAdmin.map((v, i) => (
+                  <div key={v.id || i} style={{ background: "#0F1720", border: "1px solid #263141", borderRadius: 10, padding: 18 }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap", marginBottom: 10 }}>
+                      <div style={{ fontWeight: 700, fontSize: 16 }}>Orden {v.id ? String(v.id).slice(0, 8) : i + 1}</div>
+                      <div style={{ color: "#FF7A33", fontSize: 13, fontWeight: 700 }}>{v.estado || "Sin estado"}</div>
+                    </div>
+                    <div style={{ color: "#8A97A3", fontSize: 13, lineHeight: 1.7 }}>
+                      <div><strong style={{ color: "#E8EDF2" }}>Servicio:</strong> {v.tipo || "-"}</div>
+                      <div><strong style={{ color: "#E8EDF2" }}>Origen:</strong> {v.origen || "-"}</div>
+                      <div><strong style={{ color: "#E8EDF2" }}>Destino:</strong> {v.destino || "-"}</div>
+                      {v.peso != null && <div><strong style={{ color: "#E8EDF2" }}>Peso:</strong> {v.peso} kg</div>}
+                      {v.pasajeros != null && <div><strong style={{ color: "#E8EDF2" }}>Pasajeros:</strong> {v.pasajeros}</div>}
+                      <div><strong style={{ color: "#E8EDF2" }}>Fecha y hora:</strong> {v.fecha_hora || "-"}</div>
+                      <div><strong style={{ color: "#E8EDF2" }}>Transportista:</strong> {obtenerNombreSocio(v.transportista_id)}{v.transportista_id ? ` (${String(v.transportista_id).slice(0, 8)})` : ""}</div>
+                      {v.descripcion && <div><strong style={{ color: "#E8EDF2" }}>Descripción:</strong> {v.descripcion}</div>}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         )}
 
