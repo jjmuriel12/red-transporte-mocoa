@@ -101,6 +101,26 @@ const SUPABASE_ANON_KEY = "sb_publishable_3rK7v9Jhd0ZRv02vU4JTeg_5Q8iXArI";
 
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+// Todas las acciones públicas pasan por funciones seguras de la base de datos
+const rpc = async (nombre, params) => {
+  const resp = await fetch(`${SUPABASE_URL}/rest/v1/rpc/${nombre}`, {
+    method: "POST",
+    headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}`, "Content-Type": "application/json" },
+    body: JSON.stringify(params),
+  });
+  const cuerpo = await resp.json().catch(() => null);
+  if (!resp.ok) throw new Error((cuerpo && cuerpo.message) || `Error ${resp.status}`);
+  return cuerpo;
+};
+const MENSAJES_ERROR = {
+  telefono_duplicado: "Ese celular ya está registrado. Usa 'Actualiza tu disponibilidad'.",
+  telefono_invalido: "Revisa el número de celular.",
+  falta_autorizacion: "Debes aceptar el tratamiento de tus datos.",
+  conductor_no_disponible: "Ese transportista acaba de ser asignado a otro viaje. Elige otro.",
+  registro_no_encontrado: "No pudimos actualizar tu estado. Vuelve a buscar tu registro.",
+};
+const traducirError = (e) => MENSAJES_ERROR[e.message] || e.message || "Error desconocido.";
+
 const ETIQUETAS = {
   origen: "Origen",
   destino: "Destino",
@@ -138,6 +158,7 @@ function App() {
   const [errorSocios, setErrorSocios] = useState(null);
   const [tipoTransportista, setTipoTransportista] = useState(null); // "carga" | "pasajeros"
   const [pasajerosDisponibles, setPasajerosDisponibles] = useState([]);
+  const [aceptaPrivacidad, setAceptaPrivacidad] = useState(false);
 
   // --- Panel de administrador (Supabase Auth) ---
   const [emailAdmin, setEmailAdmin] = useState("");
@@ -210,42 +231,28 @@ function App() {
       );
       return;
     }
+    if (seleccion === "transportista" && !aceptaPrivacidad) {
+      setError("Debes aceptar el tratamiento de tus datos para registrarte.");
+      return;
+    }
     setError(null);
 
     if (seleccion === "transportista") {
       setEnviado(true);
       setCargandoSocios(true);
       setErrorSocios(null);
-      const tabla = tipoTransportista === "pasajeros" ? "socios_pasajeros" : "socios";
-      const campoCapacidad =
-        tipoTransportista === "pasajeros" ? "capacidad_pasajeros" : "capacidad_ton";
       try {
-        const resp = await fetch(`${SUPABASE_URL}/rest/v1/${tabla}`, {
-          method: "POST",
-          headers: {
-            apikey: SUPABASE_ANON_KEY,
-            Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
-            "Content-Type": "application/json",
-            Prefer: "return=representation",
-          },
-          body: JSON.stringify([
-            {
-              id: crypto.randomUUID(),
-              nombre: datos.nombre,
-              telefono: datos.telefono,
-              vehiculo: datos.vehiculo,
-              [campoCapacidad]: Number(datos.capacidadValor),
-              estado: "disponible",
-            },
-          ]),
+        await rpc("registrar_socio", {
+          p_tipo: tipoTransportista === "pasajeros" ? "pasajeros" : "carga",
+          p_nombre: datos.nombre,
+          p_telefono: datos.telefono,
+          p_vehiculo: datos.vehiculo,
+          p_capacidad: Number(datos.capacidadValor),
+          p_acepto: aceptaPrivacidad,
         });
-        if (!resp.ok) {
-          const textoError = await resp.text();
-          throw new Error(`${resp.status}: ${textoError}`);
-        }
         setEnviado(true);
       } catch (err) {
-        setErrorSocios(err.message || "Error desconocido al guardar.");
+        setErrorSocios(traducirError(err));
       } finally {
         setCargandoSocios(false);
       }
@@ -256,33 +263,9 @@ function App() {
     setCargandoSocios(true);
     setErrorSocios(null);
     try {
-      if (seleccion === "pasajero") {
-        const resp = await fetch(
-          `${SUPABASE_URL}/rest/v1/socios_pasajeros?select=*&estado=eq.disponible`,
-          {
-            headers: {
-              apikey: SUPABASE_ANON_KEY,
-              Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
-            },
-          }
-        );
-        if (!resp.ok) throw new Error(`Error ${resp.status}`);
-        const data = await resp.json();
-        setPasajerosDisponibles(data);
-      } else {
-        const resp = await fetch(
-          `${SUPABASE_URL}/rest/v1/socios?select=*&estado=eq.disponible`,
-          {
-            headers: {
-              apikey: SUPABASE_ANON_KEY,
-              Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
-            },
-          }
-        );
-        if (!resp.ok) throw new Error(`Error ${resp.status}`);
-        const data = await resp.json();
-        setSocios(data);
-      }
+      const lista = await rpc("listar_disponibles", { p_tipo: seleccion === "pasajero" ? "pasajeros" : "carga" });
+      if (seleccion === "pasajero") setPasajerosDisponibles(lista);
+      else setSocios(lista);
     } catch (err) {
       setErrorSocios(
         "No pudimos cargar los transportistas disponibles. Intenta de nuevo."
@@ -303,6 +286,7 @@ function App() {
     setErrorSocios(null);
     setTipoTransportista(null);
     setPasajerosDisponibles([]);
+    setAceptaPrivacidad(false);
     setSociosAdmin([]);
     setEdicionId(null);
     setErrorAdmin(null);
@@ -369,6 +353,24 @@ function App() {
     }
   };
 
+  const respaldarTodo = async () => {
+    if (!window.XLSX) throw new Error("No cargó el exportador de Excel.");
+    const h = await obtenerHeadersAdmin();
+    const libro = window.XLSX.utils.book_new();
+    for (const [tabla, hoja] of [["socios", "Socios carga"], ["socios_pasajeros", "Socios pasajeros"], ["solicitudes", "Solicitudes"]]) {
+      const r = await fetch(`${SUPABASE_URL}/rest/v1/${tabla}?select=*`, { headers: h });
+      if (!r.ok) throw new Error(`${r.status}: ${await r.text()}`);
+      window.XLSX.utils.book_append_sheet(libro, window.XLSX.utils.json_to_sheet(await r.json()), hoja);
+    }
+    const blob = new Blob([window.XLSX.write(libro, { bookType: "xlsx", type: "array" })], { type: "application/octet-stream" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `respaldo-${new Date().toISOString().slice(0, 10)}.xlsx`;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  };
+
   const vaciarHistorialViajes = async () => {
     if (viajesAdmin.length === 0) {
       alert("El historial ya está vacío.");
@@ -384,6 +386,7 @@ function App() {
     setVaciandoHistorial(true);
     try {
       const headersAdmin = await obtenerHeadersAdmin();
+      await respaldarTodo();
       const resp = await fetch(`${SUPABASE_URL}/rest/v1/solicitudes?id=not.is.null`, {
         method: "DELETE",
         headers: { ...headersAdmin, Prefer: "return=representation" },
@@ -637,72 +640,26 @@ function App() {
   const elegirConductor = async (c) => {
     setAsignando(true);
     setErrorAsignacion(null);
-    const tablaSocio = seleccion === "pasajero" ? "socios_pasajeros" : "socios";
     try {
-      const respPatch = await fetch(
-        `${SUPABASE_URL}/rest/v1/${tablaSocio}?id=eq.${c.id}`,
-        {
-          method: "PATCH",
-          headers: {
-            apikey: SUPABASE_ANON_KEY,
-            Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ estado: "no disponible" }),
-        }
-      );
-      if (!respPatch.ok) {
-        throw new Error(`${respPatch.status}: ${await respPatch.text()}`);
-      }
-
-      const fechaHoraTexto =
-        datos.fecha && datos.hora ? `${datos.fecha} ${datos.hora}` : null;
-
-      const respPost = await fetch(`${SUPABASE_URL}/rest/v1/solicitudes`, {
-        method: "POST",
-        headers: {
-          apikey: SUPABASE_ANON_KEY,
-          Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
-          "Content-Type": "application/json",
-          Prefer: "return=minimal",
-        },
-        body: JSON.stringify([
-          {
-            tipo: seleccion,
-            origen: datos.origen || null,
-            destino: datos.destino || null,
-            peso: datos.peso ? Number(datos.peso) : null,
-            pasajeros: datos.pasajeros ? Number(datos.pasajeros) : null,
-            fecha_hora: fechaHoraTexto,
-            descripcion: datos.descripcion || null,
-            transportista_id: c.id,
-              estado: "asignado",
-          },
-        ]),
+      const r = await rpc("elegir_conductor", {
+        p_tipo: seleccion,
+        p_id: String(c.id),
+        p_origen: datos.origen || null,
+        p_destino: datos.destino || null,
+        p_peso: datos.peso ? Number(datos.peso) : null,
+        p_pasajeros: datos.pasajeros ? Number(datos.pasajeros) : null,
+        p_fecha_hora: datos.fecha && datos.hora ? `${datos.fecha} ${datos.hora}` : null,
+        p_descripcion: datos.descripcion || null,
       });
-      if (!respPost.ok) {
-        // Si no se pudo guardar la solicitud, devolvemos al conductor a "disponible"
-        try {
-          await fetch(`${SUPABASE_URL}/rest/v1/${tablaSocio}?id=eq.${c.id}`, {
-            method: "PATCH",
-            headers: {
-              apikey: SUPABASE_ANON_KEY,
-              Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ estado: "disponible" }),
-          });
-        } catch (_) {}
-        throw new Error(`${respPost.status}: ${await respPost.text()}`);
-      }
-
-      setConductorElegido(c);
+      setConductorElegido({ ...c, telefono: r.telefono, vehiculo: r.vehiculo || c.vehiculo });
     } catch (err) {
-      setErrorAsignacion(
-        "No pudimos completar la asignación. Intenta de nuevo. (" +
-          (err.message || "error desconocido") +
-          ")"
-      );
+      setErrorAsignacion(traducirError(err));
+      if (err.message === "conductor_no_disponible") {
+        try {
+          const lista = await rpc("listar_disponibles", { p_tipo: seleccion === "pasajero" ? "pasajeros" : "carga" });
+          if (seleccion === "pasajero") setPasajerosDisponibles(lista); else setSocios(lista);
+        } catch (_) {}
+      }
     } finally {
       setAsignando(false);
     }
@@ -711,57 +668,16 @@ function App() {
   const buscarMiRegistro = async (e) => {
     e.preventDefault();
     const telefonoLimpio = telefonoConsulta.trim();
-    if (!telefonoLimpio) {
-      setErrorAutoservicio("Escribe tu número de celular.");
-      return;
-    }
+    if (!telefonoLimpio) { setErrorAutoservicio("Escribe tu número de celular."); return; }
     setBuscandoAutoservicio(true);
     setErrorAutoservicio(null);
     setRegistroPropio(null);
     try {
-      const [respCarga, respPasajeros] = await Promise.all([
-        fetch(
-          `${SUPABASE_URL}/rest/v1/socios?select=*&telefono=eq.${encodeURIComponent(
-            telefonoLimpio
-          )}`,
-          {
-            headers: {
-              apikey: SUPABASE_ANON_KEY,
-              Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
-            },
-          }
-        ),
-        fetch(
-          `${SUPABASE_URL}/rest/v1/socios_pasajeros?select=*&telefono=eq.${encodeURIComponent(
-            telefonoLimpio
-          )}`,
-          {
-            headers: {
-              apikey: SUPABASE_ANON_KEY,
-              Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
-            },
-          }
-        ),
-      ]);
-      if (!respCarga.ok || !respPasajeros.ok) {
-        throw new Error("No pudimos consultar tu registro.");
-      }
-      const datosCarga = await respCarga.json();
-      const datosPasajeros = await respPasajeros.json();
-      if (datosCarga.length > 0) {
-        setRegistroPropio({ ...datosCarga[0], tabla: "socios" });
-      } else if (datosPasajeros.length > 0) {
-        setRegistroPropio({
-          ...datosPasajeros[0],
-          tabla: "socios_pasajeros",
-        });
-      } else {
-        setErrorAutoservicio(
-          "No encontramos ningún registro con ese número de celular."
-        );
-      }
+      const r = await rpc("buscar_mi_registro", { p_telefono: telefonoLimpio });
+      if (r) setRegistroPropio({ ...r, telefono: telefonoLimpio });
+      else setErrorAutoservicio("No encontramos ningún registro con ese número de celular.");
     } catch (err) {
-      setErrorAutoservicio(err.message || "Error al buscar tu registro.");
+      setErrorAutoservicio(traducirError(err));
     } finally {
       setBuscandoAutoservicio(false);
     }
@@ -771,26 +687,10 @@ function App() {
     setActualizandoEstado(true);
     setErrorAutoservicio(null);
     try {
-      const resp = await fetch(
-        `${SUPABASE_URL}/rest/v1/${registroPropio.tabla}?id=eq.${registroPropio.id}`,
-        {
-          method: "PATCH",
-          headers: {
-            apikey: SUPABASE_ANON_KEY,
-            Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
-            "Content-Type": "application/json",
-            Prefer: "return=representation",
-          },
-          body: JSON.stringify({ estado: nuevoEstado }),
-        }
-      );
-      if (!resp.ok) throw new Error(`${resp.status}: ${await resp.text()}`);
-      const data = await resp.json();
-      setRegistroPropio({ ...data[0], tabla: registroPropio.tabla });
+      await rpc("cambiar_mi_estado", { p_tabla: registroPropio.tabla, p_id: String(registroPropio.id), p_telefono: registroPropio.telefono, p_estado: nuevoEstado });
+      setRegistroPropio({ ...registroPropio, estado: nuevoEstado });
     } catch (err) {
-      setErrorAutoservicio(
-        err.message || "No pudimos actualizar tu estado."
-      );
+      setErrorAutoservicio(traducirError(err));
     } finally {
       setActualizandoEstado(false);
     }
@@ -876,11 +776,11 @@ function App() {
     seleccion === "pasajero"
       ? datos.pasajeros
         ? pasajerosDisponibles.filter(
-            (s) => Number(s.capacidad_pasajeros) >= Number(datos.pasajeros)
+            (s) => Number(s.capacidad) >= Number(datos.pasajeros)
           )
         : pasajerosDisponibles
       : seleccion === "mercancia" && datos.peso
-      ? socios.filter((s) => Number(s.capacidad_ton) * 1000 >= Number(datos.peso))
+      ? socios.filter((s) => Number(s.capacidad) * 1000 >= Number(datos.peso))
       : socios;
 
   return (
@@ -2102,6 +2002,12 @@ function App() {
                 </label>
               ))}
 
+              {seleccion === "transportista" && (
+                <label style={{ display: "flex", gap: 10, alignItems: "flex-start", fontSize: 13, color: "#8A97A3", lineHeight: 1.5 }}>
+                  <input type="checkbox" checked={aceptaPrivacidad} onChange={(e) => setAceptaPrivacidad(e.target.checked)} style={{ marginTop: 3 }} />
+                  <span>Autorizo el tratamiento de mis datos (nombre, celular y vehículo) para que los clientes puedan contactarme por solicitudes de transporte, conforme a la Ley 1581 de 2012. Puedo pedir que los actualicen o eliminen escribiendo al administrador de esta app.</span>
+                </label>
+              )}
               {error && (
                 <div
                   style={{
@@ -2309,13 +2215,8 @@ function App() {
                     >
                       {c.vehiculo} ·{" "}
                       {seleccion === "pasajero"
-                        ? `${c.capacidad_pasajeros} cupos`
-                        : `hasta ${c.capacidad_ton} ton`}
-                    </div>
-                    <div
-                      style={{ color: "#8A97A3", fontSize: 13, marginTop: 4 }}
-                    >
-                      Tel: {c.telefono}
+                        ? `${c.capacidad} cupos`
+                        : `hasta ${c.capacidad} ton`}
                     </div>
                   </div>
                   <button
@@ -2403,10 +2304,7 @@ function App() {
               }}
             >
               <a
-                href={`https://wa.me/57${conductorElegido.telefono.replace(
-                  /\D/g,
-                  ""
-                )}?text=${encodeURIComponent(
+                href={`https://wa.me/${(() => { const d = String(conductorElegido.telefono).replace(/\D/g, ""); return d.length > 10 ? d : "57" + d; })()}?text=${encodeURIComponent(
                   `Hola ${conductorElegido.nombre}, te escribo por la app de transporte para el servicio de ${servicio.titulo}${
                     datos.origen ? ` desde ${datos.origen}` : ""
                   }${datos.destino ? ` hasta ${datos.destino}` : ""}.`
